@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo/html-elements": "latest",
+    "@expo/vector-icons": "^14.0.0",
     "@gluestack-style/react": "latest",
     "@gluestack-ui/config": "latest",
     "@gluestack-ui/themed": "latest",
