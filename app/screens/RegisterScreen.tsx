@@ -13,7 +13,7 @@ import {
 } from "@gluestack-ui/themed";
 import Screen from "../components/Screen";
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
   return (
     <Screen style={styles.container}>
       <Center>
@@ -24,6 +24,19 @@ const LoginScreen = () => {
             source={require("../../assets/icon.png")}
             mb="$4"
           />
+          <FormControl
+            isDisabled={false}
+            isInvalid={false}
+            isReadOnly={false}
+            isRequired={true}
+          >
+            <FormControlLabel mb="$1">
+              <FormControlLabelText size="xs">Full Name</FormControlLabelText>
+            </FormControlLabel>
+            <Input>
+              <InputField type="text" />
+            </Input>
+          </FormControl>
           <FormControl
             isDisabled={false}
             isInvalid={false}
@@ -42,10 +55,26 @@ const LoginScreen = () => {
             isInvalid={false}
             isReadOnly={false}
             isRequired={true}
-            mt="$2"
+            mt="$1"
           >
             <FormControlLabel mb="$1">
               <FormControlLabelText size="xs">Password</FormControlLabelText>
+            </FormControlLabel>
+            <Input>
+              <InputField type="password" />
+            </Input>
+          </FormControl>
+          <FormControl
+            isDisabled={false}
+            isInvalid={false}
+            isReadOnly={false}
+            isRequired={true}
+            mt="$1"
+          >
+            <FormControlLabel mb="$1">
+              <FormControlLabelText size="xs">
+                Confirm Password
+              </FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField type="password" />
@@ -66,7 +95,7 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
