@@ -31,7 +31,7 @@ const RegisterScreen = () => {
             isRequired={true}
           >
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="xs">Full Name</FormControlLabelText>
+              <FormControlLabelText size="sm">Full Name</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField type="text" />
@@ -44,7 +44,7 @@ const RegisterScreen = () => {
             isRequired={true}
           >
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="xs">Email</FormControlLabelText>
+              <FormControlLabelText size="sm">Email</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField type="text" />
@@ -58,7 +58,7 @@ const RegisterScreen = () => {
             mt="$1"
           >
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="xs">Password</FormControlLabelText>
+              <FormControlLabelText size="sm">Password</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField type="password" />
@@ -72,7 +72,7 @@ const RegisterScreen = () => {
             mt="$1"
           >
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="xs">
+              <FormControlLabelText size="sm">
                 Confirm Password
               </FormControlLabelText>
             </FormControlLabel>
@@ -82,12 +82,12 @@ const RegisterScreen = () => {
           </FormControl>
           <Button
             variant="solid"
-            action="primary"
+            action="positive"
             isDisabled={false}
             isFocusVisible={false}
             mt="$4"
           >
-            <ButtonText>Login</ButtonText>
+            <ButtonText size="sm">Login</ButtonText>
           </Button>
         </Box>
       </Center>

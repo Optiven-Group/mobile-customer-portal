@@ -31,7 +31,7 @@ const LoginScreen = () => {
             isRequired={true}
           >
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="xs">Email</FormControlLabelText>
+              <FormControlLabelText size="sm">Email</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField type="text" />
@@ -45,7 +45,7 @@ const LoginScreen = () => {
             mt="$2"
           >
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="xs">Password</FormControlLabelText>
+              <FormControlLabelText size="sm">Password</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField type="password" />
@@ -53,12 +53,13 @@ const LoginScreen = () => {
           </FormControl>
           <Button
             variant="solid"
-            action="primary"
+            action="positive"
             isDisabled={false}
             isFocusVisible={false}
             mt="$4"
+            size="lg"
           >
-            <ButtonText>Login</ButtonText>
+            <ButtonText size="sm">Login</ButtonText>
           </Button>
         </Box>
       </Center>
