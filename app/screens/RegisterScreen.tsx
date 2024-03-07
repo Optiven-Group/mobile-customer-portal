@@ -42,6 +42,7 @@ const RegisterScreen = () => {
             isInvalid={false}
             isReadOnly={false}
             isRequired={true}
+            mt="$1"
           >
             <FormControlLabel mb="$1">
               <FormControlLabelText size="sm">Email</FormControlLabelText>
@@ -86,8 +87,9 @@ const RegisterScreen = () => {
             isDisabled={false}
             isFocusVisible={false}
             mt="$4"
+            onPress={() => console.log("Registered")}
           >
-            <ButtonText size="sm">Login</ButtonText>
+            <ButtonText size="sm">Register</ButtonText>
           </Button>
         </Box>
       </Center>

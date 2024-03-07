@@ -58,6 +58,7 @@ const LoginScreen = () => {
             isFocusVisible={false}
             mt="$4"
             size="lg"
+            onPress={() => console.log("logged in")}
           >
             <ButtonText size="sm">Login</ButtonText>
           </Button>
