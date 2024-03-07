@@ -61,13 +61,13 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    padding: 4,
+    paddingHorizontal: 8,
   },
   iconContainer: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    padding: 4,
+    paddingHorizontal: 8,
   },
   logoutContainer: {
     display: "flex",
