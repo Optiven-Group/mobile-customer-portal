@@ -37,7 +37,7 @@ const AccountScreen = () => {
                 <MaterialCommunityIcons
                   name={"logout"}
                   color={"white"}
-                  size={20}
+                  size={24}
                 />
               </Avatar>
               <Text ml="$4" bold>
@@ -45,7 +45,7 @@ const AccountScreen = () => {
               </Text>
             </Box>
             <Box ml="$4">
-              <Icon as={ChevronRightIcon} size="lg" color="black" />
+              <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
             </Box>
           </Box>
         </TouchableHighlight>
