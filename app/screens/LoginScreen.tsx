@@ -24,6 +24,7 @@ const LoginScreen = () => {
             source={require("../../assets/icon.png")}
             mb="$4"
           />
+
           <FormControl
             isDisabled={false}
             isInvalid={false}
@@ -37,6 +38,7 @@ const LoginScreen = () => {
               <InputField type="text" />
             </Input>
           </FormControl>
+
           <FormControl
             isDisabled={false}
             isInvalid={false}
@@ -51,17 +53,27 @@ const LoginScreen = () => {
               <InputField type="password" />
             </Input>
           </FormControl>
+
           <Button
             variant="solid"
             action="positive"
-            isDisabled={false}
-            isFocusVisible={false}
             mt="$4"
             size="lg"
             onPress={() => console.log("logged in")}
           >
             <ButtonText size="sm">Login</ButtonText>
           </Button>
+
+          <Box style={styles.forgotPasswordBtn}>
+            <Button
+              size="sm"
+              variant="link"
+              action="primary"
+              onPress={() => console.log("forgot password")}
+            >
+              <ButtonText>Forgot Password</ButtonText>
+            </Button>
+          </Box>
         </Box>
       </Center>
     </Screen>
@@ -77,5 +89,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     alignSelf: "center",
+  },
+  forgotPasswordBtn: {
+    alignSelf: "flex-start",
   },
 });
