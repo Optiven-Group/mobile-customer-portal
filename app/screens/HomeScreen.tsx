@@ -1,11 +1,16 @@
-import { StyleSheet } from "react-native";
 import React from "react";
+import { StyleSheet } from "react-native";
+import { NavigationProp } from "@react-navigation/native";
 import Screen from "../components/Screen";
 import { Box, Center, Pressable, Text } from "@gluestack-ui/themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
 
-const HomeScreen = () => {
+type HomeScreenProps = {
+  navigation: NavigationProp<any>;
+};
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <Screen style={styles.container}>
       <Center>
@@ -21,7 +26,7 @@ const HomeScreen = () => {
             w="$20"
           >
             <Pressable
-              onPress={() => console.log("Hello")}
+              onPress={() => navigation.navigate("Payment Schedule")}
               h="$16"
               w="$16"
               bg="$green700"
@@ -42,7 +47,7 @@ const HomeScreen = () => {
             w="$20"
           >
             <Pressable
-              onPress={() => console.log("Hello")}
+              onPress={() => navigation.navigate("View Receipts")}
               h="$16"
               w="$16"
               bg="$green700"
@@ -63,7 +68,7 @@ const HomeScreen = () => {
             w="$20"
           >
             <Pressable
-              onPress={() => console.log("Hello")}
+              onPress={() => navigation.navigate("Sales Agreement")}
               h="$16"
               w="$16"
               bg="$green700"
@@ -88,7 +93,7 @@ const HomeScreen = () => {
             w="$20"
           >
             <Pressable
-              onPress={() => console.log("Hello")}
+              onPress={() => navigation.navigate("View Statements")}
               h="$16"
               w="$16"
               bg="$green700"
