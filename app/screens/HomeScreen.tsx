@@ -2,7 +2,14 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import Screen from "../components/Screen";
-import { Box, Center, Pressable, Text } from "@gluestack-ui/themed";
+import {
+  Box,
+  Center,
+  Heading,
+  Image,
+  Pressable,
+  Text,
+} from "@gluestack-ui/themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
 
@@ -10,13 +17,15 @@ type HomeScreenProps = {
   navigation: NavigationProp<any>;
 };
 
+const user: any = {
+  fullnames: "Kasili Wachiye",
+};
+
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <Screen style={styles.container}>
       <Center>
-        <Text my="$4" bold size="lg">
-          Good morning, Kasili
-        </Text>
+        <Heading my="$4">Good morning, Kasili</Heading>
         {/* Todo: modularize these components */}
         <Box flexDirection="row">
           <Box
@@ -107,6 +116,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               View Statements
             </Text>
           </Box>
+        </Box>
+        <Box
+          w="$4/5"
+          borderColor="$borderLight100"
+          borderRadius="$xl"
+          borderWidth="$1"
+          my="$8"
+          overflow="hidden"
+        >
+          <Image
+            h={200}
+            w="$full"
+            source={{
+              uri: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=1770&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            }}
+            alt="home-image"
+          />
         </Box>
       </Center>
     </Screen>

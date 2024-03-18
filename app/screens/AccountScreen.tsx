@@ -16,7 +16,7 @@ import colors from "../utils/colors";
 const AccountScreen = () => {
   return (
     <Screen>
-      <VStack>
+      <VStack pt="$2">
         <Box style={styles.avatarContainer}>
           <Avatar bgColor="$green700" size="lg" borderRadius="$full">
             <AvatarFallbackText>Kasili Wachiye</AvatarFallbackText>
