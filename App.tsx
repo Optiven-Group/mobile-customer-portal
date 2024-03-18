@@ -20,6 +20,7 @@ export default function App() {
             },
             tabBarActiveTintColor: "green",
             // tabBarShowLabel: false,
+            headerShown: false,
           })}
           initialRouteName="Overview"
         >
