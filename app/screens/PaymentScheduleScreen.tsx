@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  ScrollView,
-  ViewStyle,
-} from "react-native";
+import { StyleSheet, ScrollView, ViewStyle } from "react-native";
 import {
   Text,
   Box,
@@ -28,7 +24,7 @@ interface Payment {
 
 const payments: Payment[] = [
   { id: "1", date: "2024-03-20", amount: "360,000.00", status: "Upcoming" },
-  { id: "2", date: "2024-02-20", amount: "360,000.00", status: "Due" },
+  { id: "2", date: "2024-02-20", amount: "9,999,999.99", status: "Due" },
   { id: "3", date: "2024-01-20", amount: "1,200,000.00", status: "Paid" },
 ];
 
@@ -51,8 +47,13 @@ const PaymentScheduleScreen: React.FC = () => {
     <Screen style={styles.container}>
       <HStack style={styles.heading}>
         <Heading>Payment Schedule</Heading>
-        <Button size="xs" variant="solid" action="primary">
-          <ButtonText>View </ButtonText>
+        <Button
+          size="xs"
+          variant="solid"
+          action="primary"
+          onPress={() => console.log("downloaded")}
+        >
+          <ButtonText bold>View </ButtonText>
           <ButtonIcon as={DownloadIcon} />
         </Button>
       </HStack>
@@ -64,7 +65,12 @@ const PaymentScheduleScreen: React.FC = () => {
                 <Text size="sm" bold>
                   {payment.date}
                 </Text>
-                <Text size="3xl">{payment.amount}</Text>
+                <HStack>
+                  <Text size="3xl">{payment.amount}</Text>
+                  <Text size="xs" bold>
+                    KES
+                  </Text>
+                </HStack>
               </VStack>
               <VStack style={styles.paymentDetails}>
                 <Box style={statusButton(payment.status)}>
