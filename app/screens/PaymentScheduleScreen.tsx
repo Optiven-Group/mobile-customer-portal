@@ -24,7 +24,7 @@ interface Payment {
 
 const payments: Payment[] = [
   { id: "1", date: "2024-03-20", amount: "360,000.00", status: "Upcoming" },
-  { id: "2", date: "2024-02-20", amount: "9,999,999.99", status: "Due" },
+  { id: "2", date: "2024-02-20", amount: "99,999,999.99", status: "Due" },
   { id: "3", date: "2024-01-20", amount: "1,200,000.00", status: "Paid" },
 ];
 
