@@ -94,15 +94,25 @@ const sampleReceipts: Receipt[] = [
 const ReceiptItem = ({ receipt }: { receipt: Receipt }) => (
   <View style={styles.receiptItem}>
     <HStack style={styles.receiptHeader}>
-      <Text style={styles.receiptNumber}>
+      <Text style={styles.receiptTitleItem}>
         Receipt No: {receipt.receiptNumber}
       </Text>
       <Text>{receipt.date}</Text>
     </HStack>
     <HStack justifyContent="space-between" alignItems="center">
       <VStack>
-        <Text>Project: {receipt.projectName}</Text>
-        <Text>Plot No: {receipt.plotNumber}</Text>
+        <HStack style={styles.receiptHeader}>
+          <Text style={styles.receiptTitleItem} mr="$1">
+            Project:
+          </Text>
+          <Text>{receipt.projectName}</Text>
+        </HStack>
+        <HStack>
+          <Text style={styles.receiptTitleItem} mr="$1">
+            Plot No:
+          </Text>
+          <Text>{receipt.plotNumber}</Text>
+        </HStack>
         <Text style={styles.amount}>
           {formatCurrency(receipt.amount, "KES", "en-KE")}
         </Text>
@@ -129,19 +139,11 @@ const ViewReceiptsScreen = () => {
     setReceipts(sampleReceipts);
   }, []);
 
-  const handlePressReceipt = (receipt: Receipt) => {
-    console.log("Receipt pressed", receipt);
-  };
-
   return (
     <Screen>
       <FlatList
         data={receipts.sort((a: any, b: any) => b.id - a.id)}
-        renderItem={({ item }) => (
-          <ReceiptItem
-            receipt={item}
-          />
-        )}
+        renderItem={({ item }) => <ReceiptItem receipt={item} />}
         keyExtractor={(item) => item.receiptNumber}
       />
     </Screen>
@@ -162,7 +164,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 8,
   },
-  receiptNumber: {
+  receiptTitleItem: {
     fontWeight: "bold",
   },
   amount: {
