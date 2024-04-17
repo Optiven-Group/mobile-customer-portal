@@ -91,7 +91,7 @@ const ViewStatement: React.FC = () => {
   return (
     <Screen>
       <FlatList
-        data={transactions}
+        data={transactions.sort((a: any, b: any) => b.id - a.id)}
         renderItem={({ item }) => (
           <TransactionItem item={item} onPress={handlePressTransaction} />
         )}
