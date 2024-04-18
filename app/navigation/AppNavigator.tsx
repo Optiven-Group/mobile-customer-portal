@@ -5,6 +5,7 @@ import OverviewNavigator from "./OverviewNavigator";
 import ActionButton from "./ActionButton";
 import AccountScreen from "../screens/AccountScreen";
 import { View, Text } from "react-native";
+import AccountNavigator from "./AccountNavigator";
 
 const PlaceholderComponent = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -53,7 +54,7 @@ const AppNavigator = () => {
       />
       <Tab.Screen
         name="Profile"
-        component={AccountScreen}
+        component={AccountNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
