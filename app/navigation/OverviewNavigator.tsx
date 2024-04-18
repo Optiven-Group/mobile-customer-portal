@@ -13,10 +13,8 @@ const OverviewNavigator: React.FC = () => {
     <Stack.Navigator
       initialRouteName="Home"
       screenOptions={{
-        // headerShadowVisible: false,
-        // headerTransparent: true,
-        // headerShown: false,
         headerShadowVisible: false,
+        headerTitleAlign: 'center',
       }}
     >
       <Stack.Screen
