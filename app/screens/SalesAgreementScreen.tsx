@@ -1,70 +1,105 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ProgressBarAndroid,
-  Button,
-  Alert,
-} from "react-native";
+import { StyleSheet, Alert, View } from "react-native";
+import * as Progress from "react-native-progress";
 import Screen from "../components/Screen";
+import colors from "../utils/colors";
+import {
+  Box,
+  Card,
+  Icon,
+  Text,
+  ScrollView,
+  LockIcon,
+  UnlockIcon,
+} from "@gluestack-ui/themed";
 
-const SalesAgreementScreen = () => {
-  // Dummy data
-  const plotPrice = 7900000; // Plot price in Kenyan Shillings
-  const amountPaid = 5750000; // Amount paid by the user
-  const progress = amountPaid / plotPrice;
-  const isPaymentComplete = progress >= 1;
+type Property = {
+  id: string;
+  plotPrice: number;
+  amountPaid: number;
+};
 
-  const handleViewAgreement = () => {
-    if (isPaymentComplete) {
-      Alert.alert("Sales Agreement", "You can now view your Sales Agreement.");
-    } else {
-      Alert.alert(
-        "Payment Incomplete",
-        "Complete the payment to unlock the Sales Agreement."
-      );
+const properties: Property[] = [
+  { id: "JL5", plotPrice: 7900000, amountPaid: 5750000 },
+  { id: "VR28", plotPrice: 6500000, amountPaid: 6500000 },
+];
+
+const SalesAgreementScreen: React.FC = () => {
+  const handleViewAgreement = (propertyId: string): void => {
+    const property = properties.find((prop) => prop.id === propertyId);
+    if (property) {
+      const isPaymentComplete = property.amountPaid >= property.plotPrice;
+      if (isPaymentComplete) {
+        Alert.alert(
+          "Sales Agreement",
+          `You can now view your Sales Agreement for ${propertyId}.`
+        );
+      }
     }
   };
 
   return (
     <Screen style={styles.container}>
-      <View style={styles.infoContainer}>
-        <Text style={styles.heading}>Sales Agreement for JL5</Text>
-        <Text style={styles.subheading}>
-          Plot Price: KES {plotPrice.toLocaleString()}
-        </Text>
-        <Text style={styles.subheading}>
-          Amount Paid: KES {amountPaid.toLocaleString()}
-        </Text>
-      </View>
+      <ScrollView>
+        {properties.map((property) => {
+          const progress = property.amountPaid / property.plotPrice;
+          const isPaymentComplete = progress >= 1;
 
-      <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Payment Progress</Text>
-        <ProgressBarAndroid
-          styleAttr="Horizontal"
-          indeterminate={false}
-          progress={progress}
-          color="#00b894"
-          style={styles.progressBar}
-        />
-        <Text style={styles.progressText}>
-          {(progress * 100).toFixed(2)}% Completed
-        </Text>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <Button
-          title={
-            isPaymentComplete
-              ? "View Sales Agreement"
-              : "Complete Payment to View Sales Agreement"
-          }
-          onPress={handleViewAgreement}
-          disabled={!isPaymentComplete}
-          color={isPaymentComplete ? "#00b894" : "#b2bec3"}
-        />
-      </View>
+          return (
+            <Box flexDirection="column" alignItems="center" key={property.id}>
+              <Card style={[styles.card, styles.propertyCard]}>
+                <Text style={styles.heading}>
+                  {property.id} - Sales Agreement
+                </Text>
+                <Text style={styles.subheading}>
+                  <Text style={styles.label}>Plot Price: </Text>
+                  <Text style={styles.value}>
+                    KES {property.plotPrice.toLocaleString()}
+                  </Text>
+                </Text>
+                <Text style={styles.subheading}>
+                  <Text style={styles.label}>Amount Paid: </Text>
+                  <Text style={styles.value}>
+                    KES {property.amountPaid.toLocaleString()}
+                  </Text>
+                </Text>
+              </Card>
+              <Card style={styles.card}>
+                <View style={styles.progressContainer}>
+                  <Progress.Circle
+                    progress={progress}
+                    size={200}
+                    thickness={20}
+                    color={isPaymentComplete ? "green" : "tomato"}
+                    style={styles.progressBar}
+                    strokeCap="round"
+                    showsText
+                    formatText={() => `${Math.floor(progress * 100)}%`}
+                  />
+                  <Icon
+                    as={isPaymentComplete ? UnlockIcon : LockIcon}
+                    style={styles.lockIcon}
+                    color={isPaymentComplete ? "green" : "tomato"}
+                  />
+                </View>
+                <Text style={styles.progressText} bold>
+                  {Math.floor(progress * 100)}% Completed
+                </Text>
+              </Card>
+              {isPaymentComplete && (
+                <Card style={styles.card}>
+                  <Text
+                    onPress={() => handleViewAgreement(property.id)}
+                    style={styles.viewAgreement}
+                  >
+                    View Sales Agreement
+                  </Text>
+                </Card>
+              )}
+            </Box>
+          );
+        })}
+      </ScrollView>
     </Screen>
   );
 };
@@ -72,60 +107,61 @@ const SalesAgreementScreen = () => {
 export default SalesAgreementScreen;
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    marginTop: 20,
-    borderRadius: 20,
-  },
   container: {
-    padding: 20,
-    backgroundColor: "#f5f5f5",
+    flex: 1,
+    backgroundColor: colors.light,
   },
-  infoContainer: {
-    marginBottom: 30,
-    padding: 20,
-    backgroundColor: "#fff",
+  card: {
+    marginVertical: 8,
+    padding: 15,
+    width: "90%",
     borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOpacity: 0.05,
   },
   heading: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2d3436",
+    color: colors.dark,
     marginBottom: 10,
+  },
+  label: {
+    fontWeight: "bold",
+    color: colors.dark,
   },
   subheading: {
     fontSize: 18,
-    color: "#636e72",
+    color: colors.dark,
     marginBottom: 5,
   },
-  chartContainer: {
-    padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  chartTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#2d3436",
-    marginBottom: 15,
+  progressContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
   },
   progressBar: {
-    height: 20,
-    borderRadius: 10,
+    marginRight: 10,
+  },
+  propertyCard: {
+    backgroundColor: colors.white,
+    borderColor: colors.light,
+    borderWidth: 1,
+  },
+  lockIcon: {
+    marginLeft: 10,
   },
   progressText: {
     marginTop: 10,
-    fontSize: 16,
-    color: "#0984e3",
     textAlign: "center",
+  },
+  value: {
+    fontWeight: "normal",
+    color: colors.medium,
+  },
+  viewAgreement: {
+    color: "green",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold",
+    paddingVertical: 10,
   },
 });

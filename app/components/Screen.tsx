@@ -1,6 +1,5 @@
 import React, { ReactNode } from "react";
 import { StyleSheet, SafeAreaView, ViewStyle } from "react-native";
-import Constants from "expo-constants";
 import { Box } from "@gluestack-ui/themed";
 
 interface ScreenProps {
@@ -18,7 +17,6 @@ const Screen: React.FC<ScreenProps> = ({ children, style }) => {
 
 const styles = StyleSheet.create({
   screen: {
-    paddingTop: Constants.statusBarHeight,
     flex: 1,
   },
 });
