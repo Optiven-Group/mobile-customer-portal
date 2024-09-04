@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Alert } from "react-native";
 import {
   Box,
   Button,
@@ -13,7 +14,14 @@ import {
 } from "@gluestack-ui/themed";
 import Screen from "../components/Screen";
 
-const LoginScreen = () => {
+const CreatePinScreen = () => {
+  const [pin, setPin] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+
+  const handleCreatePin = () => {
+    // handle PIN Creation here
+  };
+
   return (
     <Screen style={styles.container}>
       <Center>
@@ -22,7 +30,7 @@ const LoginScreen = () => {
             alt="logo"
             style={styles.logo}
             source={require("../../assets/logo.png")}
-            mb="$8"            
+            mb="$8"
           />
           <FormControl
             isDisabled={false}
@@ -31,10 +39,17 @@ const LoginScreen = () => {
             isRequired={true}
           >
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">Email</FormControlLabelText>
+              <FormControlLabelText size="md">Create PIN</FormControlLabelText>
             </FormControlLabel>
             <Input size="lg">
-              <InputField type="text" />
+              <InputField
+                type="password"
+                keyboardType="number-pad"
+                maxLength={4}
+                placeholder="Enter 4-digit PIN"
+                value={pin}
+                onChangeText={setPin}
+              />
             </Input>
           </FormControl>
           <FormControl
@@ -45,10 +60,17 @@ const LoginScreen = () => {
             mt="$2"
           >
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">Pin</FormControlLabelText>
+              <FormControlLabelText size="md">Confirm PIN</FormControlLabelText>
             </FormControlLabel>
             <Input size="lg">
-              <InputField type="password" keyboardType="number-pad" maxLength={4} />
+              <InputField
+                type="password"
+                keyboardType="number-pad"
+                maxLength={4}
+                placeholder="Re-enter 4-digit PIN"
+                value={confirmPin}
+                onChangeText={setConfirmPin}
+              />
             </Input>
           </FormControl>
           <Button
@@ -56,27 +78,17 @@ const LoginScreen = () => {
             action="positive"
             mt="$4"
             size="lg"
-            onPress={() => console.log("logged in")}
+            onPress={handleCreatePin}
           >
-            <ButtonText size="md">Login</ButtonText>
+            <ButtonText size="md">Create PIN</ButtonText>
           </Button>
-          <Box style={styles.forgotPasswordBtn}>
-            <Button
-              size="md"
-              variant="link"
-              action="primary"
-              onPress={() => console.log("forgot pin")}
-            >
-              <ButtonText>Forgot Pin</ButtonText>
-            </Button>
-          </Box>
         </Box>
       </Center>
     </Screen>
   );
 };
 
-export default LoginScreen;
+export default CreatePinScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -86,8 +98,5 @@ const styles = StyleSheet.create({
   logo: {
     alignSelf: "center",
     width: "100%",
-  },
-  forgotPasswordBtn: {
-    alignSelf: "flex-start",
   },
 });

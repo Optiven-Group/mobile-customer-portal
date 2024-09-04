@@ -20,7 +20,7 @@ type Property = {
 };
 
 const properties: Property[] = [
-  { id: "JL5", plotPrice: 7900000, amountPaid: 5750000 },
+  { id: "JL5", plotPrice: 7900000, amountPaid: 6750000 },
   { id: "VR28", plotPrice: 6500000, amountPaid: 6500000 },
 ];
 

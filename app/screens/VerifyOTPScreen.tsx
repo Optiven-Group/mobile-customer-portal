@@ -1,3 +1,4 @@
+import React from "react";
 import { StyleSheet } from "react-native";
 import {
   Box,
@@ -13,7 +14,7 @@ import {
 } from "@gluestack-ui/themed";
 import Screen from "../components/Screen";
 
-const LoginScreen = () => {
+const VerifyOTPScreen = () => {
   return (
     <Screen style={styles.container}>
       <Center>
@@ -22,7 +23,7 @@ const LoginScreen = () => {
             alt="logo"
             style={styles.logo}
             source={require("../../assets/logo.png")}
-            mb="$8"            
+            mb="$8"
           />
           <FormControl
             isDisabled={false}
@@ -31,24 +32,15 @@ const LoginScreen = () => {
             isRequired={true}
           >
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">Email</FormControlLabelText>
+              <FormControlLabelText size="md">Enter OTP</FormControlLabelText>
             </FormControlLabel>
             <Input size="lg">
-              <InputField type="text" />
-            </Input>
-          </FormControl>
-          <FormControl
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-            isRequired={true}
-            mt="$2"
-          >
-            <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">Pin</FormControlLabelText>
-            </FormControlLabel>
-            <Input size="lg">
-              <InputField type="password" keyboardType="number-pad" maxLength={4} />
+              <InputField
+                type="text"
+                keyboardType="number-pad"
+                maxLength={6}
+                placeholder="Enter 6-digit OTP"
+              />
             </Input>
           </FormControl>
           <Button
@@ -56,27 +48,17 @@ const LoginScreen = () => {
             action="positive"
             mt="$4"
             size="lg"
-            onPress={() => console.log("logged in")}
+            onPress={() => console.log("OTP verified")}
           >
-            <ButtonText size="md">Login</ButtonText>
+            <ButtonText size="md">Verify OTP</ButtonText>
           </Button>
-          <Box style={styles.forgotPasswordBtn}>
-            <Button
-              size="md"
-              variant="link"
-              action="primary"
-              onPress={() => console.log("forgot pin")}
-            >
-              <ButtonText>Forgot Pin</ButtonText>
-            </Button>
-          </Box>
         </Box>
       </Center>
     </Screen>
   );
 };
 
-export default LoginScreen;
+export default VerifyOTPScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -86,8 +68,5 @@ const styles = StyleSheet.create({
   logo: {
     alignSelf: "center",
     width: "100%",
-  },
-  forgotPasswordBtn: {
-    alignSelf: "flex-start",
   },
 });

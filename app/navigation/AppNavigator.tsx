@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import OverviewNavigator from "./OverviewNavigator";
 import ActionButton from "./ActionButton";
-import AccountScreen from "../screens/AccountScreen";
 import { View, Text } from "react-native";
 import AccountNavigator from "./AccountNavigator";
 
