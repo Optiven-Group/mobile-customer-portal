@@ -7,7 +7,7 @@ import AuthNavigator from "./app/navigation/AuthNavigator";
 
 export default function App() {
   // Simulate user authentication state
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   return (
     <GluestackUIProvider config={config}>
