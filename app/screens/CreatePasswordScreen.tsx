@@ -17,27 +17,23 @@ import api from "../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../navigation/types";
 
-type VerifyOTPScreenProps = NativeStackScreenProps<
+type CreatePasswordScreenProps = NativeStackScreenProps<
   AuthStackParamList,
-  "VerifyOTP"
+  "CreatePassword"
 >;
 
-const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
+const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
   route,
   navigation,
 }) => {
-  const [otp, setOtp] = useState<string>("");
-  const { customerNumber, email } = route.params;
+  const [newPassword, setNewPassword] = useState<string>("");
+  const { email, otp } = route.params;
 
-  const handleVerifyOTP = async () => {
+  const handleCreatePassword = async () => {
     try {
-      const response = await api.post("/verify-otp", {
-        customer_number: customerNumber,
-        email_or_phone: email,
-        otp,
-      });
-      Alert.alert("Success", "OTP verified");
-      navigation.navigate("CreatePassword", { email, otp });
+      await api.post("/reset-password", { email, otp, newPassword });
+      Alert.alert("Success", "Password has been set. Please log in.");
+      navigation.navigate("Login");
     } catch (error: any) {
       Alert.alert(
         "Error",
@@ -58,16 +54,16 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
           />
           <FormControl isRequired>
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">Enter OTP</FormControlLabelText>
+              <FormControlLabelText size="md">
+                New Password
+              </FormControlLabelText>
             </FormControlLabel>
             <Input size="lg">
               <InputField
-                type="text"
-                keyboardType="number-pad"
-                maxLength={6}
-                placeholder="Enter 6-digit OTP"
-                value={otp}
-                onChangeText={setOtp}
+                type="password"
+                placeholder="Enter new password"
+                value={newPassword}
+                onChangeText={setNewPassword}
               />
             </Input>
           </FormControl>
@@ -76,9 +72,9 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
             action="positive"
             mt="$4"
             size="lg"
-            onPress={handleVerifyOTP}
+            onPress={handleCreatePassword}
           >
-            <ButtonText size="md">Verify OTP</ButtonText>
+            <ButtonText size="md">Set Password</ButtonText>
           </Button>
         </Box>
       </Center>
@@ -86,7 +82,7 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
   );
 };
 
-export default VerifyOTPScreen;
+export default CreatePasswordScreen;
 
 const styles = StyleSheet.create({
   container: {

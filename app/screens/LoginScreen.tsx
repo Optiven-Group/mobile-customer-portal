@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Alert } from "react-native";
 import {
   Box,
   Button,
@@ -12,8 +13,31 @@ import {
   InputField,
 } from "@gluestack-ui/themed";
 import Screen from "../components/Screen";
+import api from "../utils/api";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AuthStackParamList } from "../navigation/types";
+import { useAuth } from "../context/AuthContext";
 
-const LoginScreen = () => {
+type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, "Login">;
+
+const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const { login } = useAuth();
+
+  const handleLogin = async () => {
+    try {
+      const response = await api.post("/login", { email, password });
+      Alert.alert("Success", response.data.message);
+      login(response.data.token);
+    } catch (error: any) {
+      Alert.alert(
+        "Error",
+        error.response?.data?.error || "Something went wrong"
+      );
+    }
+  };
+
   return (
     <Screen style={styles.container}>
       <Center>
@@ -22,33 +46,32 @@ const LoginScreen = () => {
             alt="logo"
             style={styles.logo}
             source={require("../../assets/logo.png")}
-            mb="$8"            
+            mb="$8"
           />
-          <FormControl
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-            isRequired={true}
-          >
+          <FormControl isRequired>
             <FormControlLabel mb="$1">
               <FormControlLabelText size="md">Email</FormControlLabelText>
             </FormControlLabel>
             <Input size="lg">
-              <InputField type="text" />
+              <InputField
+                type="text"
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+              />
             </Input>
           </FormControl>
-          <FormControl
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
-            isRequired={true}
-            mt="$2"
-          >
+          <FormControl isRequired mt="$2">
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">Pin</FormControlLabelText>
+              <FormControlLabelText size="md">Password</FormControlLabelText>
             </FormControlLabel>
             <Input size="lg">
-              <InputField type="password" keyboardType="number-pad" maxLength={4} />
+              <InputField
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChangeText={setPassword}
+              />
             </Input>
           </FormControl>
           <Button
@@ -56,7 +79,7 @@ const LoginScreen = () => {
             action="positive"
             mt="$4"
             size="lg"
-            onPress={() => console.log("logged in")}
+            onPress={handleLogin}
           >
             <ButtonText size="md">Login</ButtonText>
           </Button>
@@ -65,9 +88,9 @@ const LoginScreen = () => {
               size="md"
               variant="link"
               action="primary"
-              onPress={() => console.log("forgot pin")}
+              onPress={() => navigation.navigate("VerifyUser")}
             >
-              <ButtonText>Forgot Pin</ButtonText>
+              <ButtonText>Forgot password</ButtonText>
             </Button>
           </Box>
         </Box>
