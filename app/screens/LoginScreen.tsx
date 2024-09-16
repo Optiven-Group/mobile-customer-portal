@@ -29,12 +29,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       const response = await api.post("/login", { email, password });
-      Alert.alert("Success", response.data.message);
-      login(response.data.token);
+      const token = response.data.token;
+      if (!token) {
+        throw new Error("Token not received");
+      }
+      await login(token);
+      // Navigation will happen automatically due to isLoggedIn change
     } catch (error: any) {
       Alert.alert(
         "Error",
-        error.response?.data?.error || "Something went wrong"
+        error.response?.data?.error || error.message || "Something went wrong"
       );
     }
   };

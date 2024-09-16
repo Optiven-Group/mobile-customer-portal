@@ -23,15 +23,18 @@ type VerifyOTPScreenProps = NativeStackScreenProps<
   "VerifyOTP"
 >;
 
-const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({ navigation }) => {
-  const route = useRoute<VerifyOTPScreenProps["route"]>();
+const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
+  route,
+  navigation,
+}) => {
   const [otp, setOtp] = useState<string>("");
   const { customerNumber, email, forResetPassword } = route.params;
 
   const handleVerifyOTP = async () => {
     try {
       if (forResetPassword) {
-        const response = await api.post("/verify-otp-reset", {
+        // Password Reset Flow
+        await api.post("/verify-otp-reset", {
           email,
           otp,
         });
@@ -43,7 +46,7 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({ navigation }) => {
         });
       } else {
         // Registration Flow
-        const response = await api.post("/verify-otp", {
+        await api.post("/verify-otp", {
           customer_number: customerNumber,
           email,
           otp,

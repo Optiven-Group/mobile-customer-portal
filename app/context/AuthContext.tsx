@@ -24,9 +24,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     // Check if token exists in storage on app load
     const checkToken = async () => {
       const token = await AsyncStorage.getItem("authToken");
-      if (token) {
-        setIsLoggedIn(true);
-      }
+      setIsLoggedIn(!!token);
     };
     checkToken();
   }, []);

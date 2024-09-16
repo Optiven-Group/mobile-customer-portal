@@ -28,11 +28,36 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
 }) => {
   const [newPassword, setNewPassword] = useState<string>("");
 
+  // Extract parameters from route
+  const { email, otp, forResetPassword, customerNumber } = route.params;
+
   const handleCreatePassword = async () => {
+    if (!newPassword) {
+      Alert.alert("Error", "Please enter a new password.");
+      return;
+    }
+
     try {
-      await api.post("/reset-password", { newPassword });
-      Alert.alert("Success", "Password has been set. Please log in.");
-      navigation.navigate("Login");
+      if (forResetPassword) {
+        // Password Reset Flow
+        await api.post("/reset-password", {
+          email,
+          otp,
+          new_password: newPassword,
+        });
+        Alert.alert("Success", "Password has been reset. Please log in.");
+        navigation.navigate("Login");
+      } else {
+        // Registration Flow
+        await api.post("/complete-registration", {
+          customer_number: customerNumber,
+          email,
+          otp,
+          new_password: newPassword,
+        });
+        Alert.alert("Success", "Registration successful. You can now log in.");
+        navigation.navigate("Login");
+      }
     } catch (error: any) {
       Alert.alert(
         "Error",
@@ -85,11 +110,12 @@ export default CreatePasswordScreen;
 
 const styles = StyleSheet.create({
   container: {
-    display: "flex",
+    flex: 1,
     justifyContent: "center",
   },
   logo: {
     alignSelf: "center",
     width: "100%",
+    resizeMode: "contain",
   },
 });

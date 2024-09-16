@@ -13,7 +13,4 @@ export type AuthStackParamList = {
     forResetPassword?: boolean;
   };
   ForgotPassword: undefined;
-  ResetPassword: {
-    email: string;
-  };
 };
