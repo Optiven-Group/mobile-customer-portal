@@ -5,7 +5,6 @@ import VerifyOTPScreen from "../screens/VerifyOTPScreen";
 import CreatePasswordScreen from "../screens/CreatePasswordScreen";
 import LoginScreen from "../screens/LoginScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
-import ResetPasswordScreen from "../screens/ResetPasswordScreen";
 import { AuthStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
@@ -13,7 +12,7 @@ const Stack = createNativeStackNavigator<AuthStackParamList>();
 const AuthNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName="VerifyOTP"
+      initialRouteName="Login"
       screenOptions={{
         headerShadowVisible: false,
         headerTitleAlign: "center",
@@ -27,7 +26,7 @@ const AuthNavigator = () => {
       <Stack.Screen
         name="VerifyUser"
         component={VerifyUserScreen}
-        options={{ title: "Verify User", headerShown: false }}
+        options={{ title: "Register", headerShown: false }}
       />
       <Stack.Screen
         name="VerifyOTP"
@@ -43,11 +42,6 @@ const AuthNavigator = () => {
         name="ForgotPassword"
         component={ForgotPasswordScreen}
         options={{ title: "Forgot Password", headerShown: false }}
-      />
-      <Stack.Screen
-        name="ResetPassword"
-        component={ResetPasswordScreen}
-        options={{ title: "Reset Password", headerShown: false }}
       />
     </Stack.Navigator>
   );

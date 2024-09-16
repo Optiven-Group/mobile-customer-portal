@@ -37,8 +37,12 @@ const VerifyUserScreen: React.FC<VerifyUserScreenProps> = ({ navigation }) => {
         customer_number: customerNumber,
         email,
       });
-      Alert.alert("Success", "OTP sent to your contact");
-      navigation.navigate("VerifyOTP");
+      Alert.alert("Success", "OTP sent to your email");
+      navigation.navigate("VerifyOTP", {
+        customerNumber,
+        email,
+        forResetPassword: false,
+      });
     } catch (error: any) {
       Alert.alert(
         "Error",

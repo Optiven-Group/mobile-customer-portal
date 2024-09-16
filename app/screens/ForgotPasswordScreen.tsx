@@ -23,21 +23,28 @@ type ForgotPasswordScreenProps = NativeStackScreenProps<
 >;
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
-  route,
   navigation,
 }) => {
   const [email, setEmail] = useState<string>("");
 
   const handleSendOTP = async () => {
+    if (!email) {
+      Alert.alert("Error", "Please enter your email.");
+      return;
+    }
+
     try {
-      const response = await api.post("/forgot-password", {
+      const response = await api.post("/request-otp", {
         email,
       });
       Alert.alert(
         "Success",
-        "An OTP has sent to your email. Use it to reset your password"
+        "An OTP has been sent to your email. Use it to reset your password."
       );
-      navigation.navigate("ResetPassword");
+      navigation.navigate("VerifyOTP", {
+        email,
+        forResetPassword: true,
+      });
     } catch (error: any) {
       Alert.alert(
         "Error",

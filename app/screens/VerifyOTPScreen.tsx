@@ -16,25 +16,46 @@ import Screen from "../components/Screen";
 import api from "../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../navigation/types";
+import { useRoute } from "@react-navigation/native";
 
 type VerifyOTPScreenProps = NativeStackScreenProps<
   AuthStackParamList,
   "VerifyOTP"
 >;
 
-const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
-  route,
-  navigation,
-}) => {
+const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({ navigation }) => {
+  const route = useRoute<VerifyOTPScreenProps["route"]>();
   const [otp, setOtp] = useState<string>("");
+  const { customerNumber, email, forResetPassword } = route.params;
 
   const handleVerifyOTP = async () => {
     try {
-      const response = await api.post("/verify-otp", {
-        otp,
-      });
-      Alert.alert("Success", "OTP verified");
-      navigation.navigate("CreatePassword");
+      if (forResetPassword) {
+        const response = await api.post("/verify-otp-reset", {
+          email,
+          otp,
+        });
+        Alert.alert("Success", "OTP verified");
+        navigation.navigate("CreatePassword", {
+          email,
+          otp,
+          forResetPassword: true,
+        });
+      } else {
+        // Registration Flow
+        const response = await api.post("/verify-otp", {
+          customer_number: customerNumber,
+          email,
+          otp,
+        });
+        Alert.alert("Success", "OTP verified");
+        navigation.navigate("CreatePassword", {
+          customerNumber,
+          email,
+          otp,
+          forResetPassword: false,
+        });
+      }
     } catch (error: any) {
       Alert.alert(
         "Error",
