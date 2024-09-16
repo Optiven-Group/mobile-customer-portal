@@ -27,17 +27,14 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
   navigation,
 }) => {
   const [otp, setOtp] = useState<string>("");
-  const { customerNumber, email } = route.params;
 
   const handleVerifyOTP = async () => {
     try {
       const response = await api.post("/verify-otp", {
-        customer_number: customerNumber,
-        email_or_phone: email,
         otp,
       });
       Alert.alert("Success", "OTP verified");
-      navigation.navigate("CreatePassword", { email, otp });
+      navigation.navigate("CreatePassword");
     } catch (error: any) {
       Alert.alert(
         "Error",

@@ -17,21 +17,26 @@ import api from "../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../navigation/types";
 
-type CreatePasswordScreenProps = NativeStackScreenProps<
+type ResetPasswordScreenProps = NativeStackScreenProps<
   AuthStackParamList,
-  "CreatePassword"
+  "ResetPassword"
 >;
 
-const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
-  route,
+const ResetPasswordScreen: React.FC<ResetPasswordScreenProps> = ({
   navigation,
 }) => {
-  const [newPassword, setNewPassword] = useState<string>("");
+  const [otp, setOtp] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
-  const handleCreatePassword = async () => {
+  const handlePasswordReset = async () => {
     try {
-      await api.post("/reset-password", { newPassword });
-      Alert.alert("Success", "Password has been set. Please log in.");
+      const response = await api.post("/reset-password", {
+        password,
+      });
+      Alert.alert(
+        "Success",
+        "Your password has been reset. You may now login."
+      );
       navigation.navigate("Login");
     } catch (error: any) {
       Alert.alert(
@@ -53,16 +58,30 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
           />
           <FormControl isRequired>
             <FormControlLabel mb="$1">
+              <FormControlLabelText size="md">Enter OTP</FormControlLabelText>
+            </FormControlLabel>
+            <Input size="lg">
+              <InputField
+                type="text"
+                keyboardType="number-pad"
+                maxLength={6}
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChangeText={setOtp}
+              />
+            </Input>
+            <FormControlLabel mb="$1">
               <FormControlLabelText size="md">
-                New Password
+                Enter New Password
               </FormControlLabelText>
             </FormControlLabel>
             <Input size="lg">
               <InputField
-                type="password"
-                placeholder="Enter new password"
-                value={newPassword}
-                onChangeText={setNewPassword}
+                type="text"
+                keyboardType="visible-password"
+                placeholder="******"
+                value={password}
+                onChangeText={setPassword}
               />
             </Input>
           </FormControl>
@@ -71,9 +90,9 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
             action="positive"
             mt="$4"
             size="lg"
-            onPress={handleCreatePassword}
+            onPress={handlePasswordReset}
           >
-            <ButtonText size="md">Set Password</ButtonText>
+            <ButtonText size="md">Reset Password</ButtonText>
           </Button>
         </Box>
       </Center>
@@ -81,7 +100,7 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
   );
 };
 
-export default CreatePasswordScreen;
+export default ResetPasswordScreen;
 
 const styles = StyleSheet.create({
   container: {

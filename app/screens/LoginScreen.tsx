@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Alert } from "react-native";
+import { StyleSheet, Alert, TouchableOpacity } from "react-native";
 import {
   Box,
   Button,
@@ -11,6 +11,7 @@ import {
   Image,
   Input,
   InputField,
+  Text,
 } from "@gluestack-ui/themed";
 import Screen from "../components/Screen";
 import api from "../utils/api";
@@ -83,15 +84,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           >
             <ButtonText size="md">Login</ButtonText>
           </Button>
-          <Box style={styles.forgotPasswordBtn}>
-            <Button
-              size="md"
-              variant="link"
-              action="primary"
-              onPress={() => navigation.navigate("VerifyUser")}
+          <Box style={styles.optionsContainer}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ForgotPassword")}
             >
-              <ButtonText>Forgot password</ButtonText>
-            </Button>
+              <Text style={styles.optionText}>Forgot Password?</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("VerifyUser")}>
+              <Text style={styles.optionText}>Register</Text>
+            </TouchableOpacity>
           </Box>
         </Box>
       </Center>
@@ -112,5 +113,14 @@ const styles = StyleSheet.create({
   },
   forgotPasswordBtn: {
     alignSelf: "flex-start",
+  },
+  optionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  optionText: {
+    color: "#007AFF",
+    fontSize: 16,
   },
 });

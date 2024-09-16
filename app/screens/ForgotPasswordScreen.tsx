@@ -17,22 +17,27 @@ import api from "../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../navigation/types";
 
-type CreatePasswordScreenProps = NativeStackScreenProps<
+type ForgotPasswordScreenProps = NativeStackScreenProps<
   AuthStackParamList,
-  "CreatePassword"
+  "ForgotPassword"
 >;
 
-const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
+const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   route,
   navigation,
 }) => {
-  const [newPassword, setNewPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
 
-  const handleCreatePassword = async () => {
+  const handleSendOTP = async () => {
     try {
-      await api.post("/reset-password", { newPassword });
-      Alert.alert("Success", "Password has been set. Please log in.");
-      navigation.navigate("Login");
+      const response = await api.post("/forgot-password", {
+        email,
+      });
+      Alert.alert(
+        "Success",
+        "An OTP has sent to your email. Use it to reset your password"
+      );
+      navigation.navigate("ResetPassword");
     } catch (error: any) {
       Alert.alert(
         "Error",
@@ -53,16 +58,15 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
           />
           <FormControl isRequired>
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">
-                New Password
-              </FormControlLabelText>
+              <FormControlLabelText size="md">Email</FormControlLabelText>
             </FormControlLabel>
             <Input size="lg">
               <InputField
-                type="password"
-                placeholder="Enter new password"
-                value={newPassword}
-                onChangeText={setNewPassword}
+                type="text"
+                keyboardType="email-address"
+                placeholder="Enter email"
+                value={email}
+                onChangeText={setEmail}
               />
             </Input>
           </FormControl>
@@ -71,9 +75,9 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
             action="positive"
             mt="$4"
             size="lg"
-            onPress={handleCreatePassword}
+            onPress={handleSendOTP}
           >
-            <ButtonText size="md">Set Password</ButtonText>
+            <ButtonText size="md">Request Password Change</ButtonText>
           </Button>
         </Box>
       </Center>
@@ -81,7 +85,7 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
   );
 };
 
-export default CreatePasswordScreen;
+export default ForgotPasswordScreen;
 
 const styles = StyleSheet.create({
   container: {

@@ -35,10 +35,10 @@ const VerifyUserScreen: React.FC<VerifyUserScreenProps> = ({ navigation }) => {
     try {
       const response = await api.post("/verify-user", {
         customer_number: customerNumber,
-        email_or_phone: email,
+        email,
       });
       Alert.alert("Success", "OTP sent to your contact");
-      navigation.navigate("VerifyOTP", { customerNumber, email });
+      navigation.navigate("VerifyOTP");
     } catch (error: any) {
       Alert.alert(
         "Error",

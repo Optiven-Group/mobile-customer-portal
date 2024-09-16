@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -13,11 +20,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  const login = (token: string) => {
+  useEffect(() => {
+    // Check if token exists in storage on app load
+    const checkToken = async () => {
+      const token = await AsyncStorage.getItem("authToken");
+      if (token) {
+        setIsLoggedIn(true);
+      }
+    };
+    checkToken();
+  }, []);
+
+  const login = async (token: string) => {
+    await AsyncStorage.setItem("authToken", token);
     setIsLoggedIn(true);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await AsyncStorage.removeItem("authToken");
     setIsLoggedIn(false);
   };
 
