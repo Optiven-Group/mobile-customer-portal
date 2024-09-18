@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Avatar,
   AvatarFallbackText,
@@ -12,8 +13,19 @@ import { Text } from "@gluestack-ui/themed";
 import { StyleSheet, TouchableHighlight } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
+import { useAuth } from "../context/AuthContext";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AuthStackParamList } from "../navigation/types";
 
-const AccountScreen = () => {
+type AccountScreenProps = NativeStackScreenProps<AuthStackParamList, "Account">;
+
+const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
+  const { logout } = useAuth(); // Destructure logout from useAuth
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <Screen>
       <VStack pt="$2">
@@ -29,7 +41,7 @@ const AccountScreen = () => {
         <Divider mt="$2" />
         <TouchableHighlight
           underlayColor={colors.light}
-          onPress={() => console.log("Signed out")}
+          onPress={handleLogout} // Call handleLogout on press
         >
           <Box style={styles.logoutContainer} py="$2">
             <Box style={styles.iconContainer}>
