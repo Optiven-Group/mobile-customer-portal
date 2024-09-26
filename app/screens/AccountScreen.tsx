@@ -1,12 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  AlertDialog,
+  AlertDialogBackdrop,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogCloseButton,
+  AlertDialogFooter,
+  AlertDialogBody,
   Avatar,
   AvatarFallbackText,
+  Button,
+  ButtonText,
   Box,
   Divider,
+  Heading,
   VStack,
   ChevronRightIcon,
   Icon,
+  InfoIcon,
 } from "@gluestack-ui/themed";
 import { Text } from "@gluestack-ui/themed";
 import { StyleSheet, TouchableOpacity } from "react-native";
@@ -20,7 +31,10 @@ import { MembershipTier, tierColors } from "../utils/membershipTiers";
 type AccountScreenProps = NativeStackScreenProps<AuthStackParamList, "Account">;
 
 const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
-  const { user, logout } = useAuth(); // Destructure user and logout from useAuth
+  const [showAlertDialog, setShowAlertDialog] = useState<boolean>(false);
+  const handleClose = () => setShowAlertDialog(false);
+
+  const { logout } = useAuth(); // Destructure user and logout from useAuth
 
   const handleLogout = async () => {
     await logout();
@@ -34,48 +48,88 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <Box style={styles.container}>
-      <VStack pt={20} px={20} space={6}>
-        {/* User Info Section */}
-        <Box style={styles.userInfoContainer}>
-          <Avatar bgColor="$green700" size="lg" borderRadius="$full">
-            <AvatarFallbackText>{dummyUser.name.charAt(0)}</AvatarFallbackText>
-          </Avatar>
-          <Box ml={16} style={styles.userInfo}>
-            <Box style={styles.nameContainer}>
-              <Text style={styles.userName}>{dummyUser.name}</Text>
-              {/* Membership Tier Label */}
-              <Box
-                style={[
-                  styles.tierBadge,
-                  { backgroundColor: tierColors[dummyUser.membershipTier] },
-                ]}
-              >
-                <Text style={styles.tierText}>{dummyUser.membershipTier}</Text>
+    <>
+      <Box style={styles.container}>
+        <VStack pt={20} px={20}>
+          {/* User Info Section */}
+          <Box style={styles.userInfoContainer}>
+            <Avatar bgColor="$green700" size="lg" borderRadius="$full">
+              <AvatarFallbackText>
+                {dummyUser.name.charAt(0)}
+              </AvatarFallbackText>
+            </Avatar>
+            <Box ml={16} style={styles.userInfo}>
+              <Box style={styles.nameContainer}>
+                <Text style={styles.userName}>{dummyUser.name}</Text>
+                {/* Membership Tier Label */}
+                <Box
+                  style={[
+                    styles.tierBadge,
+                    { backgroundColor: tierColors[dummyUser.membershipTier] },
+                  ]}
+                >
+                  <Text style={styles.tierText}>
+                    {dummyUser.membershipTier}
+                  </Text>
+                </Box>
+                <TouchableOpacity onPress={() => setShowAlertDialog(true)}>
+                  <Icon
+                    as={InfoIcon}
+                    size="sm"
+                    style={{ marginTop: 5, color: colors.medium }}
+                  />
+                </TouchableOpacity>
               </Box>
+              <Text style={styles.userEmail}>{dummyUser.email}</Text>
             </Box>
-            <Text style={styles.userEmail}>{dummyUser.email}</Text>
           </Box>
-        </Box>
 
-        <Divider />
+          <Divider />
 
-        {/* Logout Section */}
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutTouchable}>
-          <Box style={styles.logoutContainer}>
-            <Box style={styles.iconContainer}>
-              <Avatar bgColor="$red600" size="lg" borderRadius="$full">
-                <MaterialCommunityIcons name="logout" color="white" size={24} />
-              </Avatar>
-              <Text ml={4} style={styles.logoutText}>
-                Logout
-              </Text>
+          {/* Logout Section */}
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={styles.logoutTouchable}
+          >
+            <Box style={styles.logoutContainer}>
+              <Box style={styles.iconContainer}>
+                <Avatar bgColor="$red600" size="lg" borderRadius="$full">
+                  <MaterialCommunityIcons
+                    name="logout"
+                    color="white"
+                    size={24}
+                  />
+                </Avatar>
+                <Text ml={4} style={styles.logoutText}>
+                  Logout
+                </Text>
+              </Box>
+              <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
             </Box>
-            <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
-          </Box>
-        </TouchableOpacity>
-      </VStack>
-    </Box>
+          </TouchableOpacity>
+        </VStack>
+      </Box>
+      <AlertDialog isOpen={showAlertDialog} onClose={handleClose} size="md">
+        <AlertDialogBackdrop />
+        <AlertDialogContent>
+          <AlertDialogHeader style={{ marginBottom: 4 }}>
+            <Heading size="md">
+              You're a {dummyUser.membershipTier.toLocaleLowerCase()} member!
+            </Heading>
+          </AlertDialogHeader>
+          <AlertDialogBody style={{ marginTop: -20, marginBottom: 4 }}>
+            <Text size="md">
+              This means you're entitled to some 5% off of all meals at GMC!
+            </Text>
+          </AlertDialogBody>
+          <AlertDialogFooter style={{ marginTop: -20, marginBottom: 4 }}>
+            <Button size="sm" onPress={handleClose} bgColor="black">
+              <ButtonText>Close</ButtonText>
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
@@ -112,7 +166,7 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   tierBadge: {
-    marginLeft: 10,
+    marginHorizontal: 10,
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 12,

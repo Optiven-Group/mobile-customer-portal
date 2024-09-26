@@ -12,52 +12,51 @@ import {
   InputField,
   Image,
 } from "@gluestack-ui/themed";
-import Screen from "../components/Screen";
-import api from "../utils/api";
+import Screen from "../../components/Screen";
+import api from "../../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "../navigation/types";
-import { useRoute } from "@react-navigation/native";
+import { AuthStackParamList } from "../../navigation/types";
 
-type VerifyOTPScreenProps = NativeStackScreenProps<
+type CreatePasswordScreenProps = NativeStackScreenProps<
   AuthStackParamList,
-  "VerifyOTP"
+  "CreatePassword"
 >;
 
-const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
+const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
   route,
   navigation,
 }) => {
-  const [otp, setOtp] = useState<string>("");
-  const { customerNumber, email, forResetPassword } = route.params;
+  const [newPassword, setNewPassword] = useState<string>("");
 
-  const handleVerifyOTP = async () => {
+  // Extract parameters from route
+  const { email, otp, forResetPassword, customerNumber } = route.params;
+
+  const handleCreatePassword = async () => {
+    if (!newPassword) {
+      Alert.alert("Error", "Please enter a new password.");
+      return;
+    }
+
     try {
       if (forResetPassword) {
         // Password Reset Flow
-        await api.post("/verify-otp-reset", {
+        await api.post("/reset-password", {
           email,
           otp,
+          new_password: newPassword,
         });
-        Alert.alert("Success", "OTP verified");
-        navigation.navigate("CreatePassword", {
-          email,
-          otp,
-          forResetPassword: true,
-        });
+        Alert.alert("Success", "Password has been reset. Please log in.");
+        navigation.navigate("Login");
       } else {
         // Registration Flow
-        await api.post("/verify-otp", {
+        await api.post("/complete-registration", {
           customer_number: customerNumber,
           email,
           otp,
+          new_password: newPassword,
         });
-        Alert.alert("Success", "OTP verified");
-        navigation.navigate("CreatePassword", {
-          customerNumber,
-          email,
-          otp,
-          forResetPassword: false,
-        });
+        Alert.alert("Success", "Registration successful. You can now log in.");
+        navigation.navigate("Login");
       }
     } catch (error: any) {
       Alert.alert(
@@ -74,21 +73,21 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
           <Image
             alt="logo"
             style={styles.logo}
-            source={require("../../assets/logo.png")}
+            source={require("../../../assets/logo.png")}
             mb="$8"
           />
           <FormControl isRequired>
             <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">Enter OTP</FormControlLabelText>
+              <FormControlLabelText size="md">
+                New Password
+              </FormControlLabelText>
             </FormControlLabel>
             <Input size="lg">
               <InputField
-                type="text"
-                keyboardType="number-pad"
-                maxLength={6}
-                placeholder="Enter 6-digit OTP"
-                value={otp}
-                onChangeText={setOtp}
+                type="password"
+                placeholder="Enter new password"
+                value={newPassword}
+                onChangeText={setNewPassword}
               />
             </Input>
           </FormControl>
@@ -97,9 +96,9 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
             action="positive"
             mt="$4"
             size="lg"
-            onPress={handleVerifyOTP}
+            onPress={handleCreatePassword}
           >
-            <ButtonText size="md">Verify OTP</ButtonText>
+            <ButtonText size="md">Set Password</ButtonText>
           </Button>
         </Box>
       </Center>
@@ -107,15 +106,16 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
   );
 };
 
-export default VerifyOTPScreen;
+export default CreatePasswordScreen;
 
 const styles = StyleSheet.create({
   container: {
-    display: "flex",
+    flex: 1,
     justifyContent: "center",
   },
   logo: {
     alignSelf: "center",
     width: "100%",
+    resizeMode: "contain",
   },
 });

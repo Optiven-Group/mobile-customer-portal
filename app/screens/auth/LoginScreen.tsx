@@ -13,11 +13,11 @@ import {
   InputField,
   Text,
 } from "@gluestack-ui/themed";
-import Screen from "../components/Screen";
-import api from "../utils/api";
+import Screen from "../../components/Screen";
+import api from "../../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "../navigation/types";
-import { useAuth } from "../context/AuthContext";
+import { AuthStackParamList } from "../../navigation/types";
+import { useAuth } from "../../context/AuthContext";
 
 type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, "Login">;
 
@@ -50,7 +50,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <Image
             alt="logo"
             style={styles.logo}
-            source={require("../../assets/logo.png")}
+            source={require("../../../assets/logo.png")}
             mb="$8"
           />
           <FormControl isRequired>

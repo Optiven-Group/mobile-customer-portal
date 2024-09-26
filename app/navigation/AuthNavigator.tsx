@@ -1,10 +1,10 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import VerifyUserScreen from "../screens/VerifyUserScreen";
-import VerifyOTPScreen from "../screens/VerifyOTPScreen";
-import CreatePasswordScreen from "../screens/CreatePasswordScreen";
-import LoginScreen from "../screens/LoginScreen";
-import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
+import VerifyUserScreen from "../screens/auth/VerifyUserScreen";
+import VerifyOTPScreen from "../screens/auth/VerifyOTPScreen";
+import CreatePasswordScreen from "../screens/auth/CreatePasswordScreen";
+import LoginScreen from "../screens/auth/LoginScreen";
+import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
 import { AuthStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
