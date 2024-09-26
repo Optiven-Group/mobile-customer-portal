@@ -4,11 +4,13 @@ import { NavigationProp } from "@react-navigation/native";
 import Screen from "../components/Screen";
 import {
   Box,
+  Button,
+  ButtonText,
   Center,
   Heading,
-  Image,
   Pressable,
   Text,
+  VStack,
 } from "@gluestack-ui/themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
@@ -18,121 +20,102 @@ type HomeScreenProps = {
 };
 
 const user: any = {
-  fullnames: "Kasili Wachiye",
+  fullnames: "Kasili",
+};
+
+const getGreeting = () => {
+  const currentHour = new Date().getHours();
+  if (currentHour < 12) {
+    return "Good morning";
+  } else if (currentHour < 18) {
+    return "Good afternoon";
+  } else {
+    return "Good evening";
+  }
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <Screen style={styles.container}>
       <Center>
-        <Heading my="$4">Good morning, Kasili</Heading>
-        {/* Todo: modularize these components */}
-        <Box flexDirection="row">
-          <Box
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            w="$20"
-          >
-            <Pressable
-              onPress={() => navigation.navigate("Payment Schedule")}
-              h="$16"
-              w="$16"
-              bg="$green700"
-              borderRadius="$full"
+        <Heading my="$4">{`${getGreeting()}, ${user.fullnames}`}</Heading>
+        <Box flexDirection="row" justifyContent="space-around" w="90%" mb="$4">
+          {[
+            {
+              label: "Payment Schedule",
+              icon: "calendar",
+              route: "Payment Schedule",
+            },
+            {
+              label: "View My Receipts",
+              icon: "receipt",
+              route: "View Receipts",
+            },
+            {
+              label: "Sales Agreement",
+              icon: "handshake-outline",
+              route: "Sales Agreement",
+            },
+            {
+              label: "View Statements",
+              icon: "history",
+              route: "View Statements",
+            },
+          ].map((item) => (
+            <VStack
+              key={item.label}
               alignItems="center"
               justifyContent="center"
+              w="$20"
             >
-              <MaterialCommunityIcons name="calendar" size={24} color="white" />
-            </Pressable>
-            <Text bold size="xs" textAlign="center" lineHeight={14} mt="$1">
-              Payment Schedule
-            </Text>
-          </Box>
-          <Box
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            w="$20"
-          >
-            <Pressable
-              onPress={() => navigation.navigate("View Receipts")}
-              h="$16"
-              w="$16"
-              bg="$green700"
-              borderRadius="$full"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <MaterialCommunityIcons name="receipt" size={24} color="white" />
-            </Pressable>
-            <Text bold size="xs" textAlign="center" lineHeight={14} mt="$1">
-              View My Receipts
-            </Text>
-          </Box>
-          <Box
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            w="$20"
-          >
-            <Pressable
-              onPress={() => navigation.navigate("Sales Agreement")}
-              h="$16"
-              w="$16"
-              bg="$green700"
-              borderRadius="$full"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <MaterialCommunityIcons
-                name="handshake-outline"
-                size={24}
-                color="white"
-              />
-            </Pressable>
-            <Text bold size="xs" textAlign="center" lineHeight={14} mt="$1">
-              Sales Agreement
-            </Text>
-          </Box>
-          <Box
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            w="$20"
-          >
-            <Pressable
-              onPress={() => navigation.navigate("View Statements")}
-              h="$16"
-              w="$16"
-              bg="$green700"
-              borderRadius="$full"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <MaterialCommunityIcons name="history" size={24} color="white" />
-            </Pressable>
-            <Text bold size="xs" textAlign="center" lineHeight={14} mt="$1">
-              View Statements
-            </Text>
-          </Box>
+              <Pressable
+                onPress={() => navigation.navigate(item.route)}
+                h="$16"
+                w="$16"
+                bg="$green700"
+                borderRadius="$full"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <MaterialCommunityIcons
+                  name={
+                    item.icon as keyof typeof MaterialCommunityIcons.glyphMap
+                  }
+                  size={24}
+                  color="white"
+                />
+              </Pressable>
+              <Text bold size="xs" textAlign="center" lineHeight={14} mt="$1">
+                {item.label}
+              </Text>
+            </VStack>
+          ))}
         </Box>
+        {/* Advertisement Section */}
         <Box
-          w="$4/5"
-          borderColor="$borderLight100"
-          borderRadius="$xl"
-          borderWidth="$1"
-          my="$8"
-          overflow="hidden"
+          w="90%"
+          bg="$darkBlue800"
+          padding="$6"
+          my="$6"
+          alignItems="center"
+          borderRadius="$2xl"
         >
-          <Image
-            h={200}
-            w="$full"
-            source={{
-              uri: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=1770&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            }}
-            alt="home-image"
-          />
+          <Text size="2xl" bold color={colors.white} mb="$3">
+            Get more Information about your Properties!
+          </Text>
+          <Text size="md" color={colors.white} mb="$4">
+            Get in-depth info about the status of your property, titles, etc.
+          </Text>
+          <Button
+            size="lg"
+            variant="outline"
+            action="primary"
+            onPress={() => console.log("Explore Offers")}
+            borderRadius="$lg"
+            paddingHorizontal="$10"
+          >
+            <ButtonText color={colors.white}>Explore Now</ButtonText>
+          </Button>
         </Box>
       </Center>
     </Screen>

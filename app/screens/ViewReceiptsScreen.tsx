@@ -93,34 +93,19 @@ const sampleReceipts: Receipt[] = [
 
 const ReceiptItem = ({ receipt }: { receipt: Receipt }) => (
   <View style={styles.receiptItem}>
-    <HStack style={styles.receiptHeader}>
-      <Text style={styles.receiptTitleItem}>
-        Receipt No: {receipt.receiptNumber}
-      </Text>
-      <Text>{receipt.date}</Text>
-    </HStack>
-    <HStack justifyContent="space-between" alignItems="center">
+    <HStack justifyContent="space-between" style={styles.receiptHeader}>
       <VStack>
-        <HStack style={styles.receiptHeader}>
-          <Text style={styles.receiptTitleItem} mr="$1">
-            Project:
-          </Text>
-          <Text>{receipt.projectName}</Text>
-        </HStack>
-        <HStack>
-          <Text style={styles.receiptTitleItem} mr="$1">
-            Plot No:
-          </Text>
-          <Text>{receipt.plotNumber}</Text>
-        </HStack>
-        <Text style={styles.amount}>
-          {formatCurrency(receipt.amount, "KES", "en-KE")}
+        <Text bold style={styles.receiptNumber}>
+          Receipt No: {receipt.receiptNumber}
         </Text>
+        <Text style={styles.receiptDate}>{receipt.date}</Text>
       </VStack>
       <Button
-        size="xs"
+        size="sm"
         variant="solid"
         action="primary"
+        borderRadius={"$full"}
+        style={styles.downloadButton}
         onPress={() =>
           console.log(`Downloaded receipt ${receipt.receiptNumber}`)
         }
@@ -128,6 +113,20 @@ const ReceiptItem = ({ receipt }: { receipt: Receipt }) => (
         <ButtonIcon as={DownloadIcon} />
       </Button>
     </HStack>
+
+    <VStack space="sm" style={styles.detailsSection}>
+      <HStack>
+        <Text bold>Project: </Text>
+        <Text>{receipt.projectName}</Text>
+      </HStack>
+      <HStack>
+        <Text bold>Plot No: </Text>
+        <Text>{receipt.plotNumber}</Text>
+      </HStack>
+      <Text style={styles.amount}>
+        {formatCurrency(receipt.amount, "KES", "en-KE")}
+      </Text>
+    </VStack>
   </View>
 );
 
@@ -135,12 +134,11 @@ const ViewReceiptsScreen = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
 
   useEffect(() => {
-    // Replace with your actual data fetching method
     setReceipts(sampleReceipts);
   }, []);
 
   return (
-    <Screen>
+    <Screen style={styles.container}>
       <FlatList
         data={receipts.sort((a: any, b: any) => b.id - a.id)}
         renderItem={({ item }) => <ReceiptItem receipt={item} />}
@@ -153,24 +151,44 @@ const ViewReceiptsScreen = () => {
 export default ViewReceiptsScreen;
 
 const styles = StyleSheet.create({
-  receiptItem: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.light,
+  container: {
+    flex: 1,
     backgroundColor: colors.white,
   },
-  receiptHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
+  receiptItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.light,
   },
-  receiptTitleItem: {
+  receiptHeader: {
+    marginBottom: 8,
+    alignItems: "center",
+  },
+  receiptNumber: {
+    fontSize: 16,
     fontWeight: "bold",
+    color: colors.dark,
+  },
+  receiptDate: {
+    fontSize: 12,
+    color: colors.medium,
+    marginTop: 4,
+  },
+  detailsSection: {
+    marginTop: 4,
   },
   amount: {
     marginTop: 8,
-    fontWeight: "bold",
     fontSize: 16,
-    color: "green",
+    fontWeight: "bold",
+    color: colors.success,
+  },
+  downloadButton: {
+    width: 36,
+    height: 36,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.primary,
   },
 });

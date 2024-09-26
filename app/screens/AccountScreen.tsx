@@ -8,83 +8,148 @@ import {
   ChevronRightIcon,
   Icon,
 } from "@gluestack-ui/themed";
-import Screen from "../components/Screen";
 import { Text } from "@gluestack-ui/themed";
-import { StyleSheet, TouchableHighlight } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
 import { useAuth } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../navigation/types";
+import { MembershipTier, tierColors } from "../utils/membershipTiers";
 
 type AccountScreenProps = NativeStackScreenProps<AuthStackParamList, "Account">;
 
 const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
-  const { logout } = useAuth(); // Destructure logout from useAuth
+  const { user, logout } = useAuth(); // Destructure user and logout from useAuth
 
   const handleLogout = async () => {
     await logout();
   };
 
+  // Dummy User Data (Replace with actual user data from context or API)
+  const dummyUser = {
+    name: "Kasili Wachiye",
+    email: "wachiye25@gmail.com",
+    membershipTier: "Gold" as MembershipTier,
+  };
+
   return (
-    <Screen>
-      <VStack pt="$2">
-        <Box style={styles.avatarContainer}>
+    <Box style={styles.container}>
+      <VStack pt={20} px={20} space={6}>
+        {/* User Info Section */}
+        <Box style={styles.userInfoContainer}>
           <Avatar bgColor="$green700" size="lg" borderRadius="$full">
-            <AvatarFallbackText>Kasili Wachiye</AvatarFallbackText>
+            <AvatarFallbackText>{dummyUser.name.charAt(0)}</AvatarFallbackText>
           </Avatar>
-          <Box ml="$4">
-            <Text bold>Kasili Wachiye</Text>
-            <Text size="sm">wachiye25@gmail.com</Text>
+          <Box ml={16} style={styles.userInfo}>
+            <Box style={styles.nameContainer}>
+              <Text style={styles.userName}>{dummyUser.name}</Text>
+              {/* Membership Tier Label */}
+              <Box
+                style={[
+                  styles.tierBadge,
+                  { backgroundColor: tierColors[dummyUser.membershipTier] },
+                ]}
+              >
+                <Text style={styles.tierText}>{dummyUser.membershipTier}</Text>
+              </Box>
+            </Box>
+            <Text style={styles.userEmail}>{dummyUser.email}</Text>
           </Box>
         </Box>
-        <Divider mt="$2" />
-        <TouchableHighlight
-          underlayColor={colors.light}
-          onPress={handleLogout} // Call handleLogout on press
-        >
-          <Box style={styles.logoutContainer} py="$2">
+
+        <Divider />
+
+        {/* Logout Section */}
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutTouchable}>
+          <Box style={styles.logoutContainer}>
             <Box style={styles.iconContainer}>
               <Avatar bgColor="$red600" size="lg" borderRadius="$full">
-                <MaterialCommunityIcons
-                  name={"logout"}
-                  color={"white"}
-                  size={24}
-                />
+                <MaterialCommunityIcons name="logout" color="white" size={24} />
               </Avatar>
-              <Text ml="$4" bold>
+              <Text ml={4} style={styles.logoutText}>
                 Logout
               </Text>
             </Box>
-            <Box ml="$4">
-              <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
-            </Box>
+            <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
           </Box>
-        </TouchableHighlight>
+        </TouchableOpacity>
       </VStack>
-    </Screen>
+    </Box>
   );
 };
 
 export default AccountScreen;
 
+// Styles
 const styles = StyleSheet.create({
-  avatarContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 8,
+  container: {
+    flex: 1,
+    backgroundColor: colors.light,
   },
-  iconContainer: {
-    display: "flex",
+  userInfoContainer: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: colors.white,
+    padding: 20,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  userInfo: {
+    flex: 1,
+  },
+  nameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: colors.dark,
+  },
+  tierBadge: {
+    marginLeft: 10,
+    paddingVertical: 4,
     paddingHorizontal: 8,
+    borderRadius: 12,
+  },
+  tierText: {
+    fontSize: 12,
+    color: "#fff",
+    fontWeight: "600",
+  },
+  userEmail: {
+    fontSize: 14,
+    color: colors.medium,
+    marginTop: 4,
+  },
+  logoutTouchable: {
+    marginTop: 20,
   },
   logoutContainer: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    backgroundColor: colors.white,
+    padding: 16,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  iconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logoutText: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: colors.dark,
+    fontWeight: "600",
   },
 });

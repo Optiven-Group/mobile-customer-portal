@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ScrollView, ViewStyle } from "react-native";
+import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
 import {
   Text,
   Box,
@@ -9,8 +9,9 @@ import {
   Heading,
   Button,
   HStack,
+  Icon,
   DownloadIcon,
-  ButtonIcon,
+  InfoIcon,
 } from "@gluestack-ui/themed";
 import Screen from "../components/Screen";
 import colors from "../utils/colors";
@@ -23,68 +24,86 @@ interface Payment {
 }
 
 const payments: Payment[] = [
-  { id: "1", date: "2024-03-20", amount: "360,000.00", status: "Upcoming" },
-  { id: "2", date: "2024-02-20", amount: "99,999,999.99", status: "Due" },
-  { id: "3", date: "2024-01-20", amount: "1,200,000.00", status: "Paid" },
+  { id: "1", date: "2024-10-20", amount: "50,000.00", status: "Upcoming" },
+  { id: "2", date: "2024-09-20", amount: "50,000.00", status: "Due" },
+  { id: "3", date: "2024-08-20", amount: "50,000.00", status: "Paid" },
+  { id: "4", date: "2024-07-20", amount: "50,000.00", status: "Paid" },
+  { id: "5", date: "2024-06-20", amount: "50,000.00", status: "Paid" },
+  { id: "6", date: "2024-05-20", amount: "50,000.00", status: "Paid" },
+  { id: "7", date: "2024-04-20", amount: "50,000.00", status: "Paid" },
+  { id: "8", date: "2024-03-20", amount: "50,000.00", status: "Paid" },
+  { id: "9", date: "2024-02-20", amount: "50,000.00", status: "Paid" },
+  { id: "10", date: "2024-01-20", amount: "50,000.00", status: "Paid" },
 ];
 
-const statusButton = (status: Payment["status"]): ViewStyle => {
-  return {
-    backgroundColor:
-      status === "Upcoming"
-        ? colors.primary
-        : status === "Due"
-        ? colors.danger
-        : colors.primary,
-    borderRadius: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-  };
+const statusColor = (status: Payment["status"]) => {
+  switch (status) {
+    case "Paid":
+      return colors.success;
+    case "Due":
+      return colors.danger;
+    case "Upcoming":
+      return colors.warning;
+    default:
+      return colors.danger;
+  }
 };
 
 const PaymentScheduleScreen: React.FC = () => {
   return (
     <Screen style={styles.container}>
       <HStack style={styles.heading}>
-        <Heading>Payment Schedule</Heading>
+        <VStack>
+          <Heading size="lg" style={styles.headingText}>
+            Payment Schedule
+          </Heading>
+          <Text size="xs" style={styles.subText}>
+            Track your payment progress below
+          </Text>
+        </VStack>
         <Button
-          size="xs"
+          size="sm"
           variant="solid"
           action="primary"
+          borderRadius={"$full"}
+          style={styles.downloadButton}
           onPress={() => console.log("downloaded")}
         >
-          <ButtonText bold>View </ButtonText>
-          <ButtonIcon as={DownloadIcon} />
+          <Icon as={DownloadIcon} style={{ color: colors.white }} />
         </Button>
       </HStack>
-      <ScrollView>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <Box flexDirection="column" alignItems="center">
           {payments.map((payment) => (
             <Card key={payment.id} style={styles.card}>
               <VStack>
-                <Text size="sm" bold>
+                <Text size="sm" bold style={styles.dateText}>
                   {payment.date}
                 </Text>
-                <HStack>
-                  <Text size="3xl">{payment.amount}</Text>
-                  <Text size="xs" bold>
+                <HStack alignItems="center">
+                  <Text size="2xl" bold>
+                    {payment.amount}
+                  </Text>
+                  <Text size="xs" style={styles.currencyText}>
                     KES
                   </Text>
                 </HStack>
               </VStack>
               <VStack style={styles.paymentDetails}>
-                <Box style={statusButton(payment.status)}>
-                  <Text color="white">
-                    {payment.status === "Due" ? "Payment Due" : payment.status}
-                  </Text>
-                </Box>
-                <Button
-                  size="sm"
-                  variant="link"
-                  onPress={() => console.log("view details")}
-                >
-                  <ButtonText>View Details</ButtonText>
-                </Button>
+                <View
+                  style={[
+                    styles.statusDot,
+                    { backgroundColor: statusColor(payment.status) },
+                  ]}
+                />
+                <TouchableOpacity onPress={() => console.log("view details")}>
+                  <Icon
+                    as={InfoIcon}
+                    size="sm"
+                    style={{ marginTop: 5, color: colors.medium }}
+                  />
+                </TouchableOpacity>
               </VStack>
             </Card>
           ))}
@@ -99,23 +118,63 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.light,
   },
+  scrollContent: {
+    paddingBottom: 90,
+  },
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     marginVertical: 8,
-    padding: 15,
+    padding: 20,
     width: "90%",
-    borderRadius: 10,
-    shadowOpacity: 0.05,
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    elevation: 3,
   },
   heading: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 20,
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.light,
+  },
+  headingText: {
+    fontWeight: "bold",
+    color: colors.dark,
+  },
+  subText: {
+    color: colors.medium,
+    marginTop: 2,
+  },
+  downloadButton: {
+    width: 42,
+    height: 42,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.primary,
+  },
+  dateText: {
+    marginBottom: 4,
+    color: colors.medium,
+  },
+  currencyText: {
+    marginLeft: 5,
+    color: colors.medium,
   },
   paymentDetails: {
     flexDirection: "column",
     alignItems: "flex-end",
+    justifyContent: "center",
+  },
+  statusDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginBottom: 10,
   },
 });
 
