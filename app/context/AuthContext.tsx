@@ -7,9 +7,17 @@ import React, {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// Define the User interface
+interface User {
+  id: number;
+  email: string;
+  name: string;
+}
+
 interface AuthContextType {
   isLoggedIn: boolean;
-  login: (token: string) => void;
+  user: User | null;
+  login: (token: string, userData: User) => void;
   logout: () => void;
 }
 
@@ -19,30 +27,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Check if token exists in storage on app load
-    const checkToken = async () => {
+    // Check if token and user data exist in storage on app load
+    const checkAuthStatus = async () => {
       const token = await AsyncStorage.getItem("authToken");
-      if (token) {
+      const userDataString = await AsyncStorage.getItem("userData");
+
+      if (token && userDataString) {
+        const userData: User = JSON.parse(userDataString);
+        setUser(userData);
         setIsLoggedIn(true);
+      } else {
+        setUser(null);
+        setIsLoggedIn(false);
       }
     };
-    checkToken();
+    checkAuthStatus();
   }, []);
 
-  const login = async (token: string) => {
+  const login = async (token: string, userData: User) => {
     await AsyncStorage.setItem("authToken", token);
+    await AsyncStorage.setItem("userData", JSON.stringify(userData));
+    setUser(userData);
     setIsLoggedIn(true);
   };
 
   const logout = async () => {
     await AsyncStorage.removeItem("authToken");
+    await AsyncStorage.removeItem("userData");
+    setUser(null);
     setIsLoggedIn(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

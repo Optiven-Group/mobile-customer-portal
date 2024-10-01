@@ -1,64 +1,113 @@
-import React from "react";
-import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, ScrollView, View, ActivityIndicator } from "react-native";
 import {
   Text,
   Box,
   Card,
   VStack,
-  ButtonText,
   Heading,
   Button,
   HStack,
   Icon,
   DownloadIcon,
-  InfoIcon,
 } from "@gluestack-ui/themed";
-import Screen from "../components/Screen";
-import colors from "../utils/colors";
+import Screen from "../../components/Screen";
+import colors from "../../utils/colors";
+import api from "../../utils/api";
 
-interface Payment {
-  id: string;
-  date: string;
-  amount: string;
-  status: "Upcoming" | "Paid" | "Due";
+interface InstallmentSchedule {
+  is_id: number;
+  due_date: string;
+  installment_amount: string;
+  paid: string;
+  // Add other fields as needed
 }
 
-const payments: Payment[] = [
-  { id: "1", date: "2024-10-20", amount: "50,000.00", status: "Upcoming" },
-  { id: "2", date: "2024-09-20", amount: "50,000.00", status: "Due" },
-  { id: "3", date: "2024-08-20", amount: "50,000.00", status: "Paid" },
-  { id: "4", date: "2024-07-20", amount: "50,000.00", status: "Paid" },
-  { id: "5", date: "2024-06-20", amount: "50,000.00", status: "Paid" },
-  { id: "6", date: "2024-05-20", amount: "50,000.00", status: "Paid" },
-  { id: "7", date: "2024-04-20", amount: "50,000.00", status: "Paid" },
-  { id: "8", date: "2024-03-20", amount: "50,000.00", status: "Paid" },
-  { id: "9", date: "2024-02-20", amount: "50,000.00", status: "Paid" },
-  { id: "10", date: "2024-01-20", amount: "50,000.00", status: "Paid" },
-];
+interface PaymentScheduleScreenProps {
+  route: any;
+}
 
-const statusColor = (status: Payment["status"]) => {
-  switch (status) {
-    case "Paid":
+const statusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "yes":
       return colors.success;
-    case "Due":
+    case "no":
       return colors.danger;
-    case "Upcoming":
+    case "upcoming":
       return colors.warning;
     default:
-      return colors.danger;
+      return colors.medium;
   }
 };
 
-const PaymentScheduleScreen: React.FC = () => {
+const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
+  route,
+}) => {
+  const property = route?.params?.property;
+
+  const [schedules, setSchedules] = useState<InstallmentSchedule[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    if (!property) return;
+
+    const fetchInstallmentSchedules = async () => {
+      try {
+        const response = await api.get(
+          `/properties/${property.lead_file_no}/installment-schedule`
+        );
+        const fetchedSchedules = response.data.installment_schedules;
+        setSchedules(fetchedSchedules);
+      } catch (error: any) {
+        setError("Failed to fetch installment schedules. Please try again.");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInstallmentSchedules();
+  }, [property]);
+
+  if (!property) {
+    return (
+      <Screen style={styles.container}>
+        <Heading size="lg" style={styles.headingText}>
+          No property selected
+        </Heading>
+        <Text size="xs" style={styles.subText}>
+          Please go back and select a property to view the payment schedule.
+        </Text>
+      </Screen>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Screen style={styles.container}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </Screen>
+    );
+  }
+
+  if (error) {
+    return (
+      <Screen style={styles.container}>
+        <Text style={{ color: colors.danger }}>{error}</Text>
+      </Screen>
+    );
+  }
+
   return (
     <Screen style={styles.container}>
       <HStack style={styles.heading}>
         <VStack>
           <Heading size="lg" style={styles.headingText}>
-            Payment Schedule
+            {property.plot_number}
           </Heading>
           <Text size="xs" style={styles.subText}>
-            Track your payment progress below
+            Track your payment progress.
           </Text>
         </VStack>
         <Button
@@ -75,15 +124,15 @@ const PaymentScheduleScreen: React.FC = () => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Box flexDirection="column" alignItems="center">
-          {payments.map((payment) => (
-            <Card key={payment.id} style={styles.card}>
+          {schedules.map((schedule) => (
+            <Card key={schedule.is_id.toString()} style={styles.card}>
               <VStack>
                 <Text size="sm" bold style={styles.dateText}>
-                  {payment.date}
+                  {new Date(schedule.due_date).toLocaleDateString()}
                 </Text>
                 <HStack alignItems="center">
                   <Text size="2xl" bold>
-                    {payment.amount}
+                    {schedule.installment_amount}
                   </Text>
                   <Text size="xs" style={styles.currencyText}>
                     KES
@@ -94,16 +143,9 @@ const PaymentScheduleScreen: React.FC = () => {
                 <View
                   style={[
                     styles.statusDot,
-                    { backgroundColor: statusColor(payment.status) },
+                    { backgroundColor: statusColor(schedule.paid) },
                   ]}
                 />
-                <TouchableOpacity onPress={() => console.log("view details")}>
-                  <Icon
-                    as={InfoIcon}
-                    size="sm"
-                    style={{ marginTop: 5, color: colors.medium }}
-                  />
-                </TouchableOpacity>
               </VStack>
             </Card>
           ))}
@@ -171,8 +213,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   statusDot: {
-    width: 20,
-    height: 20,
+    width: 10,
+    height: 10,
     borderRadius: 10,
     marginBottom: 10,
   },

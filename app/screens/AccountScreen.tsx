@@ -4,7 +4,6 @@ import {
   AlertDialogBackdrop,
   AlertDialogContent,
   AlertDialogHeader,
-  AlertDialogCloseButton,
   AlertDialogFooter,
   AlertDialogBody,
   Avatar,
@@ -12,12 +11,12 @@ import {
   Button,
   ButtonText,
   Box,
-  Divider,
   Heading,
   VStack,
   ChevronRightIcon,
   Icon,
-  InfoIcon,
+  Badge,
+  BadgeText,
 } from "@gluestack-ui/themed";
 import { Text } from "@gluestack-ui/themed";
 import { StyleSheet, TouchableOpacity } from "react-native";
@@ -26,25 +25,18 @@ import colors from "../utils/colors";
 import { useAuth } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../navigation/types";
-import { MembershipTier, tierColors } from "../utils/membershipTiers";
+
 
 type AccountScreenProps = NativeStackScreenProps<AuthStackParamList, "Account">;
 
-const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
+const AccountScreen: React.FC = () => {
   const [showAlertDialog, setShowAlertDialog] = useState<boolean>(false);
   const handleClose = () => setShowAlertDialog(false);
 
-  const { logout } = useAuth(); // Destructure user and logout from useAuth
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
-  };
-
-  // Dummy User Data (Replace with actual user data from context or API)
-  const dummyUser = {
-    name: "Kasili Wachiye",
-    email: "wachiye25@gmail.com",
-    membershipTier: "Gold" as MembershipTier,
   };
 
   return (
@@ -54,39 +46,29 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
           {/* User Info Section */}
           <Box style={styles.userInfoContainer}>
             <Avatar bgColor="$green700" size="lg" borderRadius="$full">
-              <AvatarFallbackText>
-                {dummyUser.name.charAt(0)}
-              </AvatarFallbackText>
+              <AvatarFallbackText>{user?.name || "User"}</AvatarFallbackText>
             </Avatar>
             <Box ml={16} style={styles.userInfo}>
               <Box style={styles.nameContainer}>
-                <Text style={styles.userName}>{dummyUser.name}</Text>
-                {/* Membership Tier Label */}
-                <Box
-                  style={[
-                    styles.tierBadge,
-                    { backgroundColor: tierColors[dummyUser.membershipTier] },
-                  ]}
-                >
-                  <Text style={styles.tierText}>
-                    {dummyUser.membershipTier}
-                  </Text>
-                </Box>
-                <TouchableOpacity onPress={() => setShowAlertDialog(true)}>
-                  <Icon
-                    as={InfoIcon}
-                    size="sm"
-                    style={{ marginTop: 5, color: colors.medium }}
-                  />
-                </TouchableOpacity>
+                <Text style={styles.userName}>{user?.name || "User"}</Text>
+                {/* <TouchableOpacity onPress={() => setShowAlertDialog(true)}>
+                  <Badge
+                    size="md"
+                    variant="solid"
+                    action="muted"
+                    bgColor={tierColors[dummyUser.membershipTier]}
+                    ml={4}
+                  >
+                    <BadgeText color="white" bold>
+                      {dummyUser.membershipTier}
+                    </BadgeText>
+                  </Badge>
+                </TouchableOpacity> */}
               </Box>
-              <Text style={styles.userEmail}>{dummyUser.email}</Text>
+              <Text style={styles.userEmail}>{user?.email || ""}</Text>
             </Box>
           </Box>
 
-          <Divider />
-
-          {/* Logout Section */}
           <TouchableOpacity
             onPress={handleLogout}
             style={styles.logoutTouchable}
@@ -113,9 +95,9 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
         <AlertDialogBackdrop />
         <AlertDialogContent>
           <AlertDialogHeader style={{ marginBottom: 4 }}>
-            <Heading size="md">
+            {/* <Heading size="md">
               You're a {dummyUser.membershipTier.toLocaleLowerCase()} member!
-            </Heading>
+            </Heading> */}
           </AlertDialogHeader>
           <AlertDialogBody style={{ marginTop: -20, marginBottom: 4 }}>
             <Text size="md">
@@ -135,7 +117,6 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
 
 export default AccountScreen;
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -164,17 +145,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     color: colors.dark,
-  },
-  tierBadge: {
-    marginHorizontal: 10,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 12,
-  },
-  tierText: {
-    fontSize: 12,
-    color: "#fff",
-    fontWeight: "600",
   },
   userEmail: {
     fontSize: 14,

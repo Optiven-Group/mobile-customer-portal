@@ -14,13 +14,10 @@ import {
 } from "@gluestack-ui/themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
+import { useAuth } from "../context/AuthContext";
 
 type HomeScreenProps = {
   navigation: NavigationProp<any>;
-};
-
-const user: any = {
-  fullnames: "Kasili",
 };
 
 const getGreeting = () => {
@@ -35,16 +32,17 @@ const getGreeting = () => {
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const { user } = useAuth();
   return (
     <Screen style={styles.container}>
       <Center>
-        <Heading my="$4">{`${getGreeting()}, ${user.fullnames}`}</Heading>
+        <Heading my="$4">{`${getGreeting()}, ${user?.name || "User"}`}</Heading>
         <Box flexDirection="row" justifyContent="space-around" w="90%" mb="$4">
           {[
             {
               label: "Payment Schedule",
               icon: "calendar",
-              route: "Payment Schedule",
+              route: "Properties",
             },
             {
               label: "View My Receipts",
