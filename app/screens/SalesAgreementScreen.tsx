@@ -1,5 +1,11 @@
-import React from "react";
-import { StyleSheet, Alert, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  Alert,
+  View,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
 import * as Progress from "react-native-progress";
 import Screen from "../components/Screen";
 import colors from "../utils/colors";
@@ -11,56 +17,128 @@ import {
   ScrollView,
   LockIcon,
   UnlockIcon,
+  RefreshControl,
 } from "@gluestack-ui/themed";
+import api from "../utils/api";
 
-type Property = {
-  id: string;
-  plotPrice: number;
-  amountPaid: number;
-};
-
-const properties: Property[] = [
-  { id: "JL5", plotPrice: 7900000, amountPaid: 6750000 },
-  { id: "VR28", plotPrice: 6500000, amountPaid: 6500000 },
-];
+interface Property {
+  lead_file_no: string;
+  plot_number: string;
+  purchase_price: number;
+  total_paid: number;
+  sale_agreement_sent: string;
+}
 
 const SalesAgreementScreen: React.FC = () => {
-  const handleViewAgreement = (propertyId: string): void => {
-    const property = properties.find((prop) => prop.id === propertyId);
-    if (property) {
-      const isPaymentComplete = property.amountPaid >= property.plotPrice;
-      if (isPaymentComplete) {
-        Alert.alert(
-          "Sales Agreement",
-          `You can now view your Sales Agreement for ${propertyId}.`
-        );
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+  const fetchProperties = async () => {
+    try {
+      if (!refreshing) {
+        setLoading(true);
+      }
+      const response = await api.get("/properties");
+      const fetchedProperties: Property[] = response.data.properties.map(
+        (property: any) => ({
+          lead_file_no: property.lead_file_no,
+          plot_number: property.plot_number,
+          purchase_price: property.purchase_price,
+          total_paid: property.total_paid,
+          sale_agreement_sent: property.sale_agreement_sent,
+          // Map other fields if necessary
+        })
+      );
+      setProperties(fetchedProperties);
+      setError("");
+    } catch (error: any) {
+      setError("Failed to fetch properties. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+      if (refreshing) {
+        setRefreshing(false);
       }
     }
   };
 
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchProperties();
+  };
+
+  const handleViewAgreement = (propertyId: string): void => {
+    Alert.alert(
+      "Sales Agreement",
+      `You can now view your Sales Agreement for ${propertyId}.`
+    );
+    // Implement the actual logic to view or download the sales agreement.
+  };
+
+  if (loading && !refreshing) {
+    return (
+      <Screen style={styles.container}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </Screen>
+    );
+  }
+
+  if (error) {
+    return (
+      <Screen style={styles.container}>
+        <Text style={{ color: colors.danger, textAlign: "center" }}>
+          {error}
+        </Text>
+        <Pressable onPress={fetchProperties} style={styles.retryButton}>
+          <Text style={{ color: colors.primary }}>Tap to Retry</Text>
+        </Pressable>
+      </Screen>
+    );
+  }
+
   return (
     <Screen style={styles.container}>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {properties.map((property) => {
-          const progress = property.amountPaid / property.plotPrice;
+          const progress =
+            property.total_paid && property.purchase_price
+              ? property.total_paid / property.purchase_price
+              : 0;
           const isPaymentComplete = progress >= 1;
+          const canViewAgreement =
+            isPaymentComplete &&
+            property.sale_agreement_sent.toLowerCase() === "yes";
 
           return (
-            <Box flexDirection="column" alignItems="center" key={property.id}>
+            <Box
+              flexDirection="column"
+              alignItems="center"
+              key={property.lead_file_no}
+            >
               <Card style={[styles.card, styles.propertyCard]}>
                 <Text style={styles.heading}>
-                  {property.id} - Sales Agreement
+                  {property.plot_number} - Sales Agreement
                 </Text>
                 <Text style={styles.subheading}>
                   <Text style={styles.label}>Plot Price: </Text>
                   <Text style={styles.value}>
-                    KES {property.plotPrice.toLocaleString()}
+                    KES {property.purchase_price.toLocaleString()}
                   </Text>
                 </Text>
                 <Text style={styles.subheading}>
                   <Text style={styles.label}>Amount Paid: </Text>
                   <Text style={styles.value}>
-                    KES {property.amountPaid.toLocaleString()}
+                    KES {property.total_paid.toLocaleString()}
                   </Text>
                 </Text>
               </Card>
@@ -86,14 +164,15 @@ const SalesAgreementScreen: React.FC = () => {
                   {Math.floor(progress * 100)}% Completed
                 </Text>
               </Card>
-              {isPaymentComplete && (
+              {canViewAgreement && (
                 <Card style={styles.card}>
-                  <Text
-                    onPress={() => handleViewAgreement(property.id)}
-                    style={styles.viewAgreement}
+                  <Pressable
+                    onPress={() => handleViewAgreement(property.lead_file_no)}
                   >
-                    View Sales Agreement
-                  </Text>
+                    <Text style={styles.viewAgreement}>
+                      View Sales Agreement
+                    </Text>
+                  </Pressable>
                 </Card>
               )}
             </Box>
@@ -152,6 +231,10 @@ const styles = StyleSheet.create({
   progressText: {
     marginTop: 10,
     textAlign: "center",
+  },
+  retryButton: {
+    marginTop: 20,
+    alignSelf: "center",
   },
   value: {
     fontWeight: "normal",
