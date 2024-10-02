@@ -47,7 +47,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             {
               label: "View My Receipts",
               icon: "receipt",
-              route: "View Receipts",
+              route: "Project Selection",
             },
             {
               label: "Sales Agreement",
