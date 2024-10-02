@@ -42,7 +42,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             {
               label: "Payment Schedule",
               icon: "calendar",
-              route: "Properties",
+              route: "Project Selection for Payment",
             },
             {
               label: "View My Receipts",

@@ -1,6 +1,5 @@
 export type OverviewStackParamList = {
   Home: undefined;
-  Properties: undefined;
   "Payment Schedule": {
     property: Property;
   };
@@ -12,8 +11,14 @@ export type OverviewStackParamList = {
   "View Statements": {
     property: Property;
   };
+  // Receipts Flow
   "Project Selection": undefined;
   "Property Selection": {
+    project: Project;
+  };
+  // Payment Schedule Flow
+  "Project Selection for Payment": undefined;
+  "Property Selection for Payment": {
     project: Project;
   };
 };
