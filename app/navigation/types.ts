@@ -15,3 +15,23 @@ export type AuthStackParamList = {
   ForgotPassword: undefined;
   Account: undefined;
 };
+
+export type OverviewStackParamList = {
+  Home: undefined;
+  Properties: undefined;
+  "Payment Schedule": {
+    property: Property;
+  };
+  "View Receipts": undefined;
+  "Sales Agreement": undefined;
+  "Select Property for Statements": undefined;
+  "View Statements": {
+    property: Property;
+  };
+};
+
+// Define the Property interface
+export interface Property {
+  lead_file_no: string;
+  plot_number: string;
+}

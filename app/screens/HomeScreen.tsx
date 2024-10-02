@@ -57,7 +57,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             {
               label: "View Statements",
               icon: "history",
-              route: "View Statements",
+              route: "Select Property for Statements",
             },
           ].map((item) => (
             <VStack
