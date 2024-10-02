@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ScrollView, View, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  ActivityIndicator,
+  RefreshControl,
+  FlatList,
+  View,
+} from "react-native";
 import {
   Text,
   Box,
@@ -10,7 +16,9 @@ import {
   HStack,
   Icon,
   DownloadIcon,
+  Pressable,
 } from "@gluestack-ui/themed";
+import { format } from "date-fns";
 import Screen from "../../components/Screen";
 import colors from "../../utils/colors";
 import api from "../../utils/api";
@@ -20,7 +28,6 @@ interface InstallmentSchedule {
   due_date: string;
   installment_amount: string;
   paid: string;
-  // Add other fields as needed
 }
 
 interface PaymentScheduleScreenProps {
@@ -47,28 +54,46 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
 
   const [schedules, setSchedules] = useState<InstallmentSchedule[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+
+  const fetchInstallmentSchedules = async () => {
+    try {
+      if (!refreshing) {
+        setLoading(true);
+      }
+      const response = await api.get(
+        `/properties/${property.lead_file_no}/installment-schedule`
+      );
+      const fetchedSchedules: InstallmentSchedule[] =
+        response.data.installment_schedules;
+      setSchedules(fetchedSchedules);
+      setError("");
+    } catch (error: any) {
+      setError("Failed to fetch installment schedules. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+      if (refreshing) {
+        setRefreshing(false);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!property) return;
-
-    const fetchInstallmentSchedules = async () => {
-      try {
-        const response = await api.get(
-          `/properties/${property.lead_file_no}/installment-schedule`
-        );
-        const fetchedSchedules = response.data.installment_schedules;
-        setSchedules(fetchedSchedules);
-      } catch (error: any) {
-        setError("Failed to fetch installment schedules. Please try again.");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchInstallmentSchedules();
   }, [property]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchInstallmentSchedules();
+  };
+
+  const formatAmount = (amount: string) => {
+    const number = parseFloat(amount.replace(/,/g, ""));
+    return new Intl.NumberFormat().format(number);
+  };
 
   if (!property) {
     return (
@@ -83,7 +108,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     );
   }
 
-  if (loading) {
+  if (loading && !refreshing) {
     return (
       <Screen style={styles.container}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -95,6 +120,12 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     return (
       <Screen style={styles.container}>
         <Text style={{ color: colors.danger }}>{error}</Text>
+        <Pressable
+          onPress={fetchInstallmentSchedules}
+          style={styles.retryButton}
+        >
+          <Text style={{ color: colors.primary }}>Tap to Retry</Text>
+        </Pressable>
       </Screen>
     );
   }
@@ -122,35 +153,39 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
         </Button>
       </HStack>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Box flexDirection="column" alignItems="center">
-          {schedules.map((schedule) => (
-            <Card key={schedule.is_id.toString()} style={styles.card}>
-              <VStack>
-                <Text size="sm" bold style={styles.dateText}>
-                  {new Date(schedule.due_date).toLocaleDateString()}
+      <FlatList<InstallmentSchedule>
+        data={schedules}
+        keyExtractor={(item) => item.is_id.toString()}
+        renderItem={({ item }) => (
+          <Card key={item.is_id.toString()} style={styles.card}>
+            <VStack>
+              <Text size="sm" bold style={styles.dateText}>
+                {format(new Date(item.due_date), "dd-MM-yyyy")}
+              </Text>
+              <HStack alignItems="center">
+                <Text size="2xl" bold>
+                  {formatAmount(item.installment_amount)}
                 </Text>
-                <HStack alignItems="center">
-                  <Text size="2xl" bold>
-                    {schedule.installment_amount}
-                  </Text>
-                  <Text size="xs" style={styles.currencyText}>
-                    KES
-                  </Text>
-                </HStack>
-              </VStack>
-              <VStack style={styles.paymentDetails}>
-                <View
-                  style={[
-                    styles.statusDot,
-                    { backgroundColor: statusColor(schedule.paid) },
-                  ]}
-                />
-              </VStack>
-            </Card>
-          ))}
-        </Box>
-      </ScrollView>
+                <Text size="xs" style={styles.currencyText}>
+                  KES
+                </Text>
+              </HStack>
+            </VStack>
+            <VStack style={styles.paymentDetails}>
+              <View
+                style={[
+                  styles.statusDot,
+                  { backgroundColor: statusColor(item.paid) },
+                ]}
+              />
+            </VStack>
+          </Card>
+        )}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
     </Screen>
   );
 };
@@ -162,6 +197,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 90,
+    alignItems: "center",
   },
   card: {
     flexDirection: "row",
@@ -217,6 +253,10 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 10,
     marginBottom: 10,
+  },
+  retryButton: {
+    marginTop: 20,
+    alignSelf: "center",
   },
 });
 

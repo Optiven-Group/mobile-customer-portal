@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import {
-  Card,
-  Text,
-  VStack,
-  Pressable,
-} from "@gluestack-ui/themed";
+  StyleSheet,
+  ActivityIndicator,
+  RefreshControl,
+  FlatList,
+  View,
+} from "react-native";
+import { Card, Text, VStack, Pressable } from "@gluestack-ui/themed";
 import Screen from "../../components/Screen";
 import { NavigationProp } from "@react-navigation/native";
 import colors from "../../utils/colors";
-import api from "../../utils/api"; // Import the api utility
+import api from "../../utils/api";
 
 type SelectPropertyScreenProps = {
   navigation: NavigationProp<any>;
@@ -18,7 +19,6 @@ type SelectPropertyScreenProps = {
 interface Property {
   lead_file_no: string;
   plot_number: string;
-  // Add other fields you need
 }
 
 const SelectPropertyScreen: React.FC<SelectPropertyScreenProps> = ({
@@ -27,29 +27,42 @@ const SelectPropertyScreen: React.FC<SelectPropertyScreenProps> = ({
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+
+  const fetchProperties = async () => {
+    try {
+      if (!refreshing) {
+        setLoading(true);
+      }
+      const response = await api.get("/properties");
+      const fetchedProperties: Property[] = response.data.properties;
+      setProperties(fetchedProperties);
+      setError("");
+    } catch (error: any) {
+      setError("Failed to fetch properties. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+      if (refreshing) {
+        setRefreshing(false);
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const response = await api.get("/properties");
-        const fetchedProperties = response.data.properties;
-        setProperties(fetchedProperties);
-      } catch (error: any) {
-        setError("Failed to fetch properties. Please try again.");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProperties();
   }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchProperties();
+  };
 
   const handlePropertySelect = (property: Property) => {
     navigation.navigate("Payment Schedule", { property });
   };
 
-  if (loading) {
+  if (loading && !refreshing) {
     return (
       <Screen style={styles.container}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -60,30 +73,37 @@ const SelectPropertyScreen: React.FC<SelectPropertyScreenProps> = ({
   if (error) {
     return (
       <Screen style={styles.container}>
-        <Text style={{ color: colors.danger }}>{error}</Text>
+        <Text style={{ color: colors.danger, textAlign: "center" }}>
+          {error}
+        </Text>
+        <Pressable onPress={fetchProperties} style={styles.retryButton}>
+          <Text style={{ color: colors.primary }}>Tap to Retry</Text>
+        </Pressable>
       </Screen>
     );
   }
 
   return (
     <Screen style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {properties.map((property) => (
-          <Pressable
-            key={property.lead_file_no}
-            onPress={() => handlePropertySelect(property)}
-          >
+      <FlatList<Property>
+        data={properties}
+        keyExtractor={(item) => item.lead_file_no}
+        renderItem={({ item }) => (
+          <Pressable onPress={() => handlePropertySelect(item)}>
             <Card style={styles.card}>
               <VStack>
                 <Text bold size="lg">
-                  {property.plot_number}
+                  {item.plot_number}
                 </Text>
-                {/* Add other property details if needed */}
               </VStack>
             </Card>
           </Pressable>
-        ))}
-      </ScrollView>
+        )}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
     </Screen>
   );
 };
@@ -104,6 +124,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 12,
     elevation: 3,
+  },
+  retryButton: {
+    marginTop: 20,
+    alignSelf: "center",
   },
 });
 
