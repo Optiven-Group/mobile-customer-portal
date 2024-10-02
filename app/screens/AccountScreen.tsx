@@ -24,12 +24,14 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
 import { useAuth } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "../navigation/types";
+import { AccountStackParamList } from "../navigation/types";
 
+type AccountScreenProps = NativeStackScreenProps<
+  AccountStackParamList,
+  "Account"
+>;
 
-type AccountScreenProps = NativeStackScreenProps<AuthStackParamList, "Account">;
-
-const AccountScreen: React.FC = () => {
+const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
   const [showAlertDialog, setShowAlertDialog] = useState<boolean>(false);
   const handleClose = () => setShowAlertDialog(false);
 

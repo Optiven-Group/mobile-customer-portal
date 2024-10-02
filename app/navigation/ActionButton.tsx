@@ -12,16 +12,21 @@ import {
   ExternalLinkIcon,
 } from "@gluestack-ui/themed";
 import colors from "../utils/colors";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../navigation/types";
 
-interface ActionButtonProps {
-  onPress: () => void;
-}
-
-export default function ActionButton({ onPress }: ActionButtonProps) {
+export default function ActionButton() {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const handleMenuItemPress = (routeName: keyof RootStackParamList) => {
+    setIsOpen(false);
+    navigation.navigate(routeName);
   };
 
   return (
@@ -42,15 +47,27 @@ export default function ActionButton({ onPress }: ActionButtonProps) {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
       >
-        <MenuItem key="Payment" textValue="Payment">
+        <MenuItem
+          key="MakePayment"
+          textValue="Make Payment"
+          onPress={() => handleMenuItemPress("MakePayment")}
+        >
           <Icon as={ExternalLinkIcon} size="sm" mr="$2" />
           <MenuItemLabel size="sm">Make Payment</MenuItemLabel>
         </MenuItem>
-        <MenuItem key="Settings" textValue="Settings">
+        <MenuItem
+          key="Settings"
+          textValue="Settings"
+          onPress={() => handleMenuItemPress("Settings")}
+        >
           <Icon as={SettingsIcon} size="sm" mr="$2" />
           <MenuItemLabel size="sm">Settings</MenuItemLabel>
         </MenuItem>
-        <MenuItem key="More" textValue="More">
+        <MenuItem
+          key="More"
+          textValue="More"
+          onPress={() => handleMenuItemPress("Support")}
+        >
           <Icon as={AddIcon} size="sm" mr="$2" />
           <MenuItemLabel size="sm">More</MenuItemLabel>
         </MenuItem>

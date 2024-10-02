@@ -1,3 +1,27 @@
+// Auth Stack Param List
+export type AuthStackParamList = {
+  Login: undefined;
+  VerifyUser: undefined;
+  VerifyOTP: undefined;
+  CreatePassword: undefined;
+  ForgotPassword: undefined;
+};
+
+// Account Stack Param List
+export type AccountStackParamList = {
+  Account: undefined;
+  // other account related screens
+};
+
+// Root Stack Param List (for global navigation)
+export type RootStackParamList = {
+  Main: undefined; // Tab Navigator
+  MakePayment: undefined;
+  Settings: undefined;
+  Support: undefined;
+};
+
+// Existing Overview Stack Param List
 export type OverviewStackParamList = {
   Home: undefined;
   "Payment Schedule": {
@@ -27,7 +51,7 @@ export type OverviewStackParamList = {
   };
 };
 
-// Project interface
+// Project Interface
 export interface Project {
   project_id: number;
   name: string;
@@ -35,14 +59,14 @@ export interface Project {
   // other fields
 }
 
-// Property interface
+// Property Interface
 export interface Property {
   lead_file_no: string;
   plot_number: string;
   // other fields
 }
 
-// Receipt interface
+// Receipt Interface
 export interface Receipt {
   id: number;
   receipt_no: string;

@@ -3,14 +3,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import OverviewNavigator from "./OverviewNavigator";
 import ActionButton from "./ActionButton";
-import { View, Text } from "react-native";
 import AccountNavigator from "./AccountNavigator";
 
-const PlaceholderComponent = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text>No content here. This tab is for actions.</Text>
-  </View>
-);
 const Tab = createBottomTabNavigator();
 
 const tabScreenOptions = {
@@ -22,6 +16,7 @@ const tabScreenOptions = {
 const AppNavigator = () => {
   return (
     <Tab.Navigator screenOptions={tabScreenOptions} initialRouteName="Overview">
+      {/* Overview Tab */}
       <Tab.Screen
         name="Overview"
         component={OverviewNavigator}
@@ -31,26 +26,18 @@ const AppNavigator = () => {
           ),
         }}
       />
+
+      {/* Action Center Tab */}
       <Tab.Screen
         name="Action Center"
-        component={PlaceholderComponent}
-        options={({ navigation }) => ({
-          tabBarButton: () => (
-            <ActionButton
-              onPress={() => {
-                console.log("Action Center button pressed");
-              }}
-            />
-          ),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="plus-circle"
-              color={color}
-              size={size}
-            />
-          ),
-        })}
-      />
+        options={{
+          tabBarButton: () => <ActionButton />,
+        }}
+      >
+        {() => null}
+      </Tab.Screen>
+
+      {/* Profile Tab */}
       <Tab.Screen
         name="Profile"
         component={AccountNavigator}

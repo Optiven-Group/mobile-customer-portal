@@ -2,7 +2,7 @@ import React from "react";
 import { config } from "@gluestack-ui/config";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { NavigationContainer } from "@react-navigation/native";
-import AppNavigator from "./app/navigation/AppNavigator";
+import RootNavigator from "./app/navigation/RootNavigator";
 import AuthNavigator from "./app/navigation/AuthNavigator";
 import { AuthProvider, useAuth } from "./app/context/AuthContext";
 
@@ -20,5 +20,5 @@ export default function App() {
 
 const MainNavigator = () => {
   const { isLoggedIn } = useAuth();
-  return isLoggedIn ? <AppNavigator /> : <AuthNavigator />;
+  return isLoggedIn ? <RootNavigator /> : <AuthNavigator />;
 };
