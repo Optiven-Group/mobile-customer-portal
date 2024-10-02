@@ -14,7 +14,9 @@ import api from "../utils/api";
 
 type ProjectSelectionScreenProps = NativeStackScreenProps<
   OverviewStackParamList,
-  "Project Selection for Payment" | "Project Selection"
+  | "Project Selection for Payment"
+  | "Project Selection"
+  | "Project Selection for Statements"
 >;
 
 const ProjectSelectionScreen = ({
@@ -58,6 +60,8 @@ const ProjectSelectionScreen = ({
     const nextScreen =
       route.name === "Project Selection for Payment"
         ? "Property Selection for Payment"
+        : route.name === "Project Selection for Statements"
+        ? "Property Selection for Statements"
         : "Property Selection";
     navigation.navigate(nextScreen, { project });
   };

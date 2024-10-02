@@ -4,26 +4,24 @@ import {
   ActivityIndicator,
   RefreshControl,
   FlatList,
-  View,
 } from "react-native";
 import { Card, Text, VStack, Pressable } from "@gluestack-ui/themed";
 import Screen from "../../components/Screen";
-import { NavigationProp } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { OverviewStackParamList, Property } from "../../navigation/types";
 import colors from "../../utils/colors";
 import api from "../../utils/api";
 
-type SelectPropertyScreenProps = {
-  navigation: NavigationProp<any>;
-};
+type PropertySelectionForStatementsScreenProps = NativeStackScreenProps<
+  OverviewStackParamList,
+  "Property Selection for Statements"
+>;
 
-interface Property {
-  lead_file_no: string;
-  plot_number: string;
-}
+const PropertySelectionForStatementsScreen: React.FC<
+  PropertySelectionForStatementsScreenProps
+> = ({ navigation, route }) => {
+  const { project } = route.params;
 
-const SelectPropertyScreen: React.FC<SelectPropertyScreenProps> = ({
-  navigation,
-}) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -34,7 +32,9 @@ const SelectPropertyScreen: React.FC<SelectPropertyScreenProps> = ({
       if (!refreshing) {
         setLoading(true);
       }
-      const response = await api.get("/properties");
+      const response = await api.get(
+        `/projects/${project.project_id}/properties`
+      );
       const fetchedProperties: Property[] = response.data.properties;
       setProperties(fetchedProperties);
       setError("");
@@ -59,7 +59,7 @@ const SelectPropertyScreen: React.FC<SelectPropertyScreenProps> = ({
   };
 
   const handlePropertySelect = (property: Property) => {
-    navigation.navigate("Payment Schedule", { property });
+    navigation.navigate("View Statements", { property });
   };
 
   if (loading && !refreshing) {
@@ -108,6 +108,8 @@ const SelectPropertyScreen: React.FC<SelectPropertyScreenProps> = ({
   );
 };
 
+export default PropertySelectionForStatementsScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -130,5 +132,3 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
 });
-
-export default SelectPropertyScreen;

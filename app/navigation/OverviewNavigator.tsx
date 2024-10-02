@@ -5,12 +5,11 @@ import HomeScreen from "../screens/HomeScreen";
 import PaymentScheduleScreen from "../screens/payment-schedule/PaymentScheduleScreen";
 import SalesAgreementScreen from "../screens/SalesAgreementScreen";
 import ViewStatementsScreen from "../screens/statements/ViewStatementsScreen";
-import ProjectSelectionScreen from "../screens/ProjectSelectionScreen"; // Adjusted import
-import PropertySelectionForPaymentScreen from "../screens/payment-schedule/PropertySelectionScreen"; // New import
-import SelectPropertyForStatementsScreen from "../screens/statements/SelectProperty";
-import ViewReceiptsScreen from "../screens/receipts/ViewReceiptsScreen";
-import ProjectSelectionForReceiptsScreen from "../screens/ProjectSelectionScreen";
+import ProjectSelectionScreen from "../screens/ProjectSelectionScreen";
+import PropertySelectionForPaymentScreen from "../screens/payment-schedule/PropertySelectionScreen";
 import PropertySelectionForReceiptsScreen from "../screens/receipts/PropertySelectionScreen";
+import ViewReceiptsScreen from "../screens/receipts/ViewReceiptsScreen";
+import PropertySelectionForStatementsScreen from "../screens/statements/PropertySelectionScreen";
 
 const Stack = createNativeStackNavigator<OverviewStackParamList>();
 
@@ -23,6 +22,7 @@ const OverviewNavigator: React.FC = () => {
         headerTitleAlign: "center",
       }}
     >
+      {/* Home Screen */}
       <Stack.Screen
         name="Home"
         component={HomeScreen}
@@ -43,7 +43,7 @@ const OverviewNavigator: React.FC = () => {
       {/* Receipts Flow */}
       <Stack.Screen
         name="Project Selection"
-        component={ProjectSelectionForReceiptsScreen}
+        component={ProjectSelectionScreen}
         options={{ title: "Select Project" }}
       />
       <Stack.Screen
@@ -56,13 +56,20 @@ const OverviewNavigator: React.FC = () => {
         component={ViewReceiptsScreen}
         options={{ title: "Receipts" }}
       />
-      <Stack.Screen name="Sales Agreement" component={SalesAgreementScreen} />
+      {/* Statements Flow */}
       <Stack.Screen
-        name="Select Property for Statements"
-        component={SelectPropertyForStatementsScreen}
+        name="Project Selection for Statements"
+        component={ProjectSelectionScreen}
+        options={{ title: "Select Project" }}
+      />
+      <Stack.Screen
+        name="Property Selection for Statements"
+        component={PropertySelectionForStatementsScreen}
         options={{ title: "Select Property" }}
       />
       <Stack.Screen name="View Statements" component={ViewStatementsScreen} />
+      {/* Sales Agreement */}
+      <Stack.Screen name="Sales Agreement" component={SalesAgreementScreen} />
     </Stack.Navigator>
   );
 };
