@@ -11,7 +11,6 @@ import {
   Button,
   ButtonText,
   Box,
-  Heading,
   VStack,
   ChevronRightIcon,
   Icon,
@@ -19,12 +18,14 @@ import {
   BadgeText,
 } from "@gluestack-ui/themed";
 import { Text } from "@gluestack-ui/themed";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, Share } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
 import { useAuth } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AccountStackParamList } from "../navigation/types";
+import { ShareIcon } from "@gluestack-ui/themed";
+import Screen from "../components/Screen";
 
 type AccountScreenProps = NativeStackScreenProps<
   AccountStackParamList,
@@ -32,18 +33,45 @@ type AccountScreenProps = NativeStackScreenProps<
 >;
 
 const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
-  const [showAlertDialog, setShowAlertDialog] = useState<boolean>(false);
-  const handleClose = () => setShowAlertDialog(false);
-
   const { user, logout } = useAuth();
+
+  // Function to determine membership tier
+  const getMembershipTier = (totalSpent: number): string => {
+    if (totalSpent >= 20000000) return "Platinum";
+    if (totalSpent >= 10000000) return "Gold";
+    if (totalSpent >= 5000000) return "Silver";
+    if (totalSpent >= 1000000) return "Bronze";
+    return "Sapphire";
+  };
+
+  // Define colors for each tier
+  const tierColors: { [key: string]: string } = {
+    Platinum: "#E5E4E2",
+    Gold: "#FFD700",
+    Silver: "#C0C0C0",
+    Bronze: "#CD7F32",
+    Sapphire: "#0F52BA",
+  };
+
+  const totalSpent = user?.totalSpent ?? 0; // Use nullish coalescing
+  const membershipTier = getMembershipTier(totalSpent);
 
   const handleLogout = async () => {
     await logout();
   };
 
+  const handleInvite = () => {
+    const message = `Join this amazing real estate app using my referral code: ${
+      user?.referralCode ?? "r45dAsdeK8"
+    }`;
+    Share.share({
+      message,
+    });
+  };
+
   return (
     <>
-      <Box style={styles.container}>
+      <Screen style={styles.container}>
         <VStack pt={20} px={20}>
           {/* User Info Section */}
           <Box style={styles.userInfoContainer}>
@@ -53,24 +81,52 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
             <Box ml={16} style={styles.userInfo}>
               <Box style={styles.nameContainer}>
                 <Text style={styles.userName}>{user?.name || "User"}</Text>
-                {/* <TouchableOpacity onPress={() => setShowAlertDialog(true)}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("LoyaltyInfo")}
+                >
                   <Badge
                     size="md"
                     variant="solid"
                     action="muted"
-                    bgColor={tierColors[dummyUser.membershipTier]}
+                    bgColor={tierColors[membershipTier]}
                     ml={4}
                   >
                     <BadgeText color="white" bold>
-                      {dummyUser.membershipTier}
+                      {membershipTier}
                     </BadgeText>
                   </Badge>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
               </Box>
               <Text style={styles.userEmail}>{user?.email || ""}</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("LoyaltyInfo")}
+              >
+                <Text style={styles.learnMoreText} size="sm" bold>
+                  Learn More
+                </Text>
+              </TouchableOpacity>
             </Box>
           </Box>
 
+          {/* Refer to Earn Section */}
+          <Box style={styles.referContainer}>
+            <Box style={styles.referContent}>
+              <Box style={styles.referImageContainer}>
+                <Icon as={ShareIcon} style={styles.referImage} />
+              </Box>
+              <VStack>
+                <Text style={styles.referTitle}>Invite & get rewards</Text>
+                <Text style={styles.referCode}>
+                  Your code {user?.referralCode || "r45dAsdeK8"}
+                </Text>
+              </VStack>
+            </Box>
+            <Button onPress={handleInvite} style={styles.inviteButton}>
+              <ButtonText style={styles.inviteButtonText}>Invite</ButtonText>
+            </Button>
+          </Box>
+
+          {/* Logout Button */}
           <TouchableOpacity
             onPress={handleLogout}
             style={styles.logoutTouchable}
@@ -92,27 +148,9 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
             </Box>
           </TouchableOpacity>
         </VStack>
-      </Box>
-      <AlertDialog isOpen={showAlertDialog} onClose={handleClose} size="md">
-        <AlertDialogBackdrop />
-        <AlertDialogContent>
-          <AlertDialogHeader style={{ marginBottom: 4 }}>
-            {/* <Heading size="md">
-              You're a {dummyUser.membershipTier.toLocaleLowerCase()} member!
-            </Heading> */}
-          </AlertDialogHeader>
-          <AlertDialogBody style={{ marginTop: -20, marginBottom: 4 }}>
-            <Text size="md">
-              This means you're entitled to some 5% off of all meals at GMC!
-            </Text>
-          </AlertDialogBody>
-          <AlertDialogFooter style={{ marginTop: -20, marginBottom: 4 }}>
-            <Button size="sm" onPress={handleClose} bgColor="black">
-              <ButtonText>Close</ButtonText>
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      </Screen>
+
+      {/* AlertDialog can be removed if not needed */}
     </>
   );
 };
@@ -152,6 +190,56 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.medium,
     marginTop: 4,
+  },
+  learnMoreText: {
+    color: colors.primary,
+    marginTop: 4,
+  },
+  referContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: colors.white,
+    padding: 16,
+    borderRadius: 12,
+    borderColor: colors.light,
+    borderWidth: 1,
+    marginTop: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  referContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  referImageContainer: {
+    height: 40,
+    width: 40,
+    marginRight: 12,
+  },
+  referImage: {
+    height: "100%",
+    width: "100%",
+  },
+  referTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: colors.dark,
+  },
+  referCode: {
+    fontSize: 14,
+    color: colors.medium,
+  },
+  inviteButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: colors.primary,
+  },
+  inviteButtonText: {
+    color: colors.white,
+    fontSize: 14,
   },
   logoutTouchable: {
     marginTop: 20,

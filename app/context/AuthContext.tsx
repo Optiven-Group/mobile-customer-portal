@@ -12,6 +12,9 @@ interface User {
   id: number;
   email: string;
   name: string;
+  // to remove
+  totalSpent: number;
+  referralCode: string;
 }
 
 interface AuthContextType {
