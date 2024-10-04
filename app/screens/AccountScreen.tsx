@@ -54,7 +54,9 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
   };
 
   const totalSpent = user?.totalSpent ?? 0; // Use nullish coalescing
-  const membershipTier = getMembershipTier(totalSpent);
+  // const membershipTier = getMembershipTier(totalSpent);
+  // remove this later
+  const membershipTier = getMembershipTier(1000000);
 
   const handleLogout = async () => {
     await logout();
