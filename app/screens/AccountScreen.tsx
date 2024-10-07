@@ -117,7 +117,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
                 <Icon as={ShareIcon} style={styles.referImage} />
               </Box>
               <VStack>
-                <Text style={styles.referTitle}>Invite & get rewards</Text>
+                <Text style={styles.referTitle}>Refer & get rewards</Text>
                 <Text style={styles.referCode}>
                   Your code {user?.referralCode || "r45dAsdeK8"}
                 </Text>
