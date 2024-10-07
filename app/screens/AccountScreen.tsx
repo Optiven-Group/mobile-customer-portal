@@ -25,7 +25,7 @@ import { useAuth } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AccountStackParamList } from "../navigation/types";
 import { ShareIcon } from "@gluestack-ui/themed";
-import Screen from "../components/Screen";
+import Screen from "../app-components/Screen";
 
 type AccountScreenProps = NativeStackScreenProps<
   AccountStackParamList,

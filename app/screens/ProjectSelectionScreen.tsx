@@ -6,7 +6,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { Card, Text, Pressable } from "@gluestack-ui/themed";
-import Screen from "../components/Screen";
+import Screen from "../app-components/Screen";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { OverviewStackParamList, Project } from "../navigation/types";
 import colors from "../utils/colors";
@@ -61,8 +61,8 @@ const ProjectSelectionScreen = ({
       route.name === "Project Selection for Payment"
         ? "Property Selection for Payment"
         : route.name === "Project Selection for Statements"
-        ? "Property Selection for Statements"
-        : "Property Selection";
+          ? "Property Selection for Statements"
+          : "Property Selection";
     navigation.navigate(nextScreen, { project });
   };
 

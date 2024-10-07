@@ -11,7 +11,7 @@ import {
   Textarea,
   TextareaInput,
 } from "@gluestack-ui/themed";
-import Screen from "../components/Screen";
+import Screen from "../app-components/Screen";
 
 const FeedbackScreen = () => {
   return (

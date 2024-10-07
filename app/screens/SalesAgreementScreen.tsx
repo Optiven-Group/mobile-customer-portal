@@ -7,7 +7,7 @@ import {
   Pressable,
 } from "react-native";
 import * as Progress from "react-native-progress";
-import Screen from "../components/Screen";
+import Screen from "../app-components/Screen";
 import colors from "../utils/colors";
 import {
   Box,

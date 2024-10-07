@@ -6,7 +6,7 @@ import {
   FlatList,
 } from "react-native";
 import { Card, Text, VStack, Pressable } from "@gluestack-ui/themed";
-import Screen from "../../components/Screen";
+import Screen from "../../app-components/Screen";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { OverviewStackParamList, Property } from "../../navigation/types";
 import colors from "../../utils/colors";

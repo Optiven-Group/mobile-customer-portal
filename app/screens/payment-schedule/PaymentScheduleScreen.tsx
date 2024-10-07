@@ -18,7 +18,7 @@ import {
   Pressable,
 } from "@gluestack-ui/themed";
 import { format } from "date-fns";
-import Screen from "../../components/Screen";
+import Screen from "../../app-components/Screen";
 import colors from "../../utils/colors";
 import api from "../../utils/api";
 

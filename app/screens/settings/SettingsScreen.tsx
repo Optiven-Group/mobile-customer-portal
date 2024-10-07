@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Use for icons
-import Screen from "../../components/Screen";
+import Screen from "../../app-components/Screen";
 import { Icon, LockIcon } from "@gluestack-ui/themed";
 
 const SettingsScreen = () => {
@@ -59,8 +59,8 @@ const SettingsScreen = () => {
 
         {/* Privacy Section */}
         <View style={styles.section}>
-          <TouchableOpacity style={styles.settingItem}>            
-            <Icon as={LockIcon}  />
+          <TouchableOpacity style={styles.settingItem}>
+            <Icon as={LockIcon} />
             <Text style={styles.settingText}>Privacy</Text>
           </TouchableOpacity>
         </View>

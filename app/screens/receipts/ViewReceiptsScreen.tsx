@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from "react-native";
-import Screen from "../../components/Screen";
+import Screen from "../../app-components/Screen";
 import { formatCurrency } from "../../utils/formatCurrency";
 import {
   HStack,

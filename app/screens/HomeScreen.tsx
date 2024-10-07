@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Image, ScrollView } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
-import Screen from "../components/Screen";
+import Screen from "../app-components/Screen";
 import {
   Box,
   Button,

@@ -7,7 +7,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { format } from "date-fns";
-import Screen from "../../components/Screen";
+import Screen from "../../app-components/Screen";
 import colors from "../../utils/colors";
 import { Text, Pressable } from "@gluestack-ui/themed";
 import { formatCurrency } from "../../utils/formatCurrency";

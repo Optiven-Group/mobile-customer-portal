@@ -12,7 +12,7 @@ import {
   InputField,
   Image,
 } from "@gluestack-ui/themed";
-import Screen from "../../components/Screen";
+import Screen from "../../app-components/Screen";
 import api from "../../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../navigation/types";
