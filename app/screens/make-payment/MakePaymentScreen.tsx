@@ -1,31 +1,21 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from "react-native";
-import {
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
-  ChevronDownIcon,
-} from "@gluestack-ui/themed";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, Alert } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/types";
+import { useStripe, CardField } from "@stripe/stripe-react-native";
+import api from "../../utils/api";
 import {
-  RootStackParamList,
-  InstallmentSchedule,
-  Property,
-} from "../../navigation/types";
+  Box,
+  FormControlLabel,
+  FormControlLabelText,
+  Input,
+  InputField,
+  Text,
+  Button,
+  ButtonText,
+} from "@gluestack-ui/themed";
+import colors from "../../utils/colors";
+import { useAuth } from "../../context/AuthContext";
 
 type MakePaymentScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -36,133 +26,157 @@ const MakePaymentScreen: React.FC<MakePaymentScreenProps> = ({
   route,
   navigation,
 }) => {
-  const params = route.params || {};
-  const { payment, property } = params;
+  const { payment, property } = route.params;
 
-  // Simulated property data (dummy data)
-  const properties: Property[] = [
-    { code: "VR77", lead_file_no: "123", plot_number: "A1" },
-    { code: "VR88", lead_file_no: "124", plot_number: "B1" },
-    { code: "VR99", lead_file_no: "125", plot_number: "C1" },
-  ];
+  // Get user from AuthContext
+  const { user } = useAuth();
 
-  const [amount, setAmount] = useState(payment?.installment_amount || "");
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [selectedProperty, setSelectedProperty] = useState(
-    property?.code || ""
-  );
+  // Check if user, payment, and property are defined
+  if (!user || !user.email) {
+    Alert.alert("Error", "User is not logged in or email is missing.");
+    navigation.goBack();
+    return null;
+  }
 
-  useEffect(() => {
-    // Autofill property if the user has only one property or if property is provided
-    if (property) {
-      setSelectedProperty(property.code);
-    } else if (properties.length === 1) {
-      setSelectedProperty(properties[0].code);
-    }
-  }, [properties, property]);
+  if (!payment || !property) {
+    Alert.alert("Error", "Payment or property information is missing.");
+    navigation.goBack();
+    return null;
+  }
 
-  const handlePayment = () => {
-    if (amount === "") {
+  const stripe = useStripe();
+
+  const [amount, setAmount] = useState(payment.installment_amount || "");
+  const [cardDetails, setCardDetails] = useState({ complete: false });
+
+  const handlePayment = async () => {
+    if (!amount) {
       Alert.alert("Error", "Please enter an amount.");
       return;
     }
 
-    if (paymentMethod === "") {
-      Alert.alert("Error", "Please select a payment method.");
+    if (!cardDetails.complete) {
+      Alert.alert("Error", "Please enter complete card details.");
       return;
     }
 
-    if (selectedProperty === "") {
-      Alert.alert("Error", "Please select a property.");
-      return;
-    }
+    try {
+      // Convert amount to integer (in the smallest currency unit)
+      const amountInt = parseInt(amount.replace(/,/g, ""), 10) * 100;
 
-    // Payment processing logic here (replace with real payment logic)
-    Alert.alert(
-      "Payment Successful",
-      `You have paid ${amount} for property ${selectedProperty} using ${paymentMethod}.`
-    );
+      // Create PaymentIntent on the backend
+      const response = await api.post("/create-payment-intent", {
+        amount: amountInt,
+        currency: "kes",
+        customer_email: user.email,
+      });
+
+      const { clientSecret } = response.data;
+
+      // Confirm the payment
+      const { error, paymentIntent } = await stripe.confirmPayment(
+        clientSecret,
+        {
+          paymentMethodType: "Card",
+          paymentMethodData: {
+            billingDetails: {
+              email: user.email,
+            },
+          },
+        }
+      );
+
+      if (error) {
+        Alert.alert("Payment Error", error.message || "An error occurred");
+      } else if (paymentIntent) {
+        Alert.alert("Payment Successful", "Your payment was successful.");
+        // Optionally, update payment status or refresh data
+        navigation.goBack();
+      }
+    } catch (err: any) {
+      console.error(err);
+      Alert.alert("Payment Error", "An error occurred during payment.");
+    }
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>Make a Payment</Text>
 
-      {/* Property Select */}
-      {properties.length > 1 && (
-        <>
-          <Text style={styles.label}>Select Property</Text>
-          <Select
-            onValueChange={setSelectedProperty}
-            selectedValue={selectedProperty}
-            mb="$4"
-          >
-            <SelectTrigger variant="outline" size="md">
-              <SelectInput placeholder="Select Property" />
-              <SelectIcon mr="$3" as={ChevronDownIcon} />
-            </SelectTrigger>
-            <SelectPortal>
-              <SelectBackdrop />
-              <SelectContent>
-                <SelectDragIndicatorWrapper>
-                  <SelectDragIndicator />
-                </SelectDragIndicatorWrapper>
-                {properties.map((property) => (
-                  <SelectItem
-                    key={property.code}
-                    label={property.code}
-                    value={property.code}
-                  />
-                ))}
-              </SelectContent>
-            </SelectPortal>
-          </Select>
-        </>
-      )}
+      {/* Property Information */}
+      <Box>
+        <FormControlLabel mb="$1">
+          <FormControlLabelText>Plot Number</FormControlLabelText>
+        </FormControlLabel>
+        <Input
+          variant="outline"
+          size="md"
+          isDisabled={true}
+          isInvalid={false}
+          isReadOnly={true}
+        >
+          <InputField value={property.plot_number} />
+        </Input>
+      </Box>
 
       {/* Amount Input */}
-      <Text style={styles.label}>Enter Amount</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="300,000"
-        keyboardType="numeric"
-        value={amount}
-        onChangeText={setAmount}
-      />
+      <Box mt="$4">
+        <FormControlLabel mb="$1">
+          <FormControlLabelText>Amount (KES)</FormControlLabelText>
+        </FormControlLabel>
+        <Input variant="outline" size="md">
+          <InputField
+            placeholder="Amount"
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={setAmount}
+          />
+        </Input>
+      </Box>
 
-      {/* Payment Method Select */}
-      <Text style={styles.label}>Select Payment Method</Text>
-      <Select onValueChange={setPaymentMethod} mb="$4">
-        <SelectTrigger variant="outline" size="md">
-          <SelectInput placeholder="Select Payment Method" />
-          <SelectIcon mr="$3" as={ChevronDownIcon} />
-        </SelectTrigger>
-        <SelectPortal>
-          <SelectBackdrop />
-          <SelectContent>
-            <SelectDragIndicatorWrapper>
-              <SelectDragIndicator />
-            </SelectDragIndicatorWrapper>
-            <SelectItem label="Credit Card" value="credit-card" />
-            <SelectItem label="Mobile Money" value="mobile-money" />
-            <SelectItem label="MPESA" value="mpesa" />
-          </SelectContent>
-        </SelectPortal>
-      </Select>
+      {/* Card Input Field */}
+      <Box mt="$4">
+        <FormControlLabel mb="$1">
+          <FormControlLabelText>Card Details</FormControlLabelText>
+        </FormControlLabel>
+        <CardField
+          postalCodeEnabled={false}
+          placeholders={{
+            number: "4242 4242 4242 4242",
+            expiration: "MM/YY",
+            cvc: "CVC",
+          }}
+          cardStyle={{
+            backgroundColor: "#FFFFFF",
+            textColor: "#000000",
+          }}
+          style={{
+            width: "100%",
+            height: 50,
+            marginVertical: 10,
+          }}
+          onCardChange={(details) => {
+            setCardDetails(details);
+          }}
+        />
+      </Box>
 
       {/* Pay Button */}
-      <TouchableOpacity style={styles.button} onPress={handlePayment}>
-        <Text style={styles.buttonText}>Pay Now</Text>
-      </TouchableOpacity>
-    </View>
+      <Button onPress={handlePayment} bgColor={colors.black} mt="$4">
+        <ButtonText>Pay Securely</ButtonText>
+      </Button>
+    </ScrollView>
   );
 };
 
+export default MakePaymentScreen;
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
     justifyContent: "center",
+    backgroundColor: "#fff",
   },
   header: {
     fontSize: 24,
@@ -170,28 +184,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  input: {
-    height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    paddingHorizontal: 10,
+  propertyInfo: {
+    fontSize: 18,
     marginBottom: 20,
-    borderRadius: 8,
+    color: "#000",
   },
   button: {
     backgroundColor: "#28a745",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
+    marginTop: 20,
   },
   buttonText: {
     color: "#fff",
     fontSize: 18,
   },
 });
-
-export default MakePaymentScreen;

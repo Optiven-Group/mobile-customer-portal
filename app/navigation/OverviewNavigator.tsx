@@ -32,24 +32,24 @@ const OverviewNavigator: React.FC = () => {
       <Stack.Screen
         name="Project Selection for Payment"
         component={ProjectSelectionScreen}
-        options={{ title: "Select Project" }}
+        options={{ title: "Project" }}
       />
       <Stack.Screen
         name="Property Selection for Payment"
         component={PropertySelectionForPaymentScreen}
-        options={{ title: "Select Property" }}
+        options={{ title: "Property" }}
       />
       <Stack.Screen name="Payment Schedule" component={PaymentScheduleScreen} />
       {/* Receipts Flow */}
       <Stack.Screen
         name="Project Selection"
         component={ProjectSelectionScreen}
-        options={{ title: "Select Project" }}
+        options={{ title: "Project" }}
       />
       <Stack.Screen
         name="Property Selection"
         component={PropertySelectionForReceiptsScreen}
-        options={{ title: "Select Property" }}
+        options={{ title: "Property" }}
       />
       <Stack.Screen
         name="View Receipts"
@@ -60,12 +60,12 @@ const OverviewNavigator: React.FC = () => {
       <Stack.Screen
         name="Project Selection for Statements"
         component={ProjectSelectionScreen}
-        options={{ title: "Select Project" }}
+        options={{ title: "Project" }}
       />
       <Stack.Screen
         name="Property Selection for Statements"
         component={PropertySelectionForStatementsScreen}
-        options={{ title: "Select Property" }}
+        options={{ title: "Property" }}
       />
       <Stack.Screen name="View Statements" component={ViewStatementsScreen} />
       {/* Sales Agreement */}

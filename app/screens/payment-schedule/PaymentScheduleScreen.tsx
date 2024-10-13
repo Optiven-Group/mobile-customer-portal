@@ -32,13 +32,8 @@ import {
   OverviewStackParamList,
   RootStackParamList,
 } from "../../navigation/types";
-import {
-  CompositeNavigationProp,
-  RouteProp,
-} from "@react-navigation/native";
-import {
-  NativeStackNavigationProp,
-} from "@react-navigation/native-stack";
+import { CompositeNavigationProp, RouteProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type PaymentScheduleScreenNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<OverviewStackParamList, "Payment Schedule">,
@@ -77,7 +72,6 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
       const fetchedSchedules: InstallmentSchedule[] =
         response.data.installment_schedules;
 
-      // Sort schedules from latest to earliest
       const sortedSchedules = fetchedSchedules.sort((a, b) => {
         return new Date(b.due_date).getTime() - new Date(a.due_date).getTime();
       });
@@ -99,7 +93,6 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     try {
       const url = `/properties/${property.lead_file_no}/installment-schedule/pdf`;
 
-      // Get the authorization header from your api instance
       const authHeader = api.defaults.headers.common["Authorization"] as string;
 
       if (!authHeader) {
@@ -137,7 +130,6 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
             );
           }
         } else {
-          // For web or other platforms, handle accordingly
           Alert.alert(
             "Download Complete",
             "The PDF has been downloaded to your device."
@@ -167,8 +159,8 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     return new Intl.NumberFormat().format(number);
   };
 
-  // Use the current date
-  const currentDate = new Date();
+  // Set the current date to 1st July 2024
+  const currentDate = new Date("2024-07-01");
 
   const upcomingPayments = schedules.filter(
     (schedule) =>
@@ -192,7 +184,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
 
   const handlePayNow = (payment: InstallmentSchedule) => {
     navigation.navigate("MakePayment", { payment, property });
-  };  
+  };
 
   if (!property) {
     return (
@@ -245,44 +237,48 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
           variant="solid"
           action="primary"
           borderRadius={"$full"}
-          style={styles.downloadButton}
+          bgColor={colors.black}
+          width="$10"
+          height="$10"
           onPress={downloadPDF}
         >
           <Icon as={DownloadIcon} style={{ color: colors.white }} />
         </Button>
       </HStack>
 
-      {/* Show Next Payment */}
       {nextPayment && (
-        <Card style={styles.nextPaymentCard}>
-          <VStack>
-            <Text size="sm" bold style={styles.dateText}>
-              Next Payment Due:{" "}
-              {format(new Date(nextPayment.due_date), "dd MMMM yyyy")}
-            </Text>
-            <HStack alignItems="center">
-              <Text size="2xl" bold>
-                {formatAmount(nextPayment.installment_amount)}
+        <Center>
+          <Card bgColor={colors.white} style={styles.card}>
+            <VStack>
+              <Text size="sm" bold>
+                Next Payment Due
               </Text>
-              <Text size="xs" style={styles.currencyText}>
-                KES
+              <Text size="xs">
+                {format(new Date(nextPayment.due_date), "dd MMMM yyyy")}
               </Text>
-            </HStack>
-          </VStack>
-          <Button
-            size="md"
-            variant="solid"
-            action="primary"
-            borderRadius={"$md"}
-            style={styles.payNowButton}
-            onPress={() => handlePayNow(nextPayment)}
-          >
-            <Text style={styles.payNowButtonText}>Pay Now</Text>
-          </Button>
-        </Card>
+              <HStack alignItems="center">
+                <Text size="2xl" bold>
+                  {formatAmount(nextPayment.installment_amount)}
+                </Text>
+                <Text size="xs" ml="$1">
+                  KES
+                </Text>
+              </HStack>
+            </VStack>
+            <Button
+              size="md"
+              variant="solid"
+              action="primary"
+              borderRadius={"$md"}
+              style={styles.payNowButton}
+              onPress={() => handlePayNow(nextPayment)}
+            >
+              <Text style={styles.payNowButtonText}>Pay Now</Text>
+            </Button>
+          </Card>
+        </Center>
       )}
 
-      {/* If no upcoming payments, show a message */}
       {!nextPayment && (
         <Center my="$2">
           <Text size="sm" bold>
@@ -291,7 +287,6 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
         </Center>
       )}
 
-      {/* Past Payments */}
       <FlatList<InstallmentSchedule>
         data={pastPayments}
         keyExtractor={(item) => item.is_id.toString()}
@@ -305,7 +300,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
                 <Text size="2xl" bold>
                   {formatAmount(item.installment_amount)}
                 </Text>
-                <Text size="xs" style={styles.currencyText}>
+                <Text size="xs" ml="$1">
                   KES
                 </Text>
               </HStack>
@@ -342,7 +337,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.light,
   },
   scrollContent: {
-    paddingBottom: 90,
+    paddingBottom: 220,
     alignItems: "center",
   },
   card: {
@@ -386,19 +381,8 @@ const styles = StyleSheet.create({
     color: colors.medium,
     marginTop: 2,
   },
-  downloadButton: {
-    width: 42,
-    height: 42,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: colors.primary,
-  },
   dateText: {
     marginBottom: 4,
-    color: colors.medium,
-  },
-  currencyText: {
-    marginLeft: 5,
     color: colors.medium,
   },
   paymentDetails: {
