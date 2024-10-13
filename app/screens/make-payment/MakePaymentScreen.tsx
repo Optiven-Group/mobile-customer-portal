@@ -20,29 +20,46 @@ import {
   SelectItem,
   ChevronDownIcon,
 } from "@gluestack-ui/themed";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import {
+  RootStackParamList,
+  InstallmentSchedule,
+  Property,
+} from "../../navigation/types";
 
-interface Property {
-  code: string;
-}
+type MakePaymentScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "MakePayment"
+>;
 
-const MakePaymentScreen = () => {
+const MakePaymentScreen: React.FC<MakePaymentScreenProps> = ({
+  route,
+  navigation,
+}) => {
+  const params = route.params || {};
+  const { payment, property } = params;
+
   // Simulated property data (dummy data)
   const properties: Property[] = [
-    { code: "VR77" },
-    { code: "VR88" },
-    { code: "VR99" },
+    { code: "VR77", lead_file_no: "123", plot_number: "A1" },
+    { code: "VR88", lead_file_no: "124", plot_number: "B1" },
+    { code: "VR99", lead_file_no: "125", plot_number: "C1" },
   ];
 
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(payment?.installment_amount || "");
   const [paymentMethod, setPaymentMethod] = useState("");
-  const [selectedProperty, setSelectedProperty] = useState("");
+  const [selectedProperty, setSelectedProperty] = useState(
+    property?.code || ""
+  );
 
   useEffect(() => {
-    // Autofill property if the user has only one property
-    if (properties.length === 1) {
+    // Autofill property if the user has only one property or if property is provided
+    if (property) {
+      setSelectedProperty(property.code);
+    } else if (properties.length === 1) {
       setSelectedProperty(properties[0].code);
     }
-  }, [properties]);
+  }, [properties, property]);
 
   const handlePayment = () => {
     if (amount === "") {
@@ -75,7 +92,11 @@ const MakePaymentScreen = () => {
       {properties.length > 1 && (
         <>
           <Text style={styles.label}>Select Property</Text>
-          <Select onValueChange={setSelectedProperty} mb="$4">
+          <Select
+            onValueChange={setSelectedProperty}
+            selectedValue={selectedProperty}
+            mb="$4"
+          >
             <SelectTrigger variant="outline" size="md">
               <SelectInput placeholder="Select Property" />
               <SelectIcon mr="$3" as={ChevronDownIcon} />

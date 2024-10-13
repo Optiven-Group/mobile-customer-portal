@@ -18,11 +18,11 @@ const AccountNavigator = () => {
         component={AccountScreen}
         options={{ title: "My Account" }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="LoyaltyInfo"
         component={LoyaltyInfoScreen}
         options={{ title: "Loyalty Info" }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 };

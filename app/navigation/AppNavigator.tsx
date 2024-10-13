@@ -2,8 +2,9 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import OverviewNavigator from "./OverviewNavigator";
-import ActionButton from "./ActionButton";
 import AccountNavigator from "./AccountNavigator";
+import ReferScreen from "../screens/ReferScreen";
+import NotificationsScreen from "../screens/NotificationsScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -27,15 +28,31 @@ const AppNavigator = () => {
         }}
       />
 
-      {/* Action Center Tab */}
+      {/* Refer Tab */}
       <Tab.Screen
-        name="Action Center"
+        name="Refer & Earn"
+        component={ReferScreen}
         options={{
-          tabBarButton: () => <ActionButton />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="account-multiple-plus"
+              color={color}
+              size={size}
+            />
+          ),
         }}
-      >
-        {() => null}
-      </Tab.Screen>
+      />
+
+      {/* Notifications Tab */}
+      <Tab.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="bell" color={color} size={size} />
+          ),
+        }}
+      />
 
       {/* Profile Tab */}
       <Tab.Screen

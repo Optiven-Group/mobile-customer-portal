@@ -1,11 +1,9 @@
 import React from "react";
-import { StyleSheet, Image, ScrollView } from "react-native";
+import { StyleSheet } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import Screen from "../app-components/Screen";
 import {
   Box,
-  Button,
-  ButtonText,
   Center,
   Heading,
   Pressable,
@@ -30,39 +28,6 @@ const getGreeting = () => {
     return "Good evening";
   }
 };
-
-const properties = [
-  {
-    id: 1,
-    image: {
-      uri: "https://www.optiven.co.ke/wp-content/uploads/2024/08/JL-DOTTED-copy.jpg",
-    },
-    title: "Joy Lovers Club",
-    description:
-      "Joy lovers club is in Malindi Town along Mtangani Road and only 100M from the famous Mwembe Resort. Better referred to as the “Muthaiga of Malindi“, this high-end, luxurious gated community is your ticket to a life of pure opulence on the African-Kenyan coast.",
-    price: "Starting at Ksh 3,950,000",
-  },
-  {
-    id: 2,
-    image: {
-      uri: "https://www.optiven.co.ke/wp-content/uploads/2024/06/achievers-paradise-Ngong3-1-600x514.jpeg",
-    },
-    title: "Achievers’ Paradise - Ngong, Kimuka Phase 2",
-    description: "Elevated plots with breathtaking views.",
-    price: "Starting at Ksh 1,995,000",
-  },
-  {
-    id: 3,
-    image: {
-      uri: "https://www.optiven.co.ke/wp-content/uploads/2024/02/ocean-view-ridge.jpeg",
-    },
-    title: "Ocean View Ridge - Vipingo",
-    description:
-      "Nestled just 2.4km from the Mombasa-Malindi Road Ocean View Ridge Vipingo is where your dreams meet the ocean. With the shoreline a mere 4.5km away, your new home is a gateway to the serene beauty of the coast. Whether you’re looking for a dream home, retirement haven, or a holiday escape, Ocean View Ridge Vipingo is where life becomes pure luxury, and the coast unfolds endless joy.",
-    price: "Starting at Ksh 2,750,000",
-  },
-  // Add more properties as needed
-];
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { user } = useAuth();
@@ -129,49 +94,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           ))}
         </Box>
       </Center>
-
-      {/* Scrollable Property Feed */}
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {/* Property Feed Section */}
-        <Box w="90%" mt="$4">
-          <Heading size="lg" mb="$4">
-            Featured Properties
-          </Heading>
-          {properties.map((property) => (
-            <Box key={property.id} style={styles.propertyCard}>
-              <Image source={property.image} style={styles.propertyImage} />
-              <VStack space="md" padding="$3">
-                <Text bold size="md">
-                  {property.title}
-                </Text>
-                <Text size="sm" color={colors.medium}>
-                  {property.description.length > 100
-                    ? property.description.substring(0, 100) + "..."
-                    : property.description}
-                </Text>
-                <Text bold size="lg" color={colors.primary}>
-                  {property.price}
-                </Text>
-                <Button
-                  size="sm"
-                  variant="solid"
-                  action="primary"
-                  bgColor={colors.primary}
-                  onPress={() =>
-                    navigation.navigate("PropertyDetails", {
-                      propertyId: property.id,
-                    })
-                  }
-                  borderRadius="$md"
-                  mt="$2"
-                >
-                  <ButtonText>View Details</ButtonText>
-                </Button>
-              </VStack>
-            </Box>
-          ))}
-        </Box>
-      </ScrollView>
     </Screen>
   );
 };

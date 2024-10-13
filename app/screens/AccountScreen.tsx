@@ -1,11 +1,5 @@
 import React, { useState } from "react";
 import {
-  AlertDialog,
-  AlertDialogBackdrop,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogBody,
   Avatar,
   AvatarFallbackText,
   Button,
@@ -83,30 +77,26 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
             <Box ml={16} style={styles.userInfo}>
               <Box style={styles.nameContainer}>
                 <Text style={styles.userName}>{user?.name || "User"}</Text>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("LoyaltyInfo")}
+                <Badge
+                  size="md"
+                  variant="solid"
+                  action="muted"
+                  bgColor={tierColors[membershipTier]}
+                  ml={4}
                 >
-                  <Badge
-                    size="md"
-                    variant="solid"
-                    action="muted"
-                    bgColor={tierColors[membershipTier]}
-                    ml={4}
-                  >
-                    <BadgeText color="white" bold>
-                      {membershipTier}
-                    </BadgeText>
-                  </Badge>
-                </TouchableOpacity>
+                  <BadgeText color="white" bold>
+                    {membershipTier}
+                  </BadgeText>
+                </Badge>
               </Box>
               <Text style={styles.userEmail}>{user?.email || ""}</Text>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => navigation.navigate("LoyaltyInfo")}
               >
                 <Text style={styles.learnMoreText} size="sm" bold>
                   Learn More
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </Box>
           </Box>
 

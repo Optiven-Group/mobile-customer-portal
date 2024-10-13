@@ -10,7 +10,6 @@ import PropertySelectionForPaymentScreen from "../screens/payment-schedule/Prope
 import PropertySelectionForReceiptsScreen from "../screens/receipts/PropertySelectionScreen";
 import ViewReceiptsScreen from "../screens/receipts/ViewReceiptsScreen";
 import PropertySelectionForStatementsScreen from "../screens/statements/PropertySelectionScreen";
-import PropertyDetailsScreen from "../screens/feed/PropertyDetailsScreen";
 
 const Stack = createNativeStackNavigator<OverviewStackParamList>();
 
@@ -71,12 +70,6 @@ const OverviewNavigator: React.FC = () => {
       <Stack.Screen name="View Statements" component={ViewStatementsScreen} />
       {/* Sales Agreement */}
       <Stack.Screen name="Sales Agreement" component={SalesAgreementScreen} />
-      {/* Feed */}
-      <Stack.Screen
-        name="PropertyDetails"
-        component={PropertyDetailsScreen}
-        options={{ title: "Property Details" }}
-      />
     </Stack.Navigator>
   );
 };

@@ -4,7 +4,8 @@ import {
   ActivityIndicator,
   RefreshControl,
   FlatList,
-  View,
+  Alert,
+  Platform,
 } from "react-native";
 import {
   Text,
@@ -16,40 +17,49 @@ import {
   Icon,
   DownloadIcon,
   Pressable,
+  Center,
+  View,
 } from "@gluestack-ui/themed";
 import { format } from "date-fns";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 import Screen from "../../app-components/Screen";
 import colors from "../../utils/colors";
 import api from "../../utils/api";
+import {
+  InstallmentSchedule,
+  Property,
+  OverviewStackParamList,
+  RootStackParamList,
+} from "../../navigation/types";
+import {
+  CompositeNavigationProp,
+  RouteProp,
+} from "@react-navigation/native";
+import {
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack";
 
-interface InstallmentSchedule {
-  is_id: number;
-  due_date: string;
-  installment_amount: string;
-  paid: string;
-}
+type PaymentScheduleScreenNavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<OverviewStackParamList, "Payment Schedule">,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 
-interface PaymentScheduleScreenProps {
-  route: any;
-}
+type PaymentScheduleScreenRouteProp = RouteProp<
+  OverviewStackParamList,
+  "Payment Schedule"
+>;
 
-const statusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "yes":
-      return colors.success;
-    case "no":
-      return colors.danger;
-    case "upcoming":
-      return colors.warning;
-    default:
-      return colors.medium;
-  }
+type PaymentScheduleScreenProps = {
+  navigation: PaymentScheduleScreenNavigationProp;
+  route: PaymentScheduleScreenRouteProp;
 };
 
 const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
+  navigation,
   route,
 }) => {
-  const property = route?.params?.property;
+  const property = route.params.property;
 
   const [schedules, setSchedules] = useState<InstallmentSchedule[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -66,7 +76,13 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
       );
       const fetchedSchedules: InstallmentSchedule[] =
         response.data.installment_schedules;
-      setSchedules(fetchedSchedules);
+
+      // Sort schedules from latest to earliest
+      const sortedSchedules = fetchedSchedules.sort((a, b) => {
+        return new Date(b.due_date).getTime() - new Date(a.due_date).getTime();
+      });
+
+      setSchedules(sortedSchedules);
       setError("");
     } catch (error: any) {
       setError("Failed to fetch installment schedules. Please try again.");
@@ -76,6 +92,63 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
       if (refreshing) {
         setRefreshing(false);
       }
+    }
+  };
+
+  const downloadPDF = async () => {
+    try {
+      const url = `/properties/${property.lead_file_no}/installment-schedule/pdf`;
+
+      // Get the authorization header from your api instance
+      const authHeader = api.defaults.headers.common["Authorization"] as string;
+
+      if (!authHeader) {
+        Alert.alert(
+          "Authorization Error",
+          "Authorization header is missing. Please log in again."
+        );
+        return;
+      }
+
+      const fileUri =
+        FileSystem.documentDirectory +
+        `payment_schedule_${property.lead_file_no}.pdf`;
+
+      const downloadResumable = FileSystem.createDownloadResumable(
+        api.defaults.baseURL + url,
+        fileUri,
+        {
+          headers: {
+            Authorization: authHeader,
+          },
+        }
+      );
+
+      const result = await downloadResumable.downloadAsync();
+
+      if (result && result.uri) {
+        if (Platform.OS === "ios" || Platform.OS === "android") {
+          if (await Sharing.isAvailableAsync()) {
+            await Sharing.shareAsync(result.uri);
+          } else {
+            Alert.alert(
+              "Sharing not available",
+              "The sharing functionality is not available on this device."
+            );
+          }
+        } else {
+          // For web or other platforms, handle accordingly
+          Alert.alert(
+            "Download Complete",
+            "The PDF has been downloaded to your device."
+          );
+        }
+      } else {
+        Alert.alert("Download Failed", "Failed to download the PDF file.");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "An error occurred while downloading the PDF.");
     }
   };
 
@@ -93,6 +166,33 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     const number = parseFloat(amount.replace(/,/g, ""));
     return new Intl.NumberFormat().format(number);
   };
+
+  // Use the current date
+  const currentDate = new Date();
+
+  const upcomingPayments = schedules.filter(
+    (schedule) =>
+      schedule.paid.toLowerCase() === "no" &&
+      new Date(schedule.due_date) >= currentDate
+  );
+
+  const nextPayment =
+    upcomingPayments.length > 0
+      ? upcomingPayments.reduce((prev, current) => {
+          return new Date(prev.due_date) < new Date(current.due_date)
+            ? prev
+            : current;
+        })
+      : null;
+
+  const pastPayments = schedules.filter(
+    (schedule) =>
+      schedule.is_id !== nextPayment?.is_id || upcomingPayments.length === 0
+  );
+
+  const handlePayNow = (payment: InstallmentSchedule) => {
+    navigation.navigate("MakePayment", { payment, property });
+  };  
 
   if (!property) {
     return (
@@ -146,20 +246,60 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
           action="primary"
           borderRadius={"$full"}
           style={styles.downloadButton}
-          onPress={() => console.log("downloaded")}
+          onPress={downloadPDF}
         >
           <Icon as={DownloadIcon} style={{ color: colors.white }} />
         </Button>
       </HStack>
 
+      {/* Show Next Payment */}
+      {nextPayment && (
+        <Card style={styles.nextPaymentCard}>
+          <VStack>
+            <Text size="sm" bold style={styles.dateText}>
+              Next Payment Due:{" "}
+              {format(new Date(nextPayment.due_date), "dd MMMM yyyy")}
+            </Text>
+            <HStack alignItems="center">
+              <Text size="2xl" bold>
+                {formatAmount(nextPayment.installment_amount)}
+              </Text>
+              <Text size="xs" style={styles.currencyText}>
+                KES
+              </Text>
+            </HStack>
+          </VStack>
+          <Button
+            size="md"
+            variant="solid"
+            action="primary"
+            borderRadius={"$md"}
+            style={styles.payNowButton}
+            onPress={() => handlePayNow(nextPayment)}
+          >
+            <Text style={styles.payNowButtonText}>Pay Now</Text>
+          </Button>
+        </Card>
+      )}
+
+      {/* If no upcoming payments, show a message */}
+      {!nextPayment && (
+        <Center my="$2">
+          <Text size="sm" bold>
+            No upcoming payments. All payments are up to date.
+          </Text>
+        </Center>
+      )}
+
+      {/* Past Payments */}
       <FlatList<InstallmentSchedule>
-        data={schedules}
+        data={pastPayments}
         keyExtractor={(item) => item.is_id.toString()}
         renderItem={({ item }) => (
           <Card key={item.is_id.toString()} style={styles.card}>
             <VStack>
               <Text size="sm" bold style={styles.dateText}>
-                {format(new Date(item.due_date), "dd-MM-yyyy")}
+                {format(new Date(item.due_date), "dd MMMM yyyy")}
               </Text>
               <HStack alignItems="center">
                 <Text size="2xl" bold>
@@ -174,7 +314,12 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
               <View
                 style={[
                   styles.statusDot,
-                  { backgroundColor: statusColor(item.paid) },
+                  {
+                    backgroundColor:
+                      item.paid.toLowerCase() === "yes"
+                        ? colors.success
+                        : colors.danger,
+                  },
                 ]}
               />
             </VStack>
@@ -188,6 +333,8 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     </Screen>
   );
 };
+
+export default PaymentScheduleScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -206,6 +353,18 @@ const styles = StyleSheet.create({
     padding: 20,
     width: "90%",
     backgroundColor: colors.white,
+    borderRadius: 12,
+    elevation: 3,
+  },
+  nextPaymentCard: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 16,
+    padding: 20,
+    width: "90%",
+    alignSelf: "center",
+    backgroundColor: colors.light,
     borderRadius: 12,
     elevation: 3,
   },
@@ -257,6 +416,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignSelf: "center",
   },
+  payNowButton: {
+    marginTop: 10,
+    backgroundColor: colors.primary,
+  },
+  payNowButtonText: {
+    color: colors.white,
+    fontWeight: "bold",
+  },
+  noUpcomingPaymentsText: {
+    textAlign: "center",
+    color: colors.medium,
+    marginVertical: 20,
+  },
 });
-
-export default PaymentScheduleScreen;

@@ -13,10 +13,22 @@ export type AccountStackParamList = {
   // other account related screens
 };
 
-// Root Stack Param List (for global navigation)
+// InstallmentSchedule Interface
+export interface InstallmentSchedule {
+  is_id: number;
+  due_date: string;
+  installment_amount: string;
+  paid: string;
+  // Add any other fields as needed
+}
+
+// Root Stack Param List
 export type RootStackParamList = {
-  Main: undefined; // Tab Navigator
-  MakePayment: undefined;
+  Main: undefined;
+  MakePayment: {
+    payment?: InstallmentSchedule;
+    property?: Property;
+  };
   Settings: undefined;
   Support: undefined;
 };
@@ -63,7 +75,7 @@ export interface Project {
 export interface Property {
   lead_file_no: string;
   plot_number: string;
-  // other fields
+  code: string;
 }
 
 // Receipt Interface
