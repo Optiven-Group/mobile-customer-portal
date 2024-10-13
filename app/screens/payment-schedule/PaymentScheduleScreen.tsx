@@ -32,7 +32,11 @@ import {
   OverviewStackParamList,
   RootStackParamList,
 } from "../../navigation/types";
-import { CompositeNavigationProp, RouteProp } from "@react-navigation/native";
+import {
+  CompositeNavigationProp,
+  RouteProp,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type PaymentScheduleScreenNavigationProp = CompositeNavigationProp<
@@ -60,6 +64,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [processingPayments, setProcessingPayments] = useState<number[]>([]);
 
   const fetchInstallmentSchedules = async () => {
     try {
@@ -73,7 +78,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
         response.data.installment_schedules;
 
       const sortedSchedules = fetchedSchedules.sort((a, b) => {
-        return new Date(b.due_date).getTime() - new Date(a.due_date).getTime();
+        return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
       });
 
       setSchedules(sortedSchedules);
@@ -145,9 +150,41 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
   };
 
   useEffect(() => {
-    if (!property) return;
-    fetchInstallmentSchedules();
-  }, [property]);
+    let interval: NodeJS.Timeout | null = null;
+
+    if (processingPayments.length > 0) {
+      interval = setInterval(() => {
+        fetchInstallmentSchedules();
+      }, 5000); // Poll every 5 seconds
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [processingPayments]);
+
+  useEffect(() => {
+    if (schedules.length > 0 && processingPayments.length > 0) {
+      const paidPayments = schedules.filter(
+        (schedule) =>
+          processingPayments.includes(schedule.is_id) &&
+          schedule.paid.toLowerCase() === "yes"
+      );
+      if (paidPayments.length > 0) {
+        setProcessingPayments((prev) =>
+          prev.filter((id) => !paidPayments.some((p) => p.is_id === id))
+        );
+      }
+    }
+  }, [schedules]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchInstallmentSchedules();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -159,8 +196,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     return new Intl.NumberFormat().format(number);
   };
 
-  // Set the current date to 1st July 2024
-  const currentDate = new Date("2024-07-01");
+  const currentDate = new Date();
 
   const upcomingPayments = schedules.filter(
     (schedule) =>
@@ -168,14 +204,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
       new Date(schedule.due_date) >= currentDate
   );
 
-  const nextPayment =
-    upcomingPayments.length > 0
-      ? upcomingPayments.reduce((prev, current) => {
-          return new Date(prev.due_date) < new Date(current.due_date)
-            ? prev
-            : current;
-        })
-      : null;
+  const nextPayment = upcomingPayments.length > 0 ? upcomingPayments[0] : null;
 
   const pastPayments = schedules.filter(
     (schedule) =>
@@ -183,6 +212,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
   );
 
   const handlePayNow = (payment: InstallmentSchedule) => {
+    setProcessingPayments((prev) => [...prev, payment.is_id]);
     navigation.navigate("MakePayment", { payment, property });
   };
 
@@ -265,16 +295,23 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
                 </Text>
               </HStack>
             </VStack>
-            <Button
-              size="md"
-              variant="solid"
-              action="primary"
-              borderRadius={"$md"}
-              style={styles.payNowButton}
-              onPress={() => handlePayNow(nextPayment)}
-            >
-              <Text style={styles.payNowButtonText}>Pay Now</Text>
-            </Button>
+            {processingPayments.includes(nextPayment.is_id) ? (
+              <Text style={{ color: colors.warning, marginTop: 10 }}>
+                Processing
+              </Text>
+            ) : nextPayment.paid.toLowerCase() === "yes" ? (
+              <Text style={{ color: colors.primary, marginTop: 10 }}>Paid</Text>
+            ) : (
+              <Button
+                size="md"
+                variant="solid"
+                borderRadius={"$md"}
+                style={styles.payNowButton}
+                onPress={() => handlePayNow(nextPayment)}
+              >
+                <Text style={styles.payNowButtonText}>Pay Now</Text>
+              </Button>
+            )}
           </Card>
         </Center>
       )}
@@ -348,18 +385,6 @@ const styles = StyleSheet.create({
     padding: 20,
     width: "90%",
     backgroundColor: colors.white,
-    borderRadius: 12,
-    elevation: 3,
-  },
-  nextPaymentCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 16,
-    padding: 20,
-    width: "90%",
-    alignSelf: "center",
-    backgroundColor: colors.light,
     borderRadius: 12,
     elevation: 3,
   },

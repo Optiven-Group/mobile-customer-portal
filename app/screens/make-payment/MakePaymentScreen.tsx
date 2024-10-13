@@ -69,6 +69,8 @@ const MakePaymentScreen: React.FC<MakePaymentScreenProps> = ({
         amount: amountInt,
         currency: "kes",
         customer_email: user.email,
+        installment_schedule_id: payment.is_id.toString(),
+        customer_number: user.customerNumber,
       });
 
       const { clientSecret } = response.data;

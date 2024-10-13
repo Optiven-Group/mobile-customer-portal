@@ -25,6 +25,7 @@
     "date-fns": "^4.1.0",
     "expo": "51.0.35",
     "expo-file-system": "^17.0.1",
+    "expo-notifications": "^0.28.18",
     "expo-sharing": "^12.0.1",
     "expo-status-bar": "~1.12.1",
     "prop-types": "^15.8.1",
