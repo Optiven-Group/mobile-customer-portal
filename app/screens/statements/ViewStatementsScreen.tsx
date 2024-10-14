@@ -50,7 +50,7 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
       const fetchedTransactions: Transaction[] = response.data.transactions.map(
         (transaction: any) => ({
           id: transaction.id,
-          date: format(new Date(transaction.date), "dd MMMM yyyy"),
+          date: transaction.date,
           type: transaction.type,
           amount: transaction.amount,
           time: transaction.time,

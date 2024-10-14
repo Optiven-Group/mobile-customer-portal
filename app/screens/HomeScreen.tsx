@@ -1,11 +1,14 @@
-import React from "react";
-import { StyleSheet } from "react-native";
+// HomeScreen.tsx
+
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Dimensions } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import Screen from "../app-components/Screen";
 import {
   Box,
   Center,
   Heading,
+  Image,
   Pressable,
   Text,
   VStack,
@@ -13,10 +16,15 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
 import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
+import { Project } from "../navigation/types";
+import Carousel from "react-native-reanimated-carousel";
 
 type HomeScreenProps = {
   navigation: NavigationProp<any>;
 };
+
+const { width } = Dimensions.get("window");
 
 const getGreeting = () => {
   const currentHour = new Date().getHours();
@@ -31,6 +39,19 @@ const getGreeting = () => {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { user } = useAuth();
+  const [campaigns, setCampaigns] = useState<Project[]>([]);
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const response = await api.get("/featured-projects");
+        setCampaigns(response.data.projects);
+      } catch (error) {
+        console.error("Failed to fetch campaigns:", error);
+      }
+    };
+    fetchCampaigns();
+  }, []);
 
   return (
     <Screen style={styles.container}>
@@ -93,6 +114,42 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             </VStack>
           ))}
         </Box>
+
+        {/* Campaigns Carousel */}
+        {campaigns.length > 0 ? (
+          <Carousel
+            loop
+            width={width}
+            height={300}
+            autoPlay={true}
+            data={campaigns}
+            scrollAnimationDuration={1000}
+            renderItem={({ item }: { item: Project }) => (
+              <Pressable
+                style={styles.campaignCard}
+                onPress={() =>
+                  navigation.navigate("Refer", {
+                    screen: "ReferSomeone",
+                    params: { project: item },
+                  })
+                }
+              >
+                {item.banner && (
+                  <Image
+                    source={{ uri: item.banner }}
+                    style={styles.campaignImage}
+                  />
+                )}
+                <Text bold size="lg" mt="$2">
+                  {item.name}
+                </Text>
+                <Text>{item.description}</Text>
+              </Pressable>
+            )}
+          />
+        ) : (
+          <Text>No campaigns available at the moment.</Text>
+        )}
       </Center>
     </Screen>
   );
@@ -105,23 +162,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.light,
   },
-  scrollViewContent: {
-    alignItems: "center",
-    paddingBottom: 100,
-  },
-  propertyCard: {
+  campaignCard: {
     backgroundColor: colors.white,
     borderRadius: 12,
     overflow: "hidden",
-    marginBottom: 20,
+    padding: 16,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
+    width: width * 0.9,
+    alignSelf: "center",
   },
-  propertyImage: {
+  campaignImage: {
     width: "100%",
     height: 200,
     resizeMode: "cover",
+    borderRadius: 12,
   },
 });

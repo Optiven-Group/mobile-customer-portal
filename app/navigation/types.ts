@@ -85,3 +85,20 @@ export interface Receipt {
   plot_no: string;
   amount_lcy: number;
 }
+
+export type ReferralStackParamList = {
+  ReferralHome: undefined;
+  HowItWorks: undefined;
+  ReferSomeone: { project: Project };
+  FeaturedProjects: undefined;
+  ReferralProgress: undefined;
+};
+
+export interface Project {
+  project_id: number;
+  name: string;
+  epr_id: string;
+  description: string;
+  banner: string;
+  is_featured: boolean;
+}

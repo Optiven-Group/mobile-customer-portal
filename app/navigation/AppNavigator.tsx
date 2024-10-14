@@ -3,8 +3,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import OverviewNavigator from "./OverviewNavigator";
 import AccountNavigator from "./AccountNavigator";
-import ReferScreen from "../screens/ReferScreen";
+import ReferralHomeScreen from "../screens/referral/ReferralHomeScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
+import ReferralNavigator from "./ReferralNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -31,7 +32,7 @@ const AppNavigator = () => {
       {/* Refer Tab */}
       <Tab.Screen
         name="Refer & Earn"
-        component={ReferScreen}
+        component={ReferralNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons

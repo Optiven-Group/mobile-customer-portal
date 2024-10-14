@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Avatar,
   AvatarFallbackText,
-  Button,
-  ButtonText,
   Box,
   VStack,
   ChevronRightIcon,
@@ -12,14 +10,20 @@ import {
   BadgeText,
 } from "@gluestack-ui/themed";
 import { Text } from "@gluestack-ui/themed";
-import { StyleSheet, TouchableOpacity, Share } from "react-native";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Switch,
+  ActivityIndicator,
+} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
 import { useAuth } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AccountStackParamList } from "../navigation/types";
-import { ShareIcon } from "@gluestack-ui/themed";
 import Screen from "../app-components/Screen";
+import api from "../utils/api";
 
 type AccountScreenProps = NativeStackScreenProps<
   AccountStackParamList,
@@ -28,6 +32,9 @@ type AccountScreenProps = NativeStackScreenProps<
 
 const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
   const { user, logout } = useAuth();
+  const [totalSpent, setTotalSpent] = useState<number>(0);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Function to determine membership tier
   const getMembershipTier = (totalSpent: number): string => {
@@ -47,23 +54,43 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
     Sapphire: "#0F52BA",
   };
 
-  const totalSpent = user?.totalSpent ?? 0; // Use nullish coalescing
-  // const membershipTier = getMembershipTier(totalSpent);
-  // remove this later
-  const membershipTier = getMembershipTier(1000000);
+  useEffect(() => {
+    const fetchTotalSpent = async () => {
+      try {
+        const response = await api.get("/user/total-spent");
+        setTotalSpent(response.data.total_spent);
+      } catch (error) {
+        console.error("Failed to fetch total spent:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTotalSpent();
+  }, []);
+
+  const membershipTier = getMembershipTier(totalSpent);
+
+  console.log(totalSpent);
 
   const handleLogout = async () => {
     await logout();
   };
 
-  const handleInvite = () => {
-    const message = `Join this amazing real estate app using my referral code: ${
-      user?.referralCode ?? "r45dAsdeK8"
-    }`;
-    Share.share({
-      message,
-    });
-  };
+  const settingsOptions = [
+    {
+      id: "darkMode",
+      title: "Dark Mode",
+      icon: "brightness-6",
+      type: "toggle",
+    },
+    {
+      id: "support",
+      title: "Support",
+      icon: "help-circle",
+      type: "navigate",
+      targetScreen: "Support",
+    },
+  ];
 
   return (
     <>
@@ -77,46 +104,70 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
             <Box ml={16} style={styles.userInfo}>
               <Box style={styles.nameContainer}>
                 <Text style={styles.userName}>{user?.name || "User"}</Text>
-                <Badge
-                  size="md"
-                  variant="solid"
-                  action="muted"
-                  bgColor={tierColors[membershipTier]}
-                  ml={4}
-                >
-                  <BadgeText color="white" bold>
-                    {membershipTier}
-                  </BadgeText>
-                </Badge>
+                {loading ? (
+                  <ActivityIndicator size="small" color={colors.primary} />
+                ) : (
+                  <Badge
+                    size="md"
+                    variant="solid"
+                    action="muted"
+                    bgColor={tierColors[membershipTier]}
+                    ml={4}
+                  >
+                    <BadgeText color="white" bold>
+                      {membershipTier}
+                    </BadgeText>
+                  </Badge>
+                )}
               </Box>
               <Text style={styles.userEmail}>{user?.email || ""}</Text>
-              {/* <TouchableOpacity
-                onPress={() => navigation.navigate("LoyaltyInfo")}
-              >
-                <Text style={styles.learnMoreText} size="sm" bold>
-                  Learn More
-                </Text>
-              </TouchableOpacity> */}
             </Box>
           </Box>
 
-          {/* Refer to Earn Section */}
-          <Box style={styles.referContainer}>
-            <Box style={styles.referContent}>
-              <Box style={styles.referImageContainer}>
-                <Icon as={ShareIcon} style={styles.referImage} />
-              </Box>
-              <VStack>
-                <Text style={styles.referTitle}>Refer & get rewards</Text>
-                <Text style={styles.referCode}>
-                  Your code {user?.referralCode || "r45dAsdeK8"}
-                </Text>
-              </VStack>
-            </Box>
-            <Button onPress={handleInvite} style={styles.inviteButton}>
-              <ButtonText style={styles.inviteButtonText}>Invite</ButtonText>
-            </Button>
-          </Box>
+          {/* Settings Options */}
+          <FlatList
+            data={settingsOptions}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  if (item.type === "navigate") {
+                    navigation.navigate(item.targetScreen);
+                  }
+                }}
+                style={styles.settingItem}
+              >
+                <Box style={styles.settingContainer}>
+                  <Box style={styles.iconContainer}>
+                    <MaterialCommunityIcons
+                      name={item.icon}
+                      size={24}
+                      color={colors.dark}
+                    />
+                    <Text ml={4} style={styles.settingText}>
+                      {item.title}
+                    </Text>
+                  </Box>
+                  {item.type === "toggle" ? (
+                    <Switch
+                      value={isDarkMode}
+                      onValueChange={(value) => {
+                        setIsDarkMode(value);
+                        // Implement theme switching here
+                      }}
+                    />
+                  ) : (
+                    <Icon
+                      as={ChevronRightIcon}
+                      size="lg"
+                      color={colors.medium}
+                    />
+                  )}
+                </Box>
+              </TouchableOpacity>
+            )}
+            contentContainerStyle={styles.settingsList}
+          />
 
           {/* Logout Button */}
           <TouchableOpacity
@@ -141,8 +192,6 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         </VStack>
       </Screen>
-
-      {/* AlertDialog can be removed if not needed */}
     </>
   );
 };
@@ -183,55 +232,33 @@ const styles = StyleSheet.create({
     color: colors.medium,
     marginTop: 4,
   },
-  learnMoreText: {
-    color: colors.primary,
-    marginTop: 4,
+  settingItem: {
+    marginTop: 20,
   },
-  referContainer: {
+  settingContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: colors.white,
     padding: 16,
     borderRadius: 12,
-    borderColor: colors.light,
-    borderWidth: 1,
-    marginTop: 20,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
   },
-  referContent: {
+  iconContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
-  referImageContainer: {
-    height: 40,
-    width: 40,
-    marginRight: 12,
-  },
-  referImage: {
-    height: "100%",
-    width: "100%",
-  },
-  referTitle: {
+  settingText: {
+    marginLeft: 12,
     fontSize: 16,
-    fontWeight: "bold",
     color: colors.dark,
+    fontWeight: "600",
   },
-  referCode: {
-    fontSize: 14,
-    color: colors.medium,
-  },
-  inviteButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: colors.primary,
-  },
-  inviteButtonText: {
-    color: colors.white,
-    fontSize: 14,
+  settingsList: {
+    paddingBottom: 20,
   },
   logoutTouchable: {
     marginTop: 20,
@@ -247,10 +274,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
-  },
-  iconContainer: {
-    flexDirection: "row",
-    alignItems: "center",
   },
   logoutText: {
     marginLeft: 12,
