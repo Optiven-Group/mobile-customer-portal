@@ -17,12 +17,12 @@ import {
 import colors from "../../utils/colors";
 import { useAuth } from "../../context/AuthContext";
 
-type MakePaymentScreenProps = NativeStackScreenProps<
+type StripePaymentScreenProps = NativeStackScreenProps<
   RootStackParamList,
-  "MakePayment"
+  "StripePayment"
 >;
 
-const MakePaymentScreen: React.FC<MakePaymentScreenProps> = ({
+const StripePaymentScreen: React.FC<StripePaymentScreenProps> = ({
   route,
   navigation,
 }) => {
@@ -171,7 +171,7 @@ const MakePaymentScreen: React.FC<MakePaymentScreenProps> = ({
   );
 };
 
-export default MakePaymentScreen;
+export default StripePaymentScreen;
 
 const styles = StyleSheet.create({
   container: {

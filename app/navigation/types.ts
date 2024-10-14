@@ -23,10 +23,12 @@ export interface InstallmentSchedule {
 // Root Stack Param List
 export type RootStackParamList = {
   Main: undefined;
-  MakePayment: {
+  StripePayment: {
     payment: InstallmentSchedule;
     property: Property;
   };
+  PaymentMethod: { payment: InstallmentSchedule; property: Property };
+  MpesaPayment: { payment: InstallmentSchedule; property: Property };
   Settings: undefined;
   Support: undefined;
   Refer: undefined;

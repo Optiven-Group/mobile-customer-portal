@@ -77,8 +77,9 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
       const fetchedSchedules: InstallmentSchedule[] =
         response.data.installment_schedules;
 
+      // Sort from most recent to least recent
       const sortedSchedules = fetchedSchedules.sort((a, b) => {
-        return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+        return new Date(b.due_date).getTime() - new Date(a.due_date).getTime();
       });
 
       setSchedules(sortedSchedules);
@@ -196,7 +197,8 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     return new Intl.NumberFormat().format(number);
   };
 
-  const currentDate = new Date();
+  // Simulate current date as 1st July 2024
+  const currentDate = new Date("2024-07-01");
 
   const upcomingPayments = schedules.filter(
     (schedule) =>
@@ -213,7 +215,8 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
 
   const handlePayNow = (payment: InstallmentSchedule) => {
     setProcessingPayments((prev) => [...prev, payment.is_id]);
-    navigation.navigate("MakePayment", { payment, property });
+    // navigation.navigate("StripePayment", { payment, property });
+    navigation.navigate("PaymentMethod", { payment, property });
   };
 
   if (!property) {
