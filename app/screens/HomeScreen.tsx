@@ -115,12 +115,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           ))}
         </Box>
 
+        <Heading my="$4" textAlign="left">
+          Featured Properties
+        </Heading>
         {/* Campaigns Carousel */}
         {campaigns.length > 0 ? (
           <Carousel
             loop
             width={width}
-            height={300}
+            height={360}
             autoPlay={true}
             data={campaigns}
             scrollAnimationDuration={1000}
@@ -138,12 +141,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   <Image
                     source={{ uri: item.banner }}
                     style={styles.campaignImage}
+                    alt={`${item.name} image`}
                   />
                 )}
-                <Text bold size="lg" mt="$2">
+                {/* <Text bold size="lg" mt="$2">
                   {item.name}
                 </Text>
-                <Text>{item.description}</Text>
+                <Text>{item.description}</Text> */}
               </Pressable>
             )}
           />
@@ -166,7 +170,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 12,
     overflow: "hidden",
-    padding: 16,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,

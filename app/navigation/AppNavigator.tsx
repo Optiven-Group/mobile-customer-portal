@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import OverviewNavigator from "./OverviewNavigator";
 import AccountNavigator from "./AccountNavigator";
-import ReferralHomeScreen from "../screens/referral/ReferralHomeScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import ReferralNavigator from "./ReferralNavigator";
 
@@ -52,6 +51,7 @@ const AppNavigator = () => {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="bell" color={color} size={size} />
           ),
+          headerShown: true,
         }}
       />
 

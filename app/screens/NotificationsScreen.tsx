@@ -1,12 +1,13 @@
 import React from "react";
 import { StyleSheet, View, FlatList, Text } from "react-native";
 import { useNotifications } from "../context/NotificationContext";
+import Screen from "../app-components/Screen";
 
 const NotificationsScreen = () => {
   const { notifications } = useNotifications();
 
   return (
-    <View style={styles.container}>
+    <Screen style={styles.container}>
       <FlatList
         data={notifications}
         keyExtractor={(item, index) => item.request.identifier + index}
@@ -17,7 +18,7 @@ const NotificationsScreen = () => {
           </View>
         )}
       />
-    </View>
+    </Screen>
   );
 };
 

@@ -70,8 +70,6 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
 
   const membershipTier = getMembershipTier(totalSpent);
 
-  console.log(totalSpent);
-
   const handleLogout = async () => {
     await logout();
   };
