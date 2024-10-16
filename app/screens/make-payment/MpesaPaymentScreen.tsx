@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Alert } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Alert,
+  TextInput,
+  Modal,
+  View,
+} from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 import {
@@ -28,32 +35,35 @@ const MpesaPaymentScreen: React.FC<MpesaPaymentScreenProps> = ({
   const { payment, property } = route.params;
   const { user } = useAuth();
 
-  const [amount, setAmount] = useState(payment.installment_amount || "");
+  const [amount, setAmount] = useState("150000");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [mpesaPin, setMpesaPin] = useState("");
+  const [isPromptVisible, setPromptVisible] = useState(false);
 
-  const handlePayment = async () => {
-    if (!amount) {
-      Alert.alert("Error", "Please enter an amount.");
+  const handleOpenPinPrompt = () => {
+    if (!amount || !phoneNumber) {
+      Alert.alert("Error", "Please fill all the required fields.");
       return;
     }
+    setPromptVisible(true);
+  };
 
-    if (!phoneNumber) {
-      Alert.alert("Error", "Please enter your phone number.");
-      return;
-    }
+  const handleConfirmPayment = async () => {
+    setPromptVisible(false);
+    Alert.alert("Processing", "Your payment is being processed...");
 
     try {
-      // Send request to initiate M-Pesa payment
       const response = await api.post("/initiate-mpesa-payment", {
         amount: amount.replace(/,/g, ""),
         phone_number: phoneNumber,
         installment_schedule_id: payment.is_id.toString(),
         customer_number: user?.customerNumber,
+        mpesa_pin: mpesaPin,
       });
 
       Alert.alert(
-        "Payment Initiated",
-        "Please check your phone to complete the payment."
+        "Payment Successful",
+        "Thank you! Your payment has been completed."
       );
       navigation.goBack();
     } catch (err: any) {
@@ -70,13 +80,7 @@ const MpesaPaymentScreen: React.FC<MpesaPaymentScreenProps> = ({
         <FormControlLabel mb="$1">
           <FormControlLabelText>Plot Number</FormControlLabelText>
         </FormControlLabel>
-        <Input
-          variant="outline"
-          size="md"
-          isDisabled={true}
-          isInvalid={false}
-          isReadOnly={true}
-        >
+        <Input variant="outline" size="md" isDisabled={true} isReadOnly={true}>
           <InputField value={property.plot_number} />
         </Input>
       </Box>
@@ -109,9 +113,51 @@ const MpesaPaymentScreen: React.FC<MpesaPaymentScreenProps> = ({
         </Input>
       </Box>
 
-      <Button onPress={handlePayment} bgColor={colors.black} mt="$4">
-        <ButtonText>Pay with M-Pesa</ButtonText>
+      <Button onPress={handleOpenPinPrompt} bgColor={colors.black} mt="$4">
+        <ButtonText>Lipa na M-PESA</ButtonText>
       </Button>
+
+      {/* M-Pesa PIN Prompt Modal */}
+      <Modal
+        transparent={true}
+        visible={isPromptVisible}
+        animationType="slide"
+        onRequestClose={() => setPromptVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              Do you want to pay Ksh {amount} for {property.plot_number} to
+              Optiven Limited?
+            </Text>
+            <Text style={styles.modalSubtitle}>Enter M-Pesa PIN:</Text>
+            <TextInput
+              style={styles.pinInput}
+              placeholder="****"
+              keyboardType="numeric"
+              secureTextEntry={true}
+              value={mpesaPin}
+              onChangeText={setMpesaPin}
+            />
+            <View style={styles.buttonContainer}>
+              <Button
+                onPress={() => setPromptVisible(false)}
+                bgColor={colors.light}
+                mr="$2"
+              >
+                <ButtonText style={styles.cancelText}>Cancel</ButtonText>
+              </Button>
+              <Button
+                onPress={handleConfirmPayment}
+                bgColor={colors.black}
+                disabled={!mpesaPin || mpesaPin.length !== 4}
+              >
+                <ButtonText>Confirm</ButtonText>
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -130,6 +176,50 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 30,
+    color: colors.dark,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    alignItems: "center",
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: colors.dark,
+    textAlign: "center",
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: colors.medium,
+    marginBottom: 15,
+  },
+  pinInput: {
+    width: "100%",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: colors.light,
+    borderRadius: 8,
+    marginBottom: 15,
+    textAlign: "center",
+    fontSize: 18,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  cancelText: {
     color: colors.dark,
   },
 });

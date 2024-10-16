@@ -1,7 +1,5 @@
-// HomeScreen.tsx
-
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, ScrollView } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import Screen from "../app-components/Screen";
 import {
@@ -55,106 +53,115 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <Screen style={styles.container}>
-      <Center>
-        {/* Top Section */}
-        <Heading my="$4" textAlign="center">{`${getGreeting()}, ${
-          user?.name || "User"
-        }`}</Heading>
+      <ScrollView>
+        <Center>
+          {/* Top Section */}
+          <Heading my="$4" textAlign="center">{`${getGreeting()}, ${
+            user?.name || "User"
+          }`}</Heading>
 
-        {/* Navigable Touchables */}
-        <Box flexDirection="row" justifyContent="space-around" w="90%" mb="$4">
-          {[
-            {
-              label: "Payment Schedule",
-              icon: "calendar",
-              route: "Project Selection for Payment",
-            },
-            {
-              label: "View My Receipts",
-              icon: "receipt",
-              route: "Project Selection",
-            },
-            {
-              label: "Sales Agreement",
-              icon: "handshake-outline",
-              route: "Sales Agreement",
-            },
-            {
-              label: "View Statements",
-              icon: "history",
-              route: "Project Selection for Statements",
-            },
-          ].map((item) => (
-            <VStack
-              key={item.label}
-              alignItems="center"
-              justifyContent="center"
-              w="$20"
-            >
-              <Pressable
-                onPress={() => navigation.navigate(item.route)}
-                h="$16"
-                w="$16"
-                bg="$green700"
-                borderRadius="$full"
+          {/* Navigable Touchables */}
+          <Box
+            flexDirection="row"
+            justifyContent="space-around"
+            w="90%"
+            mb="$4"
+          >
+            {[
+              {
+                label: "Payment Schedule",
+                icon: "calendar",
+                route: "Project Selection for Payment",
+              },
+              {
+                label: "View My Receipts",
+                icon: "receipt",
+                route: "Project Selection",
+              },
+              {
+                label: "Payment Progress",
+                icon: "progress-check",
+                route: "Sales Agreement",
+              },
+              {
+                label: "View Statements",
+                icon: "history",
+                route: "Project Selection for Statements",
+              },
+            ].map((item) => (
+              <VStack
+                key={item.label}
                 alignItems="center"
                 justifyContent="center"
+                w="$20"
               >
-                <MaterialCommunityIcons
-                  name={
-                    item.icon as keyof typeof MaterialCommunityIcons.glyphMap
-                  }
-                  size={24}
-                  color="white"
-                />
-              </Pressable>
-              <Text bold size="xs" textAlign="center" lineHeight={14} mt="$1">
-                {item.label}
-              </Text>
-            </VStack>
-          ))}
-        </Box>
-
-        <Heading my="$4" textAlign="left">
-          Featured Properties
-        </Heading>
-        {/* Campaigns Carousel */}
-        {campaigns.length > 0 ? (
-          <Carousel
-            loop
-            width={width}
-            height={360}
-            autoPlay={true}
-            data={campaigns}
-            scrollAnimationDuration={1000}
-            renderItem={({ item }: { item: Project }) => (
-              <Pressable
-                style={styles.campaignCard}
-                onPress={() =>
-                  navigation.navigate("Refer", {
-                    screen: "ReferSomeone",
-                    params: { project: item },
-                  })
-                }
-              >
-                {item.banner && (
-                  <Image
-                    source={{ uri: item.banner }}
-                    style={styles.campaignImage}
-                    alt={`${item.name} image`}
+                <Pressable
+                  onPress={() => navigation.navigate(item.route)}
+                  h="$16"
+                  w="$16"
+                  bg="$green700"
+                  borderRadius="$full"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <MaterialCommunityIcons
+                    name={
+                      item.icon as keyof typeof MaterialCommunityIcons.glyphMap
+                    }
+                    size={24}
+                    color="white"
                   />
-                )}
-                {/* <Text bold size="lg" mt="$2">
-                  {item.name}
+                </Pressable>
+                <Text bold size="xs" textAlign="center" lineHeight={14} mt="$1">
+                  {item.label}
                 </Text>
-                <Text>{item.description}</Text> */}
-              </Pressable>
-            )}
-          />
-        ) : (
-          <Text>No campaigns available at the moment.</Text>
-        )}
-      </Center>
+              </VStack>
+            ))}
+          </Box>
+
+          {/* Monthly Campaign Section */}
+          <Heading size="md" my="$4" textAlign="center">
+            Ongoing Monthly Campaign
+          </Heading>
+          <Box style={styles.campaignCard}>
+            <Image
+              source={require("../../assets/app-images/optiven-at-25.jpeg")}
+              width={width}
+              height={320}
+              alt={`optiven at 25 image`}
+            />
+          </Box>
+
+          <Heading my="$4" textAlign="left">
+            Featured Properties
+          </Heading>
+
+          {/* Campaigns Carousel */}
+          {campaigns.length > 0 ? (
+            <Carousel
+              loop
+              width={width}
+              height={280}
+              autoPlay={true}
+              data={campaigns}
+              scrollAnimationDuration={1000}
+              renderItem={({ item }: { item: Project }) => (
+                <Pressable style={styles.campaignCard}>
+                  {item.banner && (
+                    <Image
+                      source={{ uri: item.banner }}
+                      style={styles.campaignImage}
+                      alt={`${item.name} image`}
+                    />
+                  )}
+                </Pressable>
+              )}
+            />
+          ) : (
+            <Text>No campaigns available at the moment.</Text>
+          )}
+        </Center>
+      </ScrollView>
     </Screen>
   );
 };
@@ -164,11 +171,11 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.white,
   },
   campaignCard: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 8,
     overflow: "hidden",
     shadowColor: "#000",
     shadowOpacity: 0.05,
@@ -179,8 +186,7 @@ const styles = StyleSheet.create({
   },
   campaignImage: {
     width: "100%",
-    height: 200,
+    height: 240,
     resizeMode: "cover",
-    borderRadius: 12,
   },
 });

@@ -8,6 +8,8 @@ import {
   Icon,
   Badge,
   BadgeText,
+  Button,
+  ButtonText,
 } from "@gluestack-ui/themed";
 import { Text } from "@gluestack-ui/themed";
 import {
@@ -16,6 +18,7 @@ import {
   FlatList,
   Switch,
   ActivityIndicator,
+  View,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
@@ -36,7 +39,6 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Function to determine membership tier
   const getMembershipTier = (totalSpent: number): string => {
     if (totalSpent >= 20000000) return "Platinum";
     if (totalSpent >= 10000000) return "Gold";
@@ -45,7 +47,6 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
     return "Sapphire";
   };
 
-  // Define colors for each tier
   const tierColors: { [key: string]: string } = {
     Platinum: "#E5E4E2",
     Gold: "#FFD700",
@@ -91,106 +92,113 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
   ];
 
   return (
-    <>
-      <Screen style={styles.container}>
-        <VStack pt={20} px={20}>
-          {/* User Info Section */}
-          <Box style={styles.userInfoContainer}>
-            <Avatar bgColor="$green700" size="lg" borderRadius="$full">
-              <AvatarFallbackText>{user?.name || "User"}</AvatarFallbackText>
-            </Avatar>
-            <Box ml={16} style={styles.userInfo}>
-              <Box style={styles.nameContainer}>
-                <Text style={styles.userName}>{user?.name || "User"}</Text>
-                {loading ? (
-                  <ActivityIndicator size="small" color={colors.primary} />
+    <Screen style={styles.container}>
+      <VStack pt={20} px={20}>
+        <Box style={styles.userInfoContainer}>
+          <Avatar bgColor="$green700" size="lg" borderRadius="$full">
+            <AvatarFallbackText>{user?.name || "User"}</AvatarFallbackText>
+          </Avatar>
+          <Box ml={16} style={styles.userInfo}>
+            <Box style={styles.nameContainer}>
+              <Text style={styles.userName}>{user?.name || "User"}</Text>
+              {loading ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <Badge
+                  size="md"
+                  variant="solid"
+                  action="muted"
+                  bgColor={tierColors[membershipTier]}
+                  ml={4}
+                >
+                  <BadgeText color="white" bold>
+                    {membershipTier}
+                  </BadgeText>
+                </Badge>
+              )}
+            </Box>
+            <Text style={styles.userEmail}>{user?.email || ""}</Text>
+          </Box>
+        </Box>
+
+        {/* Loyalty Section */}
+        <Box style={styles.loyaltyContainer}>
+          <View style={styles.loyaltyHeader}>
+            <Text style={styles.loyaltyText}>Loyalty Program</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("LoyaltyProgramInfo")}
+            >
+              <MaterialCommunityIcons
+                name="information-outline"
+                size={24}
+                color={colors.dark}
+              />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.tierText}>
+            You are a {membershipTier} member!
+          </Text>
+          <Button
+            onPress={() => navigation.navigate("Deals")}
+            bgColor={colors.primary}
+            mt="$1"
+          >
+            <ButtonText>View Deals and Discounts</ButtonText>
+          </Button>
+        </Box>
+
+        <FlatList
+          data={settingsOptions}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => {
+                if (item.type === "navigate") {
+                  navigation.navigate(item.targetScreen);
+                }
+              }}
+              style={styles.settingItem}
+            >
+              <Box style={styles.settingContainer}>
+                <Box style={styles.iconContainer}>
+                  <MaterialCommunityIcons
+                    name={item.icon}
+                    size={24}
+                    color={colors.dark}
+                  />
+                  <Text ml={4} style={styles.settingText}>
+                    {item.title}
+                  </Text>
+                </Box>
+                {item.type === "toggle" ? (
+                  <Switch
+                    value={isDarkMode}
+                    onValueChange={(value) => setIsDarkMode(value)}
+                  />
                 ) : (
-                  <Badge
-                    size="md"
-                    variant="solid"
-                    action="muted"
-                    bgColor={tierColors[membershipTier]}
-                    ml={4}
-                  >
-                    <BadgeText color="white" bold>
-                      {membershipTier}
-                    </BadgeText>
-                  </Badge>
+                  <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
                 )}
               </Box>
-              <Text style={styles.userEmail}>{user?.email || ""}</Text>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.settingsList}
+        />
+
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutTouchable}>
+          <Box style={styles.logoutContainer}>
+            <Box style={styles.iconContainer}>
+              <Avatar bgColor="$red600" size="lg" borderRadius="$full">
+                <MaterialCommunityIcons name="logout" color="white" size={24} />
+              </Avatar>
+              <Text ml={4} style={styles.logoutText}>
+                Logout
+              </Text>
             </Box>
+            <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
           </Box>
-
-          {/* Settings Options */}
-          <FlatList
-            data={settingsOptions}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  if (item.type === "navigate") {
-                    navigation.navigate(item.targetScreen);
-                  }
-                }}
-                style={styles.settingItem}
-              >
-                <Box style={styles.settingContainer}>
-                  <Box style={styles.iconContainer}>
-                    <MaterialCommunityIcons
-                      name={item.icon}
-                      size={24}
-                      color={colors.dark}
-                    />
-                    <Text ml={4} style={styles.settingText}>
-                      {item.title}
-                    </Text>
-                  </Box>
-                  {item.type === "toggle" ? (
-                    <Switch
-                      value={isDarkMode}
-                      onValueChange={(value) => {
-                        setIsDarkMode(value);
-                        // Implement theme switching here
-                      }}
-                    />
-                  ) : (
-                    <Icon
-                      as={ChevronRightIcon}
-                      size="lg"
-                      color={colors.medium}
-                    />
-                  )}
-                </Box>
-              </TouchableOpacity>
-            )}
-            contentContainerStyle={styles.settingsList}
-          />
-
-          {/* Logout Button */}
-          <TouchableOpacity
-            onPress={handleLogout}
-            style={styles.logoutTouchable}
-          >
-            <Box style={styles.logoutContainer}>
-              <Box style={styles.iconContainer}>
-                <Avatar bgColor="$red600" size="lg" borderRadius="$full">
-                  <MaterialCommunityIcons
-                    name="logout"
-                    color="white"
-                    size={24}
-                  />
-                </Avatar>
-                <Text ml={4} style={styles.logoutText}>
-                  Logout
-                </Text>
-              </Box>
-              <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
-            </Box>
-          </TouchableOpacity>
-        </VStack>
-      </Screen>
-    </>
+        </TouchableOpacity>
+      </VStack>
+    </Screen>
   );
 };
 
@@ -226,6 +234,31 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   userEmail: {
+    fontSize: 14,
+    color: colors.medium,
+    marginTop: 4,
+  },
+  loyaltyContainer: {
+    marginTop: 20,
+    backgroundColor: colors.white,
+    padding: 16,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  loyaltyHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  loyaltyText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.dark,
+  },
+  tierText: {
     fontSize: 14,
     color: colors.medium,
     marginTop: 4,

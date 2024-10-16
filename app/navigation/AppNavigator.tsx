@@ -35,7 +35,7 @@ const AppNavigator = () => {
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
-              name="account-multiple-plus"
+              name="cash-plus"
               color={color}
               size={size}
             />

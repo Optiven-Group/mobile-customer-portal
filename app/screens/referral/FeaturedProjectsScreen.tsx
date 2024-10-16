@@ -6,11 +6,12 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { View, Text } from "@gluestack-ui/themed";
+import { View, Text, Icon, Button, ButtonText } from "@gluestack-ui/themed";
 import { NavigationProp } from "@react-navigation/native";
 import { ReferralStackParamList, Project } from "../../navigation/types";
 import api from "../../utils/api";
 import colors from "../../utils/colors";
+import { Feather } from "@expo/vector-icons"; // For the share icon
 
 interface FeaturedProjectsScreenProps {
   navigation: NavigationProp<ReferralStackParamList, "FeaturedProjects">;
@@ -53,16 +54,27 @@ const FeaturedProjectsScreen: React.FC<FeaturedProjectsScreenProps> = ({
       data={projects}
       keyExtractor={(item) => item.project_id.toString()}
       renderItem={({ item }) => (
-        <TouchableOpacity
-          style={styles.projectItem}
-          onPress={() => handleSelectProject(item)}
-        >
-          {item.banner && (
-            <Image source={{ uri: item.banner }} style={styles.banner} />
-          )}
-          <Text style={styles.projectName}>{item.name}</Text>
-          <Text style={styles.description}>{item.description}</Text>
-        </TouchableOpacity>
+        <View style={styles.card}>
+          <TouchableOpacity onPress={() => handleSelectProject(item)}>
+            {item.banner && (
+              <Image source={{ uri: item.banner }} style={styles.banner} />
+            )}
+            <View style={styles.content}>
+              <Text style={styles.projectName}>{item.name}</Text>
+              {/* <Text style={styles.description}>{item.description}</Text> */}
+              <Button variant="link" justifyContent="flex-start">
+                <ButtonText color={colors.primary}>View Details</ButtonText>
+              </Button>
+            </View>
+          </TouchableOpacity>
+          {/* Share Icon */}
+          <TouchableOpacity
+            style={styles.shareButton}
+            onPress={() => handleSelectProject(item)}
+          >
+            <Feather name="share" size={24} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
       )}
     />
   );
@@ -71,24 +83,44 @@ const FeaturedProjectsScreen: React.FC<FeaturedProjectsScreenProps> = ({
 export default FeaturedProjectsScreen;
 
 const styles = StyleSheet.create({
-  projectItem: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.medium,
+  card: {
+    marginHorizontal: 20,
+    marginVertical: 10,
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 3,
+    overflow: "hidden", // To ensure the image doesn't go beyond card
   },
   banner: {
     width: "100%",
     height: 200,
     resizeMode: "cover",
-    marginBottom: 10,
+  },
+  content: {
+    padding: 15,
   },
   projectName: {
     fontSize: 18,
     fontWeight: "bold",
+    color: colors.dark,
+    marginBottom: 5,
   },
   description: {
-    marginTop: 5,
+    fontSize: 14,
     color: colors.medium,
+    marginBottom: 10,
+  },
+  shareButton: {
+    position: "absolute",
+    right: 15,
+    top: 15,
+    backgroundColor: "#FFF",
+    borderRadius: 20,
+    padding: 5,
+    elevation: 5,
   },
   centered: {
     flex: 1,

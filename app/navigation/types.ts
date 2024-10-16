@@ -10,6 +10,8 @@ export type AuthStackParamList = {
 // Account Stack Param List
 export type AccountStackParamList = {
   Account: undefined;
+  Deals: undefined;
+  LoyaltyProgramInfo: undefined;
 };
 
 // InstallmentSchedule Interface

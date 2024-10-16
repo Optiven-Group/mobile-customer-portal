@@ -1,8 +1,9 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import colors from "../utils/colors";
+import { Text } from "@gluestack-ui/themed";
 
 type PaymentMethodScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -15,10 +16,6 @@ const PaymentMethodScreen: React.FC<PaymentMethodScreenProps> = ({
 }) => {
   const { payment, property } = route.params;
 
-  const handleBankPayment = () => {
-    navigation.navigate("StripePayment", { payment, property });
-  };
-
   const handleMpesaPayment = () => {
     navigation.navigate("MpesaPayment", { payment, property });
   };
@@ -26,11 +23,12 @@ const PaymentMethodScreen: React.FC<PaymentMethodScreenProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Choose Payment Method</Text>
-      <TouchableOpacity style={styles.button} onPress={handleBankPayment}>
-        <Text style={styles.buttonText}>Bank</Text>
-      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleMpesaPayment}>
-        <Text style={styles.buttonText}>M-Pesa</Text>
+        <Image
+          source={require("../../assets/app-images/mpesa-logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
       </TouchableOpacity>
     </View>
   );
@@ -53,14 +51,14 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   button: {
-    backgroundColor: colors.primary,
-    padding: 15,
-    borderRadius: 8,
     alignItems: "center",
+    backgroundColor: colors.dark,
+    padding: 5,
+    borderRadius: 8,
     marginVertical: 10,
   },
-  buttonText: {
-    color: colors.white,
-    fontSize: 18,
+  logo: {
+    width: 140,
+    height: 50,
   },
 });
