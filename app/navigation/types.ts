@@ -12,6 +12,12 @@ export type AccountStackParamList = {
   Account: undefined;
   Deals: undefined;
   LoyaltyProgramInfo: undefined;
+  PersonalDetails: undefined;
+  EditDetails: {
+    name: string;
+    email: string;
+    phone: string;
+  };
 };
 
 // InstallmentSchedule Interface

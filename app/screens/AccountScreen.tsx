@@ -118,6 +118,15 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
               )}
             </Box>
             <Text style={styles.userEmail}>{user?.email || ""}</Text>
+            <Button
+              onPress={() => navigation.navigate("PersonalDetails")}
+              variant="link"
+              justifyContent="flex-start"
+            >
+              <ButtonText size="sm" color={colors.primary}>
+                View Details
+              </ButtonText>
+            </Button>
           </Box>
         </Box>
 

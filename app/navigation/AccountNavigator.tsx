@@ -3,6 +3,8 @@ import AccountScreen from "../screens/AccountScreen";
 import DealsScreen from "../screens/DealsScreen"; // Import the new DealsScreen
 import { AccountStackParamList } from "./types";
 import LoyaltyInfoScreen from "../screens/loyalty/LoyaltyInfoScreen";
+import PersonalDetailsScreen from "../screens/PersonalDetailsScreen";
+import EditDetailsScreen from "../screens/EditDetailsScreen";
 
 const Stack = createNativeStackNavigator<AccountStackParamList>();
 
@@ -28,6 +30,16 @@ const AccountNavigator = () => {
         name="LoyaltyProgramInfo"
         component={LoyaltyInfoScreen}
         options={{ title: "Loyalty Program Info" }}
+      />
+      <Stack.Screen
+        name="PersonalDetails"
+        component={PersonalDetailsScreen}
+        options={{ title: "Personal Details" }}
+      />
+      <Stack.Screen
+        name="EditDetails"
+        component={EditDetailsScreen}
+        options={{ title: "Edit Details" }}
       />
     </Stack.Navigator>
   );
