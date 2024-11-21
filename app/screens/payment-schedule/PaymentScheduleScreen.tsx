@@ -38,6 +38,7 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type PaymentScheduleScreenNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<OverviewStackParamList, "Payment Schedule">,
@@ -95,57 +96,47 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     }
   };
 
+  // Inside your downloadPDF function for the installment schedule
   const downloadPDF = async () => {
     try {
-      const url = `/properties/${property.lead_file_no}/installment-schedule/pdf`;
+      const uri = `${api.defaults.baseURL}/properties/${property.lead_file_no}/installment-schedule/pdf`;
+      const token = await AsyncStorage.getItem("authToken");
 
-      const authHeader = api.defaults.headers.common["Authorization"] as string;
-
-      if (!authHeader) {
+      if (!token) {
         Alert.alert(
           "Authorization Error",
-          "Authorization header is missing. Please log in again."
+          "You are not logged in. Please log in again."
         );
         return;
       }
 
-      const fileUri =
-        FileSystem.documentDirectory +
-        `payment_schedule_${property.lead_file_no}.pdf`;
-
       const downloadResumable = FileSystem.createDownloadResumable(
-        api.defaults.baseURL + url,
-        fileUri,
+        uri,
+        FileSystem.documentDirectory +
+          `payment_schedule_${property.lead_file_no}.pdf`,
         {
           headers: {
-            Authorization: authHeader,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       const result = await downloadResumable.downloadAsync();
 
-      if (result && result.uri) {
-        if (Platform.OS === "ios" || Platform.OS === "android") {
-          if (await Sharing.isAvailableAsync()) {
-            await Sharing.shareAsync(result.uri);
-          } else {
-            Alert.alert(
-              "Sharing not available",
-              "The sharing functionality is not available on this device."
-            );
-          }
+      if (result && result.status === 200 && result.uri) {
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(result.uri);
         } else {
           Alert.alert(
-            "Download Complete",
-            "The PDF has been downloaded to your device."
+            "Sharing not available",
+            "Cannot share the file on this device."
           );
         }
       } else {
         Alert.alert("Download Failed", "Failed to download the PDF file.");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error downloading PDF:", error);
       Alert.alert("Error", "An error occurred while downloading the PDF.");
     }
   };
