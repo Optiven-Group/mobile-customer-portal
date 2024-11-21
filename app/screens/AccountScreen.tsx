@@ -89,12 +89,12 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
   };
 
   const settingsOptions = [
-    {
-      id: "darkMode",
-      title: "Dark Mode",
-      icon: "brightness-6",
-      type: "toggle",
-    },
+    // {
+    //   id: "darkMode",
+    //   title: "Dark Mode",
+    //   icon: "brightness-6",
+    //   type: "toggle",
+    // },
     {
       id: "support",
       title: "Support",

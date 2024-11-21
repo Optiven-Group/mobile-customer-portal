@@ -189,7 +189,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
   };
 
   // Use the actual current date
-  const currentDate = new Date("2024-07-01");
+  const currentDate = new Date();
 
   const upcomingPayments = schedules.filter(
     (schedule) =>
@@ -303,7 +303,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
                 style={styles.payNowButton}
                 onPress={() => handlePayNow(nextPayment)}
               >
-                <Text style={styles.payNowButtonText}>Pay Now</Text>
+                <Text style={styles.payNowButtonText}>Lipa Na MPESA</Text>
               </Button>
             )}
           </Card>
