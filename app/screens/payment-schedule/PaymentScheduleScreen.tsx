@@ -197,7 +197,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     return new Intl.NumberFormat().format(number);
   };
 
-  // Simulate current date as 1st July 2024
+  // Use the actual current date
   const currentDate = new Date("2024-07-01");
 
   const upcomingPayments = schedules.filter(

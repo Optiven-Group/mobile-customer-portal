@@ -1,15 +1,17 @@
+// OverviewNavigator.tsx
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { OverviewStackParamList } from "./types";
 import HomeScreen from "../screens/HomeScreen";
 import PaymentScheduleScreen from "../screens/payment-schedule/PaymentScheduleScreen";
-import SalesAgreementScreen from "../screens/SalesAgreementScreen";
+import PaymentProgressScreen from "../screens/PaymentProgressScreen";
 import ViewStatementsScreen from "../screens/statements/ViewStatementsScreen";
 import ProjectSelectionScreen from "../screens/ProjectSelectionScreen";
 import PropertySelectionForPaymentScreen from "../screens/payment-schedule/PropertySelectionScreen";
 import PropertySelectionForReceiptsScreen from "../screens/receipts/PropertySelectionScreen";
 import ViewReceiptsScreen from "../screens/receipts/ViewReceiptsScreen";
 import PropertySelectionForStatementsScreen from "../screens/statements/PropertySelectionScreen";
+import TitleStatusScreen from "../screens/TitleStatusScreen";
 
 const Stack = createNativeStackNavigator<OverviewStackParamList>();
 
@@ -68,8 +70,14 @@ const OverviewNavigator: React.FC = () => {
         options={{ title: "Property" }}
       />
       <Stack.Screen name="View Statements" component={ViewStatementsScreen} />
-      {/* Sales Agreement */}
-      <Stack.Screen name="Sales Agreement" component={SalesAgreementScreen} />
+      {/* Payment Progress */}
+      <Stack.Screen name="Payment Progress" component={PaymentProgressScreen} />
+      {/* Title Status */}
+      <Stack.Screen
+        name="Title Status"
+        component={TitleStatusScreen}
+        options={{ title: "Title Status" }}
+      />
     </Stack.Navigator>
   );
 };

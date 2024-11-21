@@ -52,7 +52,7 @@ export type OverviewStackParamList = {
   "View Receipts": {
     property: Property;
   };
-  "Sales Agreement": undefined;
+  "Payment Progress": undefined;
   "View Statements": {
     property: Property;
   };
@@ -67,6 +67,9 @@ export type OverviewStackParamList = {
   "Project Selection for Statements": undefined;
   "Property Selection for Statements": {
     project: Project;
+  };
+  "Title Status": {
+    leadFileNo: string;
   };
 };
 

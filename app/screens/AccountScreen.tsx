@@ -19,6 +19,8 @@ import {
   Switch,
   ActivityIndicator,
   View,
+  Linking, // Import Linking API
+  Alert,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
@@ -75,6 +77,17 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
     await logout();
   };
 
+  // Add handleCallSupport function
+  const handleCallSupport = async () => {
+    const phoneNumber = "tel:+254790300300";
+    const supported = await Linking.canOpenURL(phoneNumber);
+    if (supported) {
+      Linking.openURL(phoneNumber);
+    } else {
+      Alert.alert("Error", "Unable to place a call.");
+    }
+  };
+
   const settingsOptions = [
     {
       id: "darkMode",
@@ -86,8 +99,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
       id: "support",
       title: "Support",
       icon: "help-circle",
-      type: "navigate",
-      targetScreen: "Support",
+      type: "call", // Updated to 'call' type for clarity
     },
   ];
 
@@ -162,8 +174,10 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
-                if (item.type === "navigate") {
-                  navigation.navigate(item.targetScreen);
+                if (item.type === "toggle") {
+                  setIsDarkMode(!isDarkMode);
+                } else if (item.id === "support") {
+                  handleCallSupport(); // Call support when clicked
                 }
               }}
               style={styles.settingItem}

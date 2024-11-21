@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
   Pressable,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Progress from "react-native-progress";
 import Screen from "../app-components/Screen";
 import colors from "../utils/colors";
@@ -20,6 +22,7 @@ import {
   RefreshControl,
 } from "@gluestack-ui/themed";
 import api from "../utils/api";
+import { OverviewStackParamList } from "../navigation/types";
 
 interface Property {
   lead_file_no: string;
@@ -29,7 +32,9 @@ interface Property {
   sale_agreement_sent: string;
 }
 
-const SalesAgreementScreen: React.FC = () => {
+const PaymentProgressScreen: React.FC = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<OverviewStackParamList>>();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -73,12 +78,12 @@ const SalesAgreementScreen: React.FC = () => {
     fetchProperties();
   };
 
-  const handleViewAgreement = (propertyId: string): void => {
-    Alert.alert(
-      "Sales Agreement",
-      `You can now view your Sales Agreement for ${propertyId}.`
-    );
-    // Implement the actual logic to view or download the sales agreement.
+  const handleViewTitleStatus = (propertyId: string | undefined): void => {
+    if (propertyId) {
+      navigation.navigate("Title Status", { leadFileNo: propertyId });
+    } else {
+      Alert.alert("Error", "Property ID is undefined");
+    }
   };
 
   if (loading && !refreshing) {
@@ -115,9 +120,6 @@ const SalesAgreementScreen: React.FC = () => {
               ? property.total_paid / property.purchase_price
               : 0;
           const isPaymentComplete = progress >= 1;
-          const canViewAgreement =
-            isPaymentComplete &&
-            property.sale_agreement_sent.toLowerCase() === "yes";
 
           return (
             <Box
@@ -127,7 +129,7 @@ const SalesAgreementScreen: React.FC = () => {
             >
               <Card style={[styles.card, styles.propertyCard]}>
                 <Text style={styles.heading}>
-                  {property.plot_number} - Sales Agreement
+                  {property.plot_number} - Payment Progress
                 </Text>
                 <Text style={styles.subheading}>
                   <Text style={styles.label}>Plot Price: </Text>
@@ -154,27 +156,33 @@ const SalesAgreementScreen: React.FC = () => {
                     showsText
                     formatText={() => `${Math.floor(progress * 100)}%`}
                   />
-                  <Icon
-                    as={isPaymentComplete ? UnlockIcon : LockIcon}
-                    style={styles.lockIcon}
-                    color={isPaymentComplete ? "green" : "tomato"}
-                  />
                 </View>
                 <Text style={styles.progressText} bold>
                   {Math.floor(progress * 100)}% Completed
                 </Text>
-              </Card>
-              {canViewAgreement && (
-                <Card style={styles.card}>
-                  <Pressable
-                    onPress={() => handleViewAgreement(property.lead_file_no)}
+                <Pressable
+                  style={[
+                    styles.viewTitleButton,
+                    !isPaymentComplete && styles.disabledButton,
+                  ]}
+                  onPress={() => handleViewTitleStatus(property.lead_file_no)}
+                  disabled={!isPaymentComplete}
+                >
+                  <Icon
+                    as={isPaymentComplete ? UnlockIcon : LockIcon}
+                    color={colors.white}
+                    style={styles.lockIcon}
+                  />
+                  <Text
+                    style={[
+                      styles.viewTitleText,
+                      !isPaymentComplete && styles.disabledText,
+                    ]}
                   >
-                    <Text style={styles.viewAgreement}>
-                      View Sales Agreement
-                    </Text>
-                  </Pressable>
-                </Card>
-              )}
+                    Title Status
+                  </Text>
+                </Pressable>
+              </Card>
             </Box>
           );
         })}
@@ -183,7 +191,7 @@ const SalesAgreementScreen: React.FC = () => {
   );
 };
 
-export default SalesAgreementScreen;
+export default PaymentProgressScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -226,7 +234,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   lockIcon: {
-    marginLeft: 10,
+    marginRight: 10,
   },
   progressText: {
     marginTop: 10,
@@ -240,11 +248,25 @@ const styles = StyleSheet.create({
     fontWeight: "normal",
     color: colors.medium,
   },
-  viewAgreement: {
-    color: "green",
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "bold",
+  viewTitleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 15,
     paddingVertical: 10,
+    backgroundColor: colors.primary,
+    borderRadius: 5,
+    width: "100%",
+  },
+  viewTitleText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  disabledButton: {
+    backgroundColor: colors.medium,
+  },
+  disabledText: {
+    color: colors.light,
   },
 });

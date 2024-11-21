@@ -81,7 +81,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               {
                 label: "Payment Progress",
                 icon: "progress-check",
-                route: "Sales Agreement",
+                route: "Payment Progress",
               },
               {
                 label: "View Statements",

@@ -2,25 +2,16 @@ import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
-  Alert,
   TextInput,
-  Modal,
-  View,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
+import { Text } from "@gluestack-ui/themed";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
-import {
-  Box,
-  FormControlLabel,
-  FormControlLabelText,
-  Input,
-  InputField,
-  Text,
-  Button,
-  ButtonText,
-} from "@gluestack-ui/themed";
-import colors from "../../utils/colors";
 import api from "../../utils/api";
+import colors from "../../utils/colors";
 import { useAuth } from "../../context/AuthContext";
 
 type MpesaPaymentScreenProps = NativeStackScreenProps<
@@ -35,129 +26,121 @@ const MpesaPaymentScreen: React.FC<MpesaPaymentScreenProps> = ({
   const { payment, property } = route.params;
   const { user } = useAuth();
 
-  const [amount, setAmount] = useState("150000");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [mpesaPin, setMpesaPin] = useState("");
-  const [isPromptVisible, setPromptVisible] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState<string>(user?.phone || "");
+  const [customerNumber] = useState<string>(user?.customer_number || "");
+  const [amount, setAmount] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [paymentInitiated, setPaymentInitiated] = useState<boolean>(false);
 
-  const handleOpenPinPrompt = () => {
-    if (!amount || !phoneNumber) {
-      Alert.alert("Error", "Please fill all the required fields.");
+  const MaxTransactionAmount = 150000; // M-PESA maximum per transaction
+  const MinTransactionAmount = 1; // M-PESA minimum per transaction
+
+  const handleInitiatePayment = async () => {
+    if (!phoneNumber) {
+      Alert.alert("Error", "Please enter your phone number");
       return;
     }
-    setPromptVisible(true);
-  };
 
-  const handleConfirmPayment = async () => {
-    setPromptVisible(false);
-    Alert.alert("Processing", "Your payment is being processed...");
+    const phoneRegex = /^2547\d{8}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      Alert.alert(
+        "Error",
+        "Please enter a valid phone number starting with 2547 and 12 digits long"
+      );
+      return;
+    }
+
+    // Remove commas and parse the amount
+    const parsedAmount = parseFloat(amount.replace(/,/g, ""));
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      Alert.alert("Error", "Please enter a valid amount");
+      return;
+    }
+
+    if (parsedAmount < MinTransactionAmount) {
+      Alert.alert(
+        "Error",
+        `Amount must be at least KES ${MinTransactionAmount}`
+      );
+      return;
+    }
+
+    if (parsedAmount > MaxTransactionAmount) {
+      Alert.alert(
+        "Error",
+        `Amount exceeds M-PESA maximum transaction limit of KES ${MaxTransactionAmount}`
+      );
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const response = await api.post("/initiate-mpesa-payment", {
-        amount: amount.replace(/,/g, ""),
+        amount: parsedAmount.toString(),
         phone_number: phoneNumber,
         installment_schedule_id: payment.is_id.toString(),
-        customer_number: user?.customerNumber,
-        mpesa_pin: mpesaPin,
+        customer_number: customerNumber,
       });
 
-      Alert.alert(
-        "Payment Successful",
-        "Thank you! Your payment has been completed."
-      );
-      navigation.goBack();
-    } catch (err: any) {
-      console.error(err);
-      Alert.alert("Payment Error", "An error occurred during payment.");
+      Alert.alert("Payment Initiated", response.data.CustomerMessage);
+      setPaymentInitiated(true);
+    } catch (error: any) {
+      console.error("Failed to initiate M-PESA payment", error);
+      if (error.response) {
+        Alert.alert(
+          "Error",
+          error.response.data?.error || "Failed to initiate payment"
+        );
+      } else {
+        Alert.alert(
+          "Error",
+          "Network error. Please check your internet connection and try again."
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>M-Pesa Payment</Text>
+      <Text style={styles.title}>M-PESA Payment</Text>
 
-      <Box>
-        <FormControlLabel mb="$1">
-          <FormControlLabelText>Plot Number</FormControlLabelText>
-        </FormControlLabel>
-        <Input variant="outline" size="md" isDisabled={true} isReadOnly={true}>
-          <InputField value={property.plot_number} />
-        </Input>
-      </Box>
+      <Text style={styles.label}>Plot Number:</Text>
+      <Text style={styles.value}>{property.plot_number}</Text>
 
-      <Box mt="$4">
-        <FormControlLabel mb="$1">
-          <FormControlLabelText>Amount (KES)</FormControlLabelText>
-        </FormControlLabel>
-        <Input variant="outline" size="md">
-          <InputField
-            placeholder="Amount"
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={setAmount}
-          />
-        </Input>
-      </Box>
+      <Text style={styles.label}>Amount to Pay:</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={amount}
+        onChangeText={setAmount}
+        placeholder="Enter amount to pay"
+      />
 
-      <Box mt="$4">
-        <FormControlLabel mb="$1">
-          <FormControlLabelText>Phone Number</FormControlLabelText>
-        </FormControlLabel>
-        <Input variant="outline" size="md">
-          <InputField
-            placeholder="2547XXXXXXXX"
-            keyboardType="phone-pad"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-          />
-        </Input>
-      </Box>
+      <Text style={styles.label}>Phone Number:</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="phone-pad"
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        placeholder="Enter your phone number"
+      />
 
-      <Button onPress={handleOpenPinPrompt} bgColor={colors.black} mt="$4">
-        <ButtonText>Lipa na M-PESA</ButtonText>
-      </Button>
+      {isLoading ? (
+        <ActivityIndicator size="large" color={colors.primary} />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleInitiatePayment}>
+          <Text style={styles.buttonText}>Pay Now</Text>
+        </TouchableOpacity>
+      )}
 
-      {/* M-Pesa PIN Prompt Modal */}
-      <Modal
-        transparent={true}
-        visible={isPromptVisible}
-        animationType="slide"
-        onRequestClose={() => setPromptVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              Do you want to pay Ksh {amount} for {property.plot_number} to
-              Optiven Limited?
-            </Text>
-            <Text style={styles.modalSubtitle}>Enter M-Pesa PIN:</Text>
-            <TextInput
-              style={styles.pinInput}
-              placeholder="****"
-              keyboardType="numeric"
-              secureTextEntry={true}
-              value={mpesaPin}
-              onChangeText={setMpesaPin}
-            />
-            <View style={styles.buttonContainer}>
-              <Button
-                onPress={() => setPromptVisible(false)}
-                bgColor={colors.light}
-                mr="$2"
-              >
-                <ButtonText style={styles.cancelText}>Cancel</ButtonText>
-              </Button>
-              <Button
-                onPress={handleConfirmPayment}
-                bgColor={colors.black}
-                disabled={!mpesaPin || mpesaPin.length !== 4}
-              >
-                <ButtonText>Confirm</ButtonText>
-              </Button>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {paymentInitiated && (
+        <Text style={styles.infoText}>
+          Please check your phone to complete the M-PESA payment.
+        </Text>
+      )}
     </ScrollView>
   );
 };
@@ -168,58 +151,50 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    justifyContent: "center",
     backgroundColor: colors.white,
+    justifyContent: "center",
   },
-  header: {
+  title: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 30,
     color: colors.dark,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: colors.dark,
   },
-  modalContent: {
-    width: "80%",
-    padding: 20,
-    backgroundColor: colors.white,
+  value: {
+    fontSize: 18,
+    marginBottom: 20,
+    color: colors.dark,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.medium,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 20,
+    color: colors.dark,
+  },
+  button: {
+    backgroundColor: colors.primary,
+    padding: 15,
     borderRadius: 8,
     alignItems: "center",
-    elevation: 5,
+    marginTop: 10,
   },
-  modalTitle: {
+  buttonText: {
+    color: colors.white,
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
-    color: colors.dark,
-    textAlign: "center",
   },
-  modalSubtitle: {
+  infoText: {
+    marginTop: 20,
     fontSize: 16,
-    color: colors.medium,
-    marginBottom: 15,
-  },
-  pinInput: {
-    width: "100%",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: colors.light,
-    borderRadius: 8,
-    marginBottom: 15,
+    color: colors.primary,
     textAlign: "center",
-    fontSize: 18,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  cancelText: {
-    color: colors.dark,
   },
 });
