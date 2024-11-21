@@ -21,6 +21,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { OverviewStackParamList, Receipt } from "../../navigation/types";
 import api from "../../utils/api";
 import { parse, format } from "date-fns";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type ViewReceiptsScreenProps = NativeStackScreenProps<
   OverviewStackParamList,
@@ -110,7 +113,9 @@ const ViewReceiptsScreen = ({ route, navigation }: ViewReceiptsScreenProps) => {
     <Screen style={styles.container}>
       <FlatList
         data={receipts.sort((a, b) => b.id - a.id)}
-        renderItem={({ item }) => <ReceiptItem receipt={item} />}
+        renderItem={({ item }) => (
+          <ReceiptItem receipt={item} leadFileNo={property.lead_file_no} />
+        )}
         keyExtractor={(item) => item.id.toString()}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -122,38 +127,85 @@ const ViewReceiptsScreen = ({ route, navigation }: ViewReceiptsScreenProps) => {
 
 const formatDate = (dateString: string): string => {
   const parsedDate = parse(dateString, "MM/dd/yy", new Date());
-  return format(parsedDate, "d MMMM yyyy"); // e.g., '27 July 2024'
+  return format(parsedDate, "d MMMM yyyy");
 };
 
-const ReceiptItem = ({ receipt }: { receipt: Receipt }) => (
-  <View style={styles.receiptItem}>
-    <HStack justifyContent="space-between" style={styles.receiptHeader}>
-      <VStack>
-        <Text bold style={styles.receiptNumber}>
-          {receipt.receipt_no}
-        </Text>
-        <Text style={styles.receiptDate}>
-          {formatDate(receipt.date_posted)}
+const ReceiptItem = ({
+  receipt,
+  leadFileNo,
+}: {
+  receipt: Receipt;
+  leadFileNo: string;
+}) => {
+  const handleDownloadReceipt = async () => {
+    try {
+      const uri = `${api.defaults.baseURL}/properties/${leadFileNo}/receipts/${receipt.id}/pdf`;
+      const token = await AsyncStorage.getItem("authToken");
+
+      const downloadResumable = FileSystem.createDownloadResumable(
+        uri,
+        FileSystem.documentDirectory + `receipt_${receipt.receipt_no}.pdf`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const downloadResult = await downloadResumable.downloadAsync();
+
+      console.log("Download result:", downloadResult);
+
+      if (downloadResult && downloadResult.status === 200) {
+        const localUri = downloadResult.uri;
+        console.log("Finished downloading to ", localUri);
+
+        // Open the PDF
+        if (localUri && (await FileSystem.getInfoAsync(localUri)).exists) {
+          await Sharing.shareAsync(localUri);
+        } else {
+          alert("Could not find the downloaded file.");
+        }
+      } else {
+        console.log("Download failed. Status:", downloadResult?.status);
+        alert("Failed to download receipt. Please try again.");
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      alert("Failed to download receipt. Please try again.");
+    }
+  };
+
+  return (
+    <View style={styles.receiptItem}>
+      <HStack justifyContent="space-between" style={styles.receiptHeader}>
+        <VStack>
+          <Text bold style={styles.receiptNumber}>
+            {receipt.receipt_no}
+          </Text>
+          <Text style={styles.receiptDate}>
+            {formatDate(receipt.date_posted)}
+          </Text>
+        </VStack>
+        <Button
+          size="sm"
+          variant="solid"
+          action="primary"
+          borderRadius={"$full"}
+          style={styles.downloadButton}
+          onPress={handleDownloadReceipt}
+        >
+          <ButtonIcon as={DownloadIcon} />
+        </Button>
+      </HStack>
+      <VStack space="sm" style={styles.detailsSection}>
+        <Text color={colors.success} size="2xl" bold>
+          {formatCurrency(receipt.amount_lcy, "KES", "en-KE")}
         </Text>
       </VStack>
-      <Button
-        size="sm"
-        variant="solid"
-        action="primary"
-        borderRadius={"$full"}
-        style={styles.downloadButton}
-        onPress={() => console.log(`Downloaded receipt ${receipt.receipt_no}`)}
-      >
-        <ButtonIcon as={DownloadIcon} />
-      </Button>
-    </HStack>
-    <VStack space="sm" style={styles.detailsSection}>
-      <Text color={colors.success} size="2xl" bold>
-        {formatCurrency(receipt.amount_lcy, "KES", "en-KE")}
-      </Text>
-    </VStack>
-  </View>
-);
+    </View>
+  );
+};
 
 export default ViewReceiptsScreen;
 
