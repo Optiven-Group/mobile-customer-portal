@@ -19,7 +19,7 @@ import {
   Switch,
   ActivityIndicator,
   View,
-  Linking, // Import Linking API
+  Linking,
   Alert,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -35,11 +35,29 @@ type AccountScreenProps = NativeStackScreenProps<
   "Account"
 >;
 
+type SettingOption = {
+  id: string;
+  title: string;
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  type: "toggle" | "call";
+};
+
 const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
   const { user, logout } = useAuth();
   const [totalSpent, setTotalSpent] = useState<number>(0);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const getInitials = (name: string | undefined): string => {
+    if (!name) return "U";
+    const names = name.trim().split(" ");
+    if (names.length === 0) return "U";
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (
+      names[0].charAt(0).toUpperCase() +
+      names[names.length - 1].charAt(0).toUpperCase()
+    );
+  };
 
   const getMembershipTier = (totalSpent: number): string => {
     if (totalSpent >= 20000000) return "Platinum";
@@ -77,7 +95,6 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
     await logout();
   };
 
-  // Add handleCallSupport function
   const handleCallSupport = async () => {
     const phoneNumber = "tel:+254790300300";
     const supported = await Linking.canOpenURL(phoneNumber);
@@ -88,7 +105,8 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
     }
   };
 
-  const settingsOptions = [
+  const settingsOptions: SettingOption[] = [
+    // Uncomment and define dark mode if needed
     // {
     //   id: "darkMode",
     //   title: "Dark Mode",
@@ -99,131 +117,198 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
       id: "support",
       title: "Support",
       icon: "help-circle",
-      type: "call", // Updated to 'call' type for clarity
+      type: "call",
     },
   ];
 
   return (
     <Screen style={styles.container}>
       <VStack pt={20} px={20}>
-        <Box style={styles.userInfoContainer}>
-          <Avatar bgColor="$green700" size="lg" borderRadius="$full">
-            <AvatarFallbackText>{user?.name || "User"}</AvatarFallbackText>
-          </Avatar>
-          <Box ml={16} style={styles.userInfo}>
-            <Box style={styles.nameContainer}>
-              <Text style={styles.userName}>{user?.name || "User"}</Text>
-              {loading ? (
-                <ActivityIndicator size="small" color={colors.primary} />
-              ) : (
-                <Badge
-                  size="md"
-                  variant="solid"
-                  action="muted"
-                  bgColor={tierColors[membershipTier]}
-                  ml={4}
-                >
-                  <BadgeText color="white" bold>
-                    {membershipTier}
-                  </BadgeText>
-                </Badge>
-              )}
-            </Box>
-            <Text style={styles.userEmail}>{user?.email || ""}</Text>
-            <Button
-              onPress={() => navigation.navigate("PersonalDetails")}
-              variant="link"
-              justifyContent="flex-start"
-            >
-              <ButtonText size="sm" color={colors.primary}>
-                View Details
-              </ButtonText>
-            </Button>
-          </Box>
-        </Box>
-
-        {/* Loyalty Section */}
-        <Box style={styles.loyaltyContainer}>
-          <View style={styles.loyaltyHeader}>
-            <Text style={styles.loyaltyText}>Loyalty Program</Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("LoyaltyProgramInfo")}
-            >
-              <MaterialCommunityIcons
-                name="information-outline"
-                size={24}
-                color={colors.dark}
-              />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.tierText}>
-            You are a {membershipTier} member!
-          </Text>
-          <Button
-            onPress={() => navigation.navigate("Deals")}
-            bgColor={colors.primary}
-            mt="$1"
-          >
-            <ButtonText>View Deals and Discounts</ButtonText>
-          </Button>
-        </Box>
-
-        <FlatList
-          data={settingsOptions}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => {
-                if (item.type === "toggle") {
-                  setIsDarkMode(!isDarkMode);
-                } else if (item.id === "support") {
-                  handleCallSupport(); // Call support when clicked
-                }
-              }}
-              style={styles.settingItem}
-            >
-              <Box style={styles.settingContainer}>
-                <Box style={styles.iconContainer}>
-                  <MaterialCommunityIcons
-                    name={item.icon}
-                    size={24}
-                    color={colors.dark}
-                  />
-                  <Text ml={4} style={styles.settingText}>
-                    {item.title}
-                  </Text>
-                </Box>
-                {item.type === "toggle" ? (
-                  <Switch
-                    value={isDarkMode}
-                    onValueChange={(value) => setIsDarkMode(value)}
-                  />
-                ) : (
-                  <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
-                )}
-              </Box>
-            </TouchableOpacity>
-          )}
-          contentContainerStyle={styles.settingsList}
+        {/* User Info Section */}
+        <UserInfo
+          user={user}
+          loading={loading}
+          membershipTier={membershipTier}
+          tierColors={tierColors}
+          initials={getInitials(user?.name)}
         />
 
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutTouchable}>
-          <Box style={styles.logoutContainer}>
-            <Box style={styles.iconContainer}>
-              <Avatar bgColor="$red600" size="lg" borderRadius="$full">
-                <MaterialCommunityIcons name="logout" color="white" size={24} />
-              </Avatar>
-              <Text ml={4} style={styles.logoutText}>
-                Logout
-              </Text>
-            </Box>
-            <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
-          </Box>
-        </TouchableOpacity>
+        {/* Loyalty Section */}
+        <LoyaltySection
+          membershipTier={membershipTier}
+          navigation={navigation}
+        />
+
+        {/* Settings Options */}
+        <SettingsOptions
+          settingsOptions={settingsOptions}
+          isDarkMode={isDarkMode}
+          setIsDarkMode={setIsDarkMode}
+          handleCallSupport={handleCallSupport}
+        />
+
+        {/* Logout Button */}
+        <LogoutButton handleLogout={handleLogout} />
       </VStack>
     </Screen>
   );
 };
+
+// Reusable UserInfo Component
+type UserInfoProps = {
+  user: any; // Define proper user type
+  loading: boolean;
+  membershipTier: string;
+  tierColors: { [key: string]: string };
+  initials: string;
+};
+
+const UserInfo: React.FC<UserInfoProps> = ({
+  user,
+  loading,
+  membershipTier,
+  tierColors,
+  initials,
+}) => (
+  <Box style={styles.userInfoContainer}>
+    <Avatar bgColor="$green700" size="lg" borderRadius="$full">
+      <AvatarFallbackText>{initials}</AvatarFallbackText>
+    </Avatar>
+    <Box ml={16} style={styles.userInfo}>
+      <View style={styles.nameContainer}>
+        <Text style={styles.userName}>{user?.name || "User"}</Text>
+        {loading ? (
+          <ActivityIndicator
+            size="small"
+            color={colors.primary}
+            style={styles.activityIndicator}
+          />
+        ) : (
+          <Badge
+            size="md"
+            variant="solid"
+            action="muted"
+            bgColor={tierColors[membershipTier]}
+            ml={4}
+          >
+            <BadgeText color="white" bold>
+              {membershipTier}
+            </BadgeText>
+          </Badge>
+        )}
+      </View>
+      <Text style={styles.userEmail}>{user?.email || ""}</Text>
+    </Box>
+  </Box>
+);
+
+// Reusable LoyaltySection Component
+type LoyaltySectionProps = {
+  membershipTier: string;
+  navigation: any; // Define proper navigation type
+};
+
+const LoyaltySection: React.FC<LoyaltySectionProps> = ({
+  membershipTier,
+  navigation,
+}) => (
+  <Box style={styles.loyaltyContainer}>
+    <View style={styles.loyaltyHeader}>
+      <Text style={styles.loyaltyText}>Loyalty Program</Text>
+    </View>
+    <Text style={styles.tierText}>You are a {membershipTier} member!</Text>
+    <Button
+      onPress={() => navigation.navigate("LoyaltyProgramInfo")}
+      bgColor={colors.secondary}
+      my="$1"
+      style={styles.loyaltyButton}
+    >
+      <ButtonText>View Benefits</ButtonText>
+    </Button>
+    <Button
+      onPress={() => navigation.navigate("Deals")}
+      bgColor={colors.primary}
+      style={styles.loyaltyButton}
+    >
+      <ButtonText>View Deals and Discounts</ButtonText>
+    </Button>
+  </Box>
+);
+
+// Reusable SettingsOptions Component
+type SettingsOptionsProps = {
+  settingsOptions: SettingOption[];
+  isDarkMode: boolean;
+  setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
+  handleCallSupport: () => void;
+};
+
+const SettingsOptions: React.FC<SettingsOptionsProps> = ({
+  settingsOptions,
+  isDarkMode,
+  setIsDarkMode,
+  handleCallSupport,
+}) => (
+  <FlatList
+    data={settingsOptions}
+    keyExtractor={(item) => item.id}
+    renderItem={({ item }) => (
+      <TouchableOpacity
+        onPress={() => {
+          if (item.type === "toggle") {
+            setIsDarkMode(!isDarkMode);
+          } else if (item.id === "support") {
+            handleCallSupport();
+          }
+        }}
+        style={styles.settingItem}
+      >
+        <Box style={styles.settingContainer}>
+          <Box style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              name={item.icon}
+              size={24}
+              color={colors.dark}
+            />
+            <Text ml={4} style={styles.settingText}>
+              {item.title}
+            </Text>
+          </Box>
+          {item.type === "toggle" ? (
+            <Switch
+              value={isDarkMode}
+              onValueChange={(value) => setIsDarkMode(value)}
+            />
+          ) : (
+            <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
+          )}
+        </Box>
+      </TouchableOpacity>
+    )}
+    contentContainerStyle={styles.settingsList}
+  />
+);
+
+// Reusable LogoutButton Component
+type LogoutButtonProps = {
+  handleLogout: () => void;
+};
+
+const LogoutButton: React.FC<LogoutButtonProps> = ({ handleLogout }) => (
+  <TouchableOpacity onPress={handleLogout}>
+    <Box style={styles.logoutContainer}>
+      <Box style={styles.iconContainer}>
+        <Avatar bgColor="$red600" size="md" borderRadius="$full">
+          <MaterialCommunityIcons name="logout" color="white" size={24} />
+        </Avatar>
+        <Text ml={4} style={styles.logoutText}>
+          Logout
+        </Text>
+      </Box>
+      <Icon as={ChevronRightIcon} size="lg" color={colors.medium} />
+    </Box>
+  </TouchableOpacity>
+);
 
 export default AccountScreen;
 
@@ -232,6 +317,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.light,
   },
+  // User Info Styles
   userInfoContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -245,6 +331,7 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     flex: 1,
+    marginLeft: 16,
   },
   nameContainer: {
     flexDirection: "row",
@@ -256,11 +343,15 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.dark,
   },
+  activityIndicator: {
+    marginLeft: 8,
+  },
   userEmail: {
     fontSize: 14,
     color: colors.medium,
     marginTop: 4,
   },
+  // Loyalty Section Styles
   loyaltyContainer: {
     marginTop: 20,
     backgroundColor: colors.white,
@@ -285,6 +376,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.medium,
     marginTop: 4,
+  },
+  loyaltyButton: {
+    marginTop: 8,
   },
   settingItem: {
     marginTop: 20,
@@ -312,10 +406,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   settingsList: {
-    paddingBottom: 20,
-  },
-  logoutTouchable: {
-    marginTop: 20,
+    paddingBottom: 0,
   },
   logoutContainer: {
     flexDirection: "row",
@@ -328,6 +419,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
+    marginTop: 20,
   },
   logoutText: {
     marginLeft: 12,

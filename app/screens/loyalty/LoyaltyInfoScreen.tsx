@@ -10,21 +10,33 @@ const LoyaltyInfoScreen: React.FC = () => {
       <Box px={20} py={20}>
         <Text style={styles.header}>Unlock Exclusive Benefits!</Text>
         <Text style={styles.subHeader}>
-          Discover the perks of climbing up our loyalty tiers. The more you invest, the more you gain!
+          Discover the perks of climbing up our loyalty tiers. The more you
+          invest, the more you gain!
         </Text>
-
+        <Divider
+          style={{ marginTop: 20, backgroundColor: colors.light, height: 1 }}
+        />
         <VStack space="xs" mt={20}>
           {/* Platinum Tier */}
           <Box style={styles.tierContainer}>
             <HStack alignItems="center">
-              <Box style={[styles.iconContainer, { backgroundColor: "#E5E4E2" }]}>
-                <MaterialCommunityIcons name="crown" size={24} color={colors.white} />
+              <Box
+                style={[styles.iconContainer, { backgroundColor: "#E5E4E2" }]}
+              >
+                <MaterialCommunityIcons
+                  name="crown"
+                  size={24}
+                  color={colors.white}
+                />
               </Box>
-              <Text style={[styles.tierTitle, { color: "#E5E4E2" }]}>Platinum Tier</Text>
+              <Text style={[styles.tierTitle, { color: "#E5E4E2" }]}>
+                Platinum Tier
+              </Text>
             </HStack>
             <Text style={styles.tierDescription}>
-              🎉 You're a property mogul! With over 20 million spent, enjoy an **exclusive 10% discount** 
-              on your next purchase. Time to add another gem to your collection!
+              🎉 You're a property mogul! With over 20 million spent, enjoy an{" "}
+              <Text bold>exclusive 10% discount</Text> on your next purchase.
+              Time to add another gem to your collection!
             </Text>
           </Box>
           <Divider style={styles.divider} />
@@ -32,14 +44,23 @@ const LoyaltyInfoScreen: React.FC = () => {
           {/* Gold Tier */}
           <Box style={styles.tierContainer}>
             <HStack alignItems="center">
-              <Box style={[styles.iconContainer, { backgroundColor: "#FFD700" }]}>
-                <MaterialCommunityIcons name="star" size={24} color={colors.white} />
+              <Box
+                style={[styles.iconContainer, { backgroundColor: "#FFD700" }]}
+              >
+                <MaterialCommunityIcons
+                  name="star"
+                  size={24}
+                  color={colors.white}
+                />
               </Box>
-              <Text style={[styles.tierTitle, { color: "#FFD700" }]}>Gold Tier</Text>
+              <Text style={[styles.tierTitle, { color: "#FFD700" }]}>
+                Gold Tier
+              </Text>
             </HStack>
             <Text style={styles.tierDescription}>
-              ✨ Shining bright! With over 10 million spent, enjoy a **7% discount** on your next purchase. 
-              Keep up the sparkle!
+              ✨ Shining bright! With over 10 million spent, enjoy a{" "}
+              <Text bold>7% discount</Text> on your next purchase. Keep up the
+              sparkle!
             </Text>
           </Box>
           <Divider style={styles.divider} />
@@ -47,14 +68,23 @@ const LoyaltyInfoScreen: React.FC = () => {
           {/* Silver Tier */}
           <Box style={styles.tierContainer}>
             <HStack alignItems="center">
-              <Box style={[styles.iconContainer, { backgroundColor: "#C0C0C0" }]}>
-                <MaterialCommunityIcons name="medal" size={24} color={colors.white} />
+              <Box
+                style={[styles.iconContainer, { backgroundColor: "#C0C0C0" }]}
+              >
+                <MaterialCommunityIcons
+                  name="medal"
+                  size={24}
+                  color={colors.white}
+                />
               </Box>
-              <Text style={[styles.tierTitle, { color: "#C0C0C0" }]}>Silver Tier</Text>
+              <Text style={[styles.tierTitle, { color: "#C0C0C0" }]}>
+                Silver Tier
+              </Text>
             </HStack>
             <Text style={styles.tierDescription}>
-              🥈 You're climbing the ladder! With over 5 million spent, enjoy a **5% discount** on your next 
-              purchase. Silver suits you!
+              🥈 You're climbing the ladder! With over 5 million spent, enjoy a{" "}
+              <Text bold>5% discount</Text> on your next purchase. Silver suits
+              you!
             </Text>
           </Box>
           <Divider style={styles.divider} />
@@ -62,14 +92,23 @@ const LoyaltyInfoScreen: React.FC = () => {
           {/* Bronze Tier */}
           <Box style={styles.tierContainer}>
             <HStack alignItems="center">
-              <Box style={[styles.iconContainer, { backgroundColor: "#CD7F32" }]}>
-                <MaterialCommunityIcons name="trophy" size={24} color={colors.white} />
+              <Box
+                style={[styles.iconContainer, { backgroundColor: "#CD7F32" }]}
+              >
+                <MaterialCommunityIcons
+                  name="trophy"
+                  size={24}
+                  color={colors.white}
+                />
               </Box>
-              <Text style={[styles.tierTitle, { color: "#CD7F32" }]}>Bronze Tier</Text>
+              <Text style={[styles.tierTitle, { color: "#CD7F32" }]}>
+                Bronze Tier
+              </Text>
             </HStack>
             <Text style={styles.tierDescription}>
-              🏅 Great start! With over 1 million spent, enjoy a **3% discount** on your next purchase. Keep 
-              going for more rewards!
+              🏅 Great start! With over 1 million spent, enjoy a{" "}
+              <Text bold>3% discount</Text> on your next purchase. Keep going
+              for more rewards!
             </Text>
           </Box>
           <Divider style={styles.divider} />
@@ -77,14 +116,23 @@ const LoyaltyInfoScreen: React.FC = () => {
           {/* Sapphire Tier */}
           <Box style={styles.tierContainer}>
             <HStack alignItems="center">
-              <Box style={[styles.iconContainer, { backgroundColor: "#0F52BA" }]}>
-                <MaterialCommunityIcons name="circle" size={24} color={colors.white} />
+              <Box
+                style={[styles.iconContainer, { backgroundColor: "#0F52BA" }]}
+              >
+                <MaterialCommunityIcons
+                  name="circle"
+                  size={24}
+                  color={colors.white}
+                />
               </Box>
-              <Text style={[styles.tierTitle, { color: "#0F52BA" }]}>Sapphire Tier</Text>
+              <Text style={[styles.tierTitle, { color: "#0F52BA" }]}>
+                Sapphire Tier
+              </Text>
             </HStack>
             <Text style={styles.tierDescription}>
-              💎 Welcome aboard! As a Sapphire member, you're on your way to unlocking amazing benefits. Let's 
-              embark on this exciting journey together!
+              💎 Welcome aboard! As a Sapphire member, you're on your way to
+              unlocking amazing benefits. Let's embark on this exciting journey
+              together!
             </Text>
           </Box>
         </VStack>

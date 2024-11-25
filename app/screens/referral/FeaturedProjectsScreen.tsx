@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { View, Text, Icon, Button, ButtonText } from "@gluestack-ui/themed";
+import { View, Text, Button, ButtonText } from "@gluestack-ui/themed";
 import { NavigationProp } from "@react-navigation/native";
 import { ReferralStackParamList, Project } from "../../navigation/types";
 import api from "../../utils/api";
