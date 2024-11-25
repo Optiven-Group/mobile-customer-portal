@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { config } from "@gluestack-ui/config";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { NavigationContainer } from "@react-navigation/native";
@@ -14,7 +14,6 @@ import {
 } from "./app/context/NotificationContext";
 import { MembershipProvider } from "./app/context/MembershipContext";
 
-// Set notification handler
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -24,6 +23,14 @@ Notifications.setNotificationHandler({
 });
 
 export default function App() {
+  useEffect(() => {
+    registerForPushNotificationsAsync().then(async (token) => {
+      if (token) {
+        console.log("Push Notification Token:", token);
+      }
+    });
+  }, []);
+
   return (
     <AuthProvider>
       <MembershipProvider>
@@ -48,7 +55,7 @@ const MainNavigator = () => {
 const NotificationHandler = () => {
   const { addNotification } = useNotifications();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const notificationListener = Notifications.addNotificationReceivedListener(
       (notification) => {
         console.log("Notification received:", notification);

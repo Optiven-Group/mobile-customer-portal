@@ -1,9 +1,17 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import { Notification } from "expo-notifications";
+import axios from "axios";
 
 interface NotificationContextType {
   notifications: Notification[];
   addNotification: (notification: Notification) => void;
+  setNotifications: (notifications: Notification[]) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -19,8 +27,22 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
     setNotifications((prev) => [notification, ...prev]);
   };
 
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get("/notifications");
+        setNotifications(response.data.notifications);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
   return (
-    <NotificationContext.Provider value={{ notifications, addNotification }}>
+    <NotificationContext.Provider
+      value={{ notifications, addNotification, setNotifications }}
+    >
       {children}
     </NotificationContext.Provider>
   );
