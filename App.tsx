@@ -5,7 +5,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import RootNavigator from "./app/navigation/RootNavigator";
 import AuthNavigator from "./app/navigation/AuthNavigator";
 import { AuthProvider, useAuth } from "./app/context/AuthContext";
-import { StripeProvider } from "@stripe/stripe-react-native";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Alert } from "react-native";
@@ -13,6 +12,7 @@ import {
   NotificationProvider,
   useNotifications,
 } from "./app/context/NotificationContext";
+import { MembershipProvider } from "./app/context/MembershipContext";
 
 // Set notification handler
 Notifications.setNotificationHandler({
@@ -26,16 +26,16 @@ Notifications.setNotificationHandler({
 export default function App() {
   return (
     <AuthProvider>
-      <NotificationProvider>
-        <GluestackUIProvider config={config}>
-          <StripeProvider publishableKey="pk_live_51IdvJgK5HXK2AlvIpE92GtBv8lqz6UDrnneZaOSSFsy4Kf7vI2DWodkpAevs3S8riKBgYYXAhMtgJhVDjjkRAkVP00H6c6gwd1">
+      <MembershipProvider>
+        <NotificationProvider>
+          <GluestackUIProvider config={config}>
             <NavigationContainer>
               <MainNavigator />
             </NavigationContainer>
             <NotificationHandler />
-          </StripeProvider>
-        </GluestackUIProvider>
-      </NotificationProvider>
+          </GluestackUIProvider>
+        </NotificationProvider>
+      </MembershipProvider>
     </AuthProvider>
   );
 }

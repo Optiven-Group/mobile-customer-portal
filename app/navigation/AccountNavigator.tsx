@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import AccountScreen from "../screens/AccountScreen";
-import DealsScreen from "../screens/DealsScreen"; // Import the new DealsScreen
+import AccountScreen from "../screens/account/AccountScreen";
+import DealsScreen from "../screens/account/DealsScreen";
 import { AccountStackParamList } from "./types";
-import LoyaltyInfoScreen from "../screens/loyalty/LoyaltyInfoScreen";
+import LoyaltyInfoScreen from "../screens/account/LoyaltyInfoScreen";
 import PersonalDetailsScreen from "../screens/PersonalDetailsScreen";
 import EditDetailsScreen from "../screens/EditDetailsScreen";
 
@@ -24,7 +24,7 @@ const AccountNavigator = () => {
       <Stack.Screen
         name="Deals"
         component={DealsScreen}
-        options={{ title: "Property Deals" }}
+        options={{ title: "Deals" }}
       />
       <Stack.Screen
         name="LoyaltyProgramInfo"
