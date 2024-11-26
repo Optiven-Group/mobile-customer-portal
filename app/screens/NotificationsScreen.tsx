@@ -1,27 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { StyleSheet, View, FlatList, Text } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Screen from "../app-components/Screen";
 import moment from "moment";
 import { useNotifications } from "../context/NotificationContext";
-import axios from "axios";
 
 type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
 
 const NotificationsScreen = () => {
-  const { notifications, setNotifications } = useNotifications();
-
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await axios.get("/notifications");
-        setNotifications(response.data.notifications);
-      } catch (error) {
-        console.error("Failed to fetch notifications:", error);
-      }
-    };
-    fetchNotifications();
-  }, []);
+  const { notifications } = useNotifications();
 
   const getTimeAgo = (date?: Date) => {
     return date ? moment(date).fromNow() : "";

@@ -13,6 +13,8 @@ import {
   useNotifications,
 } from "./app/context/NotificationContext";
 import { MembershipProvider } from "./app/context/MembershipContext";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -26,7 +28,23 @@ export default function App() {
   useEffect(() => {
     registerForPushNotificationsAsync().then(async (token) => {
       if (token) {
-        console.log("Push Notification Token:", token);
+        const token = await AsyncStorage.getItem("authToken");
+        try {
+          await axios.post(
+            "/save-push-token",
+            {
+              push_token: token,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          console.log("Push token saved successfully");
+        } catch (error) {
+          console.error("Failed to save push token:", error);
+        }
       }
     });
   }, []);

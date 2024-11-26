@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Dimensions, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import Screen from "../app-components/Screen";
 import {
@@ -15,7 +20,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../utils/colors";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
-import { Project } from "../navigation/types";
+import { Project, Campaign } from "../navigation/types";
 import Carousel from "react-native-reanimated-carousel";
 
 type HomeScreenProps = {
@@ -38,6 +43,11 @@ const getGreeting = () => {
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { user } = useAuth();
   const [campaigns, setCampaigns] = useState<Project[]>([]);
+  const [featuredCampaign, setFeaturedCampaign] = useState<Campaign | null>(
+    null
+  );
+  const [loadingFeatured, setLoadingFeatured] = useState<boolean>(true);
+  const [featuredError, setFeaturedError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -48,19 +58,36 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         console.error("Failed to fetch campaigns:", error);
       }
     };
+
+    const fetchFeaturedCampaign = async () => {
+      try {
+        const response = await api.get("/monthly-campaign");
+        setFeaturedCampaign(response.data.campaign);
+        setFeaturedError(null);
+      } catch (error: any) {
+        if (error.response && error.response.status === 404) {
+          setFeaturedError("No featured campaigns at the moment.");
+        } else {
+          setFeaturedError("Failed to fetch featured campaign.");
+        }
+        console.error("Failed to fetch featured campaign:", error);
+      } finally {
+        setLoadingFeatured(false);
+      }
+    };
+
     fetchCampaigns();
+    fetchFeaturedCampaign();
   }, []);
 
   return (
     <Screen style={styles.container}>
       <ScrollView>
         <Center>
-          {/* Top Section */}
           <Heading my="$4" textAlign="center">{`${getGreeting()}, ${
             user?.name || "User"
           }`}</Heading>
 
-          {/* Navigable Touchables */}
           <Box
             flexDirection="row"
             justifyContent="space-around"
@@ -119,24 +146,49 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             ))}
           </Box>
 
-          {/* Monthly Campaign Section */}
           <Heading size="md" my="$4" textAlign="center">
-            Ongoing Monthly Campaign
+            Featured Campaign
           </Heading>
-          <Box style={styles.campaignCard}>
-            <Image
-              source={require("../../assets/app-images/optiven-at-25.jpeg")}
-              width={width}
-              height={320}
-              alt={`optiven at 25 image`}
-            />
-          </Box>
+
+          {loadingFeatured ? (
+            <ActivityIndicator size="large" color={colors.primary} />
+          ) : featuredError ? (
+            <Text color="red.500" textAlign="center" mb="$4">
+              {featuredError}
+            </Text>
+          ) : (
+            featuredCampaign && (
+              <Box key={featuredCampaign.id} style={styles.campaignCard}>
+                <Image
+                  source={{ uri: featuredCampaign.banner_image_url }}
+                  width={width}
+                  height={320}
+                  alt={`${featuredCampaign.title} image`}
+                />
+                <Box
+                  position="absolute"
+                  bottom={10}
+                  left={15}
+                  right={15}
+                  bg="rgba(0,0,0,0.5)"
+                  p={5}
+                  borderRadius={8}
+                >
+                  <Text color="white" bold size="lg">
+                    {featuredCampaign.title}
+                  </Text>
+                  <Text color="white" size="sm">
+                    {featuredCampaign.description}
+                  </Text>
+                </Box>
+              </Box>
+            )
+          )}
 
           <Heading my="$4" textAlign="left">
             Featured Properties
           </Heading>
 
-          {/* Campaigns Carousel */}
           {campaigns.length > 0 ? (
             <Carousel
               loop
@@ -146,7 +198,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               data={campaigns}
               scrollAnimationDuration={1000}
               renderItem={({ item }: { item: Project }) => (
-                <Pressable style={styles.campaignCard}>
+                <Pressable key={item.project_id} style={styles.campaignCard}>
                   {item.banner && (
                     <Image
                       source={{ uri: item.banner }}
@@ -183,6 +235,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     width: width * 0.9,
     alignSelf: "center",
+    marginBottom: 20,
   },
   campaignImage: {
     width: "100%",

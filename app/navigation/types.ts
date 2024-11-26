@@ -78,6 +78,9 @@ export interface Project {
   project_id: number;
   name: string;
   epr_id: string;
+  description?: string;
+  banner?: string;
+  is_featured?: boolean;
 }
 
 // Property Interface
@@ -97,6 +100,17 @@ export interface Receipt {
   amount_lcy: number;
 }
 
+// Campaign Interface
+export interface Campaign {
+  id: number;
+  title: string;
+  description: string;
+  banner_image_url: string;
+  month: number;
+  year: number;
+}
+
+// Referral Stack Param List
 export type ReferralStackParamList = {
   ReferralHome: undefined;
   HowItWorks: undefined;
@@ -104,12 +118,3 @@ export type ReferralStackParamList = {
   FeaturedProjects: undefined;
   ReferralProgress: undefined;
 };
-
-export interface Project {
-  project_id: number;
-  name: string;
-  epr_id: string;
-  description: string;
-  banner: string;
-  is_featured: boolean;
-}

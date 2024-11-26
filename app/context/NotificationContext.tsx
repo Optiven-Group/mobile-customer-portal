@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import { Notification } from "expo-notifications";
 import axios from "axios";
+import { useAuth } from "./AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -29,8 +31,13 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     const fetchNotifications = async () => {
+      const token = await AsyncStorage.getItem("authToken");
       try {
-        const response = await axios.get("/notifications");
+        const response = await axios.get("/notifications", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setNotifications(response.data.notifications);
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
