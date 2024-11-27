@@ -2,8 +2,17 @@
 export type AuthStackParamList = {
   Login: undefined;
   VerifyUser: undefined;
-  VerifyOTP: undefined;
-  CreatePassword: undefined;
+  VerifyOTP: {
+    customerNumber?: string;
+    email: string;
+    forResetPassword: boolean;
+  };
+  CreatePassword: {
+    customerNumber?: string;
+    email: string;
+    otp: string;
+    forResetPassword: boolean;
+  };
   ForgotPassword: undefined;
 };
 
@@ -118,3 +127,18 @@ export type ReferralStackParamList = {
   FeaturedProjects: undefined;
   ReferralProgress: undefined;
 };
+
+// Notification Interface (Custom)
+export interface AppNotification {
+  id: number;
+  user_id: number;
+  title: string;
+  body: string;
+  data: string;
+  created_at: string;
+}
+
+export interface LeadFile {
+  leadFileNo: string;
+  customerNo: string;
+}

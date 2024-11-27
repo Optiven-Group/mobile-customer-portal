@@ -10,6 +10,7 @@ import api from "../utils/api";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Alert } from "react-native";
+import { LeadFile } from "../navigation/types";
 
 // Define the User interface
 interface User {
@@ -17,6 +18,7 @@ interface User {
   email: string;
   name: string;
   customerNumber: string;
+  leadFiles: LeadFile[];
 }
 
 interface AuthContextType {
