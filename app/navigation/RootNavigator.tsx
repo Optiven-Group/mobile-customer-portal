@@ -5,7 +5,6 @@ import SettingsScreen from "../screens/settings/SettingsScreen";
 import SupportScreen from "../screens/support/SupportScreen";
 import { RootStackParamList } from "./types";
 import PaymentMethodScreen from "../screens/PaymentMethodScreen";
-import StripePaymentScreen from "../screens/make-payment/StripePaymentScreen";
 import MpesaPaymentScreen from "../screens/make-payment/MpesaPaymentScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -18,11 +17,6 @@ const RootNavigator = () => {
         name="Main"
         component={AppNavigator}
         options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="StripePayment"
-        component={StripePaymentScreen}
-        options={{ title: "Bank" }}
       />
       <Stack.Screen
         name="PaymentMethod"

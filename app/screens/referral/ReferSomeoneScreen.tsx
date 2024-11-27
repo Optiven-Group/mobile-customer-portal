@@ -19,7 +19,7 @@ const ReferSomeoneScreen: React.FC<ReferSomeoneScreenProps> = ({ route }) => {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Join me in the ${project.name} project! Use my referral code ${referralCode} to sign up!`,
+        message: `Join me in the ${project.name} project! Use my referral code ${referralCode} and get 1% off!`,
       });
     } catch (error) {
       console.error("Error sharing referral code:", error);

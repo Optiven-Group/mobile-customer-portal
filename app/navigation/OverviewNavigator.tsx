@@ -1,4 +1,3 @@
-// OverviewNavigator.tsx
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { OverviewStackParamList } from "./types";

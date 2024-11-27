@@ -4,31 +4,32 @@ import { Feather } from "@expo/vector-icons";
 import Screen from "../app-components/Screen";
 import moment from "moment";
 import { useNotifications } from "../context/NotificationContext";
+import { AppNotification } from "../navigation/types";
 
 type FeatherIconName = React.ComponentProps<typeof Feather>["name"];
 
 const NotificationsScreen = () => {
   const { notifications } = useNotifications();
 
-  const getTimeAgo = (date?: Date) => {
-    return date ? moment(date).fromNow() : "";
+  const getTimeAgo = (dateString?: string) => {
+    return dateString ? moment(dateString).fromNow() : "";
   };
 
-  const getIconName = (notification: any): FeatherIconName => {
-    const title = notification.request.content.title || "";
+  const getIconName = (notification: AppNotification): FeatherIconName => {
+    const title = notification.title || "";
     if (title.includes("Referral")) {
       if (title.includes("In Progress")) return "clock";
       if (title.includes("Completed")) return "check-circle";
       if (title.includes("Processing")) return "refresh-cw";
     }
     if (title.includes("Payment Reminder")) return "calendar";
-    if (title.includes("Optiven at 25")) return "star";
+    if (title.includes("Communication")) return "star";
     return "bell";
   };
 
-  const renderItem = ({ item }: { item: any }) => {
-    const { title, body } = item.request.content;
-    const timestamp = getTimeAgo(item.date);
+  const renderItem = ({ item }: { item: AppNotification }) => {
+    const { title, body, created_at } = item;
+    const timestamp = getTimeAgo(created_at);
     const iconName = getIconName(item);
 
     return (
@@ -52,9 +53,7 @@ const NotificationsScreen = () => {
     <Screen style={styles.container}>
       <FlatList
         data={notifications}
-        keyExtractor={(item, index) =>
-          item.request.identifier || index.toString()
-        }
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         ListEmptyComponent={
           <Text style={styles.emptyText}>No notifications received yet.</Text>

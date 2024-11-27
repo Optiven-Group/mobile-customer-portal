@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "expo-app",
+    "name": "OptivenCustomerPortal",
     "slug": "expo-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,17 +14,28 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "scheme": "optivencustomerportal",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.optiven.optivencustomerportal",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.optiven.optivencustomerportal",
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5aae01d1-4f72-4b8f-b77a-81e94487d171"
+      }
     }
   }
 }
