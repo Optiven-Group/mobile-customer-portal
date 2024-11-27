@@ -28,9 +28,11 @@ const ProjectSelectionScreen = ({
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  const fetchProjects = async () => {
+  const fetchProjects = async (isRefreshing = false) => {
     try {
-      if (!refreshing) {
+      if (isRefreshing) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
       }
       const response = await api.get("/projects");
@@ -40,9 +42,10 @@ const ProjectSelectionScreen = ({
       setError("Failed to fetch projects. Please try again.");
       console.error(error);
     } finally {
-      setLoading(false);
-      if (refreshing) {
+      if (isRefreshing) {
         setRefreshing(false);
+      } else {
+        setLoading(false);
       }
     }
   };
@@ -52,8 +55,7 @@ const ProjectSelectionScreen = ({
   }, []);
 
   const onRefresh = () => {
-    setRefreshing(true);
-    fetchProjects();
+    fetchProjects(true);
   };
 
   const handleProjectSelect = (project: Project) => {
@@ -61,12 +63,12 @@ const ProjectSelectionScreen = ({
       route.name === "Project Selection for Payment"
         ? "Property Selection for Payment"
         : route.name === "Project Selection for Statements"
-          ? "Property Selection for Statements"
-          : "Property Selection";
+        ? "Property Selection for Statements"
+        : "Property Selection";
     navigation.navigate(nextScreen, { project });
   };
 
-  if (loading && !refreshing) {
+  if (loading) {
     return (
       <Screen style={styles.container}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -80,7 +82,7 @@ const ProjectSelectionScreen = ({
         <Text style={{ color: colors.danger, textAlign: "center" }}>
           {error}
         </Text>
-        <Pressable onPress={fetchProjects} style={styles.retryButton}>
+        <Pressable onPress={() => fetchProjects()} style={styles.retryButton}>
           <Text style={{ color: colors.primary }}>Tap to Retry</Text>
         </Pressable>
       </Screen>

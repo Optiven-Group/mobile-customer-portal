@@ -16,7 +16,7 @@ import api from "../../utils/api";
 
 interface Transaction {
   id: string;
-  date: string;
+  date: Date;
   type: string;
   amount: number;
   time: string;
@@ -37,34 +37,41 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = async (isRefreshing = false) => {
     if (!property) return;
 
     try {
-      if (!refreshing) {
+      if (isRefreshing) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
       }
+
       const response = await api.get(
         `/properties/${property.lead_file_no}/transactions`
       );
-      const fetchedTransactions: Transaction[] = response.data.transactions.map(
-        (transaction: any) => ({
+
+      const fetchedTransactions: Transaction[] = response.data.transactions
+        .map((transaction: any) => ({
           id: transaction.id,
-          date: transaction.date,
+          date: new Date(transaction.date),
           type: transaction.type,
           amount: transaction.amount,
           time: transaction.time,
-        })
-      );
+        }))
+        .sort((a: any, b: any) => b.date - a.date)
+        .filter((transaction: any) => transaction.amount > 0);
+
       setTransactions(fetchedTransactions);
       setError("");
     } catch (error: any) {
       setError("Failed to fetch transactions. Please try again.");
       console.error(error);
     } finally {
-      setLoading(false);
-      if (refreshing) {
+      if (isRefreshing) {
         setRefreshing(false);
+      } else {
+        setLoading(false);
       }
     }
   };
@@ -74,16 +81,10 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
   }, [property]);
 
   const onRefresh = () => {
-    setRefreshing(true);
-    fetchTransactions();
+    fetchTransactions(true);
   };
 
-  const handlePressTransaction = (item: Transaction) => {
-    console.log("Navigate to detail screen", item);
-    // Implement navigation to transaction detail screen if needed
-  };
-
-  if (loading && !refreshing) {
+  if (loading) {
     return (
       <Screen style={styles.container}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -97,7 +98,10 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
         <Text style={{ color: colors.danger, textAlign: "center" }}>
           {error}
         </Text>
-        <Pressable onPress={fetchTransactions} style={styles.retryButton}>
+        <Pressable
+          onPress={() => fetchTransactions()}
+          style={styles.retryButton}
+        >
           <Text style={{ color: colors.primary }}>Tap to Retry</Text>
         </Pressable>
       </Screen>
@@ -114,13 +118,21 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
     );
   }
 
+  if (transactions.length === 0) {
+    return (
+      <Screen style={styles.container}>
+        <Text style={{ textAlign: "center", marginTop: 20 }}>
+          No transactions found.
+        </Text>
+      </Screen>
+    );
+  }
+
   return (
     <Screen>
       <FlatList
         data={transactions.sort((a, b) => b.id.localeCompare(a.id))}
-        renderItem={({ item }) => (
-          <TransactionItem item={item} onPress={handlePressTransaction} />
-        )}
+        renderItem={({ item }) => <TransactionItem item={item} />}
         keyExtractor={(item) => item.id}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -130,24 +142,15 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
   );
 };
 
-const TransactionItem = ({
-  item,
-  onPress,
-}: {
-  item: Transaction;
-  onPress: (item: Transaction) => void;
-}) => (
-  <Pressable style={styles.transactionItem} onPress={() => onPress(item)}>
+const TransactionItem = ({ item }: { item: Transaction }) => (
+  <Pressable style={styles.transactionItem}>
     <View style={styles.transactionType}>
       <Text bold>{item.type}</Text>
-      <Text size="sm">{item.date}</Text>
+      <Text size="sm">{format(item.date, "do MMMM yyyy")}</Text>
     </View>
     <View style={styles.transactionAmount}>
       <Text color={item.amount >= 0 ? "green" : "tomato"}>
         {formatCurrency(item.amount, "KES", "en-KE")}
-      </Text>
-      <Text size="sm" color={colors.medium}>
-        {item.time}
       </Text>
     </View>
   </Pressable>

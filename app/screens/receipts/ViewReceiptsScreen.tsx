@@ -48,9 +48,11 @@ const ViewReceiptsScreen = ({ route, navigation }: ViewReceiptsScreenProps) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  const fetchReceipts = async () => {
+  const fetchReceipts = async (isRefreshing = false) => {
     try {
-      if (!refreshing) {
+      if (isRefreshing) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
       }
       const response = await api.get(
@@ -62,9 +64,10 @@ const ViewReceiptsScreen = ({ route, navigation }: ViewReceiptsScreenProps) => {
       setError("Failed to fetch receipts. Please try again.");
       console.error(error);
     } finally {
-      setLoading(false);
-      if (refreshing) {
+      if (isRefreshing) {
         setRefreshing(false);
+      } else {
+        setLoading(false);
       }
     }
   };
@@ -74,11 +77,10 @@ const ViewReceiptsScreen = ({ route, navigation }: ViewReceiptsScreenProps) => {
   }, []);
 
   const onRefresh = () => {
-    setRefreshing(true);
-    fetchReceipts();
+    fetchReceipts(true);
   };
 
-  if (loading && !refreshing) {
+  if (loading) {
     return (
       <Screen style={styles.container}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -92,7 +94,7 @@ const ViewReceiptsScreen = ({ route, navigation }: ViewReceiptsScreenProps) => {
         <Text style={{ color: colors.danger, textAlign: "center" }}>
           {error}
         </Text>
-        <Button onPress={fetchReceipts} style={styles.retryButton}>
+        <Button onPress={() => fetchReceipts()} style={styles.retryButton}>
           <Text style={{ color: colors.primary }}>Tap to Retry</Text>
         </Button>
       </Screen>

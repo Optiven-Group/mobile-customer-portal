@@ -27,24 +27,26 @@ const PropertySelectionForStatementsScreen: React.FC<
   const [error, setError] = useState<string>("");
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
-  const fetchProperties = async () => {
+  const fetchProperties = async (isRefreshing = false) => {
     try {
-      if (!refreshing) {
+      if (isRefreshing) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
       }
       const response = await api.get(
         `/projects/${project.project_id}/properties`
       );
-      const fetchedProperties: Property[] = response.data.properties;
-      setProperties(fetchedProperties);
+      setProperties(response.data.properties);
       setError("");
     } catch (error: any) {
       setError("Failed to fetch properties. Please try again.");
       console.error(error);
     } finally {
-      setLoading(false);
-      if (refreshing) {
+      if (isRefreshing) {
         setRefreshing(false);
+      } else {
+        setLoading(false);
       }
     }
   };
@@ -54,15 +56,14 @@ const PropertySelectionForStatementsScreen: React.FC<
   }, []);
 
   const onRefresh = () => {
-    setRefreshing(true);
-    fetchProperties();
+    fetchProperties(true);
   };
 
   const handlePropertySelect = (property: Property) => {
     navigation.navigate("View Statements", { property });
   };
 
-  if (loading && !refreshing) {
+  if (loading) {
     return (
       <Screen style={styles.container}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -76,7 +77,7 @@ const PropertySelectionForStatementsScreen: React.FC<
         <Text style={{ color: colors.danger, textAlign: "center" }}>
           {error}
         </Text>
-        <Pressable onPress={fetchProperties} style={styles.retryButton}>
+        <Pressable onPress={() => fetchProperties()} style={styles.retryButton}>
           <Text style={{ color: colors.primary }}>Tap to Retry</Text>
         </Pressable>
       </Screen>

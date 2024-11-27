@@ -67,9 +67,11 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
   const [error, setError] = useState<string>("");
   const [processingPayments, setProcessingPayments] = useState<number[]>([]);
 
-  const fetchInstallmentSchedules = async () => {
+  const fetchInstallmentSchedules = async (isRefreshing = false) => {
     try {
-      if (!refreshing) {
+      if (isRefreshing) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
       }
       const response = await api.get(
@@ -89,12 +91,23 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
       setError("Failed to fetch installment schedules. Please try again.");
       console.error(error);
     } finally {
-      setLoading(false);
-      if (refreshing) {
+      if (isRefreshing) {
         setRefreshing(false);
+      } else {
+        setLoading(false);
       }
     }
   };
+
+  const onRefresh = () => {
+    fetchInstallmentSchedules(true);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchInstallmentSchedules();
+    }, [])
+  );
 
   // Inside your downloadPDF function for the installment schedule
   const downloadPDF = async () => {
@@ -172,17 +185,6 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     }
   }, [schedules]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchInstallmentSchedules();
-    }, [])
-  );
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchInstallmentSchedules();
-  };
-
   const formatAmount = (amount: string) => {
     const number = parseFloat(amount.replace(/,/g, ""));
     return new Intl.NumberFormat().format(number);
@@ -222,24 +224,10 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     );
   }
 
-  if (loading && !refreshing) {
+  if (loading) {
     return (
       <Screen style={styles.container}>
         <ActivityIndicator size="large" color={colors.primary} />
-      </Screen>
-    );
-  }
-
-  if (error) {
-    return (
-      <Screen style={styles.container}>
-        <Text style={{ color: colors.danger }}>{error}</Text>
-        <Pressable
-          onPress={fetchInstallmentSchedules}
-          style={styles.retryButton}
-        >
-          <Text style={{ color: colors.primary }}>Tap to Retry</Text>
-        </Pressable>
       </Screen>
     );
   }
