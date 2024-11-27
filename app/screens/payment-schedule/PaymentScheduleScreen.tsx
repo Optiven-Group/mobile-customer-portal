@@ -78,7 +78,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
       const fetchedSchedules: InstallmentSchedule[] =
         response.data.installment_schedules;
 
-      // Sort from most recent to least recent
+      // Sort from latest to earliest
       const sortedSchedules = fetchedSchedules.sort((a, b) => {
         return new Date(b.due_date).getTime() - new Date(a.due_date).getTime();
       });
@@ -188,25 +188,24 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     return new Intl.NumberFormat().format(number);
   };
 
-  // Use the actual current date
   const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
 
-  const upcomingPayments = schedules.filter(
-    (schedule) =>
-      schedule.paid.toLowerCase() === "no" &&
-      new Date(schedule.due_date) >= currentDate
+  const unpaidPayments = schedules.filter(
+    (schedule) => schedule.paid.toLowerCase() === "no"
   );
 
-  const nextPayment = upcomingPayments.length > 0 ? upcomingPayments[0] : null;
+  const nextPayment = unpaidPayments.length > 0 ? unpaidPayments[0] : null;
+  const isOverdue =
+    nextPayment &&
+    new Date(nextPayment.due_date).getTime() < currentDate.getTime();
 
-  const pastPayments = schedules.filter(
-    (schedule) =>
-      schedule.is_id !== nextPayment?.is_id || upcomingPayments.length === 0
+  const otherPayments = schedules.filter(
+    (schedule) => schedule.is_id !== nextPayment?.is_id
   );
 
   const handlePayNow = (payment: InstallmentSchedule) => {
     setProcessingPayments((prev) => [...prev, payment.is_id]);
-    // navigation.navigate("StripePayment", { payment, property });
     navigation.navigate("PaymentMethod", { payment, property });
   };
 
@@ -270,12 +269,12 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
         </Button>
       </HStack>
 
-      {nextPayment && (
+      {nextPayment ? (
         <Center>
           <Card bgColor={colors.white} style={styles.card}>
             <VStack>
               <Text size="sm" bold>
-                Next Payment Due
+                {isOverdue ? "Overdue Payment" : "Next Payment Due"}
               </Text>
               <Text size="xs">
                 {format(new Date(nextPayment.due_date), "dd MMMM yyyy")}
@@ -303,10 +302,16 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
                 style={styles.payNowButton}
                 onPress={() => handlePayNow(nextPayment)}
               >
-                <Text style={styles.payNowButtonText}>Lipa Na MPESA</Text>
+                <Text style={styles.payNowButtonText}>Pay Now</Text>
               </Button>
             )}
           </Card>
+        </Center>
+      ) : (
+        <Center my="$2">
+          <Text size="sm" bold>
+            All payments are up to date.
+          </Text>
         </Center>
       )}
 
@@ -319,38 +324,46 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
       )}
 
       <FlatList<InstallmentSchedule>
-        data={pastPayments}
+        data={otherPayments}
         keyExtractor={(item) => item.is_id.toString()}
-        renderItem={({ item }) => (
-          <Card key={item.is_id.toString()} style={styles.card}>
-            <VStack>
-              <Text size="sm" bold style={styles.dateText}>
-                {format(new Date(item.due_date), "dd MMMM yyyy")}
-              </Text>
-              <HStack alignItems="center">
-                <Text size="2xl" bold>
-                  {formatAmount(item.installment_amount)}
+        renderItem={({ item }) => {
+          const isItemOverdue =
+            item.paid.toLowerCase() === "no" &&
+            new Date(item.due_date).getTime() < currentDate.getTime();
+          const statusText =
+            item.paid.toLowerCase() === "yes"
+              ? "Paid"
+              : isItemOverdue
+              ? "Overdue"
+              : "Unpaid";
+          const statusColor =
+            item.paid.toLowerCase() === "yes"
+              ? colors.success
+              : isItemOverdue
+              ? colors.warning
+              : colors.danger;
+
+          return (
+            <Card key={item.is_id.toString()} style={styles.card}>
+              <VStack>
+                <Text size="sm" bold style={styles.dateText}>
+                  {format(new Date(item.due_date), "dd MMMM yyyy")}
                 </Text>
-                <Text size="xs" ml="$1">
-                  KES
-                </Text>
-              </HStack>
-            </VStack>
-            <VStack style={styles.paymentDetails}>
-              <View
-                style={[
-                  styles.statusDot,
-                  {
-                    backgroundColor:
-                      item.paid.toLowerCase() === "yes"
-                        ? colors.success
-                        : colors.danger,
-                  },
-                ]}
-              />
-            </VStack>
-          </Card>
-        )}
+                <HStack alignItems="center">
+                  <Text size="2xl" bold>
+                    {formatAmount(item.installment_amount)}
+                  </Text>
+                  <Text size="xs" ml="$1">
+                    KES
+                  </Text>
+                </HStack>
+              </VStack>
+              <VStack style={styles.paymentDetails}>
+                <Text style={[{ color: statusColor }]}>{statusText}</Text>
+              </VStack>
+            </Card>
+          );
+        }}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
