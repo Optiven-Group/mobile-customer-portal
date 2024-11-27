@@ -29,13 +29,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       const response = await api.post("/login", { email, password });
-      const { token, user: userData } = response.data;
+      const { access_token, refresh_token, user: userData } = response.data;
 
-      if (!token || !userData) {
+      if (!access_token || !refresh_token || !userData) {
         throw new Error("Invalid login response");
       }
 
-      await login(token, userData);
+      await login(access_token, refresh_token, userData);
       // Navigation will happen automatically due to isLoggedIn change
     } catch (error: any) {
       Alert.alert(
