@@ -140,7 +140,7 @@ const ReceiptItem = ({
   const handleDownloadReceipt = async () => {
     try {
       const uri = `${api.defaults.baseURL}/properties/${leadFileNo}/receipts/${receipt.id}/pdf`;
-      const token = await AsyncStorage.getItem("authToken");
+      const token = await AsyncStorage.getItem("accessToken");
 
       const downloadResumable = FileSystem.createDownloadResumable(
         uri,

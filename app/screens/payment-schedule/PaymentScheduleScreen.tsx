@@ -100,7 +100,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
   const downloadPDF = async () => {
     try {
       const uri = `${api.defaults.baseURL}/properties/${property.lead_file_no}/installment-schedule/pdf`;
-      const token = await AsyncStorage.getItem("authToken");
+      const token = await AsyncStorage.getItem("accessToken");
 
       if (!token) {
         Alert.alert(
