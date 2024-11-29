@@ -29,6 +29,7 @@ type HomeScreenProps = {
 
 const { width } = Dimensions.get("window");
 
+// Utility function to get greeting based on the time of day
 const getGreeting = () => {
   const currentHour = new Date().getHours();
   if (currentHour < 12) {
@@ -39,6 +40,19 @@ const getGreeting = () => {
     return "Good evening";
   }
 };
+
+// Separate Greeting Component for better readability
+const Greeting: React.FC<{ name: string }> = ({ name }) => (
+  <Heading
+    my="$4"
+    textAlign="center"
+    numberOfLines={2} // Allow up to 2 lines for long names
+    adjustsFontSizeToFit // Adjust font size to fit the container
+    style={styles.greetingHeading}
+  >
+    {`${getGreeting()}, ${name}`}
+  </Heading>
+);
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { user } = useAuth();
@@ -82,14 +96,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <Screen style={styles.container}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Center>
-          <Heading my="$4" textAlign="center">{`${getGreeting()}, ${
-            user?.name || "User"
-          }`}</Heading>
+          {/* Greeting Section */}
+          <Greeting name={user?.name || "User"} />
 
+          {/* Quick Actions */}
           <Box
             flexDirection="row"
+            flexWrap="wrap" // Allow wrapping for better responsiveness
             justifyContent="space-around"
             w="90%"
             mb="$4"
@@ -120,7 +135,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 key={item.label}
                 alignItems="center"
                 justifyContent="center"
-                w="$20"
+                w="20%"
+                mb="$4" // Add margin bottom for better spacing on wrap
               >
                 <Pressable
                   onPress={() => navigation.navigate(item.route)}
@@ -130,6 +146,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   borderRadius="$full"
                   alignItems="center"
                   justifyContent="center"
+                  style={styles.quickActionButton}
                 >
                   <MaterialCommunityIcons
                     name={
@@ -139,13 +156,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     color="white"
                   />
                 </Pressable>
-                <Text bold size="xs" textAlign="center" lineHeight={14} mt="$1">
+                <Text
+                  bold
+                  size="xs"
+                  textAlign="center"
+                  lineHeight={14}
+                  mt="$1"
+                  style={styles.quickActionLabel}
+                >
                   {item.label}
                 </Text>
               </VStack>
             ))}
           </Box>
 
+          {/* Featured Campaign Section */}
           <Heading size="md" my="$4" textAlign="center">
             Featured Campaign
           </Heading>
@@ -161,23 +186,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               <Box key={featuredCampaign.id} style={styles.campaignCard}>
                 <Image
                   source={{ uri: featuredCampaign.banner_image_url }}
-                  width={width}
+                  width={width * 0.9} // Adjust width for better spacing
                   height={320}
                   alt={`${featuredCampaign.title} image`}
+                  style={styles.campaignImage}
                 />
                 <Box
                   position="absolute"
                   bottom={10}
                   left={15}
                   right={15}
-                  bg="rgba(0,0,0,0.5)"
+                  bg="rgba(0,0,0,0.6)" // Increased opacity for better readability
                   p={5}
                   borderRadius={8}
                 >
-                  <Text color="white" bold size="lg">
+                  <Text color="white" bold size="lg" style={styles.campaignTitle}>
                     {featuredCampaign.title}
                   </Text>
-                  <Text color="white" size="sm">
+                  <Text color="white" size="sm" style={styles.campaignDescription}>
                     {featuredCampaign.description}
                   </Text>
                 </Box>
@@ -185,14 +211,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             )
           )}
 
-          <Heading my="$4" textAlign="left">
+          {/* Featured Properties Section */}
+          <Heading my="$4" textAlign="left" style={styles.featuredPropertiesHeading}>
             Featured Properties
           </Heading>
 
           {campaigns.length > 0 ? (
             <Carousel
               loop
-              width={width}
+              width={width * 0.9} // Adjust width for better spacing
               height={280}
               autoPlay={true}
               data={campaigns}
@@ -210,7 +237,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               )}
             />
           ) : (
-            <Text>No campaigns available at the moment.</Text>
+            <Text style={styles.noCampaignsText}>
+              No campaigns available at the moment.
+            </Text>
           )}
         </Center>
       </ScrollView>
@@ -225,9 +254,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
+  scrollContainer: {
+    alignItems: "center",
+    paddingVertical: 20,
+  },
+  greetingHeading: {
+    fontSize: 24, // Increased font size
+    fontWeight: "700", // Bolder text
+    color: colors.textPrimary, // Use a defined text color
+    paddingHorizontal: 10, // Add padding to prevent text from touching edges
+  },
+  quickActionButton: {
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3, // Add shadow for better visual depth
+  },
+  quickActionLabel: {
+    fontSize: 12,
+    color: colors.secondary, // Use a secondary text color
+  },
   campaignCard: {
     backgroundColor: colors.white,
-    borderRadius: 8,
+    borderRadius: 12,
     overflow: "hidden",
     shadowColor: "#000",
     shadowOpacity: 0.05,
@@ -241,5 +290,23 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 240,
     resizeMode: "cover",
+  },
+  campaignTitle: {
+    fontSize: 20,
+    marginBottom: 5,
+  },
+  campaignDescription: {
+    fontSize: 14,
+  },
+  featuredPropertiesHeading: {
+    alignSelf: "flex-start",
+    fontSize: 20,
+    fontWeight: "700",
+    color: colors.primary,
+  },
+  noCampaignsText: {
+    fontSize: 16,
+    color: colors.secondary,
+    marginTop: 10,
   },
 });

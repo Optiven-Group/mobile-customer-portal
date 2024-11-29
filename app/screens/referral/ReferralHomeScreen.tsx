@@ -1,9 +1,19 @@
-import React from "react";
-import { StyleSheet, View, Linking, ImageBackground } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Linking,
+  ImageBackground,
+  ActivityIndicator,
+  Dimensions,
+} from "react-native";
 import { Button, ButtonText, Heading, Text } from "@gluestack-ui/themed";
 import { NavigationProp } from "@react-navigation/native";
 import { ReferralStackParamList } from "../../navigation/types";
 import colors from "../../utils/colors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+const { width, height } = Dimensions.get("window");
 
 interface ReferralHomeScreenProps {
   navigation: NavigationProp<ReferralStackParamList, "ReferralHome">;
@@ -12,9 +22,13 @@ interface ReferralHomeScreenProps {
 const ReferralHomeScreen: React.FC<ReferralHomeScreenProps> = ({
   navigation,
 }) => {
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(true);
+
   const handleHowItWorks = () => {
     const url = "https://ors.optiven.co.ke/";
-    Linking.openURL(url);
+    Linking.openURL(url).catch((err) =>
+      console.error("Failed to open URL:", err)
+    );
   };
 
   const handleReferSomeone = () => {
@@ -26,56 +40,138 @@ const ReferralHomeScreen: React.FC<ReferralHomeScreenProps> = ({
   };
 
   return (
-    <ImageBackground
-      source={require("../../../assets/app-images/wallet.jpg")} // Replace this with a more suitable image
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.container}>
-        <Heading size="3xl" color={colors.white} mb="$2">
-          Refer & Earn
-        </Heading>
-        <Text color={colors.white} textAlign="center" mb="$4">
-          Share the opportunity, and get rewarded for every successful referral!
-        </Text>
+    <View style={styles.container}>
+      {isImageLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      )}
+      <ImageBackground
+        source={require("../../../assets/app-images/wallet.jpg")} // Replace with a more suitable image if needed
+        style={styles.background}
+        resizeMode="cover"
+        onLoadEnd={() => setIsImageLoading(false)}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.contentContainer}>
+            <Heading size="3xl" color={colors.white} mb="$2" textAlign="center">
+              Refer & Earn
+            </Heading>
+            <Text color={colors.white} textAlign="center" mb="$6" size="lg">
+              Share the opportunity and get rewarded for every successful
+              referral!
+            </Text>
 
-        <Button
-          onPress={handleReferSomeone}
-          mt="$4"
-          width="$full"
-          bgColor={colors.primary}
-          size="md"
-        >
-          <ButtonText>Refer Someone</ButtonText>
-        </Button>
-        <Button
-          onPress={handleViewProgress}
-          mt="$4"
-          width="$full"
-          bgColor={colors.white}
-          size="md"
-        >
-          <ButtonText color={colors.black}>View My Referrals</ButtonText>
-        </Button>
-        <Button onPress={handleHowItWorks} variant="link" mt="$32">
-          <ButtonText color={colors.white}>See How It Works</ButtonText>
-        </Button>
-      </View>
-    </ImageBackground>
+            <Button
+              onPress={handleReferSomeone}
+              mt="$4"
+              width={width * 0.8}
+              bgColor={colors.primary}
+              size="md"
+              style={styles.button}
+            >
+              <MaterialCommunityIcons
+                name="account-plus"
+                size={20}
+                color={colors.white}
+                style={styles.buttonIcon}
+              />
+              <ButtonText>Refer Someone</ButtonText>
+            </Button>
+
+            <Button
+              onPress={handleViewProgress}
+              mt="$4"
+              width={width * 0.8}
+              bgColor={colors.white}
+              size="md"
+              style={styles.buttonSecondary}
+            >
+              <MaterialCommunityIcons
+                name="clipboard-check"
+                size={20}
+                color={colors.primary}
+                style={styles.buttonIcon}
+              />
+              <ButtonText color={colors.primary}>View My Referrals</ButtonText>
+            </Button>
+
+            <Button
+              onPress={handleHowItWorks}
+              variant="link"
+              mt="$8"
+              style={styles.linkButton}
+            >
+              <ButtonText color={colors.white} underline>
+                See How It Works
+              </ButtonText>
+            </Button>
+          </View>
+        </View>
+      </ImageBackground>
+    </View>
   );
 };
 
 export default ReferralHomeScreen;
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
   container: {
     flex: 1,
-    alignItems: "center",
+    backgroundColor: colors.black, // Fallback background color
+  },
+  loadingContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: width,
+    height: height,
     justifyContent: "center",
-    padding: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.25)",
+    alignItems: "center",
+    backgroundColor: colors.black,
+    zIndex: 1,
+  },
+  background: {
+    flex: 1,
+    width: width,
+    height: height,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent overlay for better text readability
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  contentContainer: {
+    alignItems: "center",
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  buttonSecondary: {
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  buttonIcon: {
+    marginRight: 10,
+  },
+  linkButton: {
+    paddingVertical: 10,
   },
 });

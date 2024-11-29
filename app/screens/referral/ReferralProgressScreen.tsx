@@ -1,170 +1,73 @@
-import React, { useState } from "react";
-import {
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  View,
-  Alert,
-} from "react-native";
-import * as Progress from "react-native-progress";
-import { Text, Button, ButtonText } from "@gluestack-ui/themed";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View, ActivityIndicator, Dimensions } from "react-native";
+import { Text, VStack } from "@gluestack-ui/themed";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../../utils/colors";
 
-interface Referral {
-  id: string;
-  personName: string; // Referrer's name
-  status: string;
-  property: string;
-  progress: number; // Progress as a decimal
-}
-
-const dummyReferrals: Referral[] = [
-  {
-    id: "1",
-    personName: "Wambui Kimani",
-    status: "Processing",
-    property: "Ocean View Ridge - Vipingo",
-    progress: 0.0,
-  },
-  {
-    id: "2",
-    personName: "Achieng' Otieno",
-    status: "In Progress",
-    property: "Ocean View Ridge - Vipingo",
-    progress: 0.34,
-  },
-  {
-    id: "3",
-    personName: "Kibet Kipchirchir",
-    status: "Completed",
-    property: "Ushindi Gardens",
-    progress: 1,
-  },
-];
-
 const ReferralProgressScreen: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const handleRedeemReward = () => {
-    Alert.alert("Reward Processing", "Your reward is being processed.");
-  };
+  useEffect(() => {
+    // Simulate a network request or any async operation
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000); // 2 seconds delay
+
+    return () => clearTimeout(timer);
+  }, []);
 
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.loadingText}>Loading referrals...</Text>
       </View>
     );
   }
 
   return (
-    <FlatList
-      data={dummyReferrals}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <View style={styles.referralItem}>
-          {/* Person's Name */}
-          <Text style={styles.personName}>{item.personName}</Text>
-          {/* Property Name */}
-          <Text style={styles.propertyName}>{item.property}</Text>
-          {/* Status */}
-          <Text style={styles.status}>
-            <Text
-              style={{
-                fontWeight: "bold",
-                color:
-                  item.status === "Completed"
-                    ? "#4CAF50"
-                    : item.status === "In Progress"
-                    ? "#FF9800"
-                    : "#F44336",
-              }}
-            >
-              {item.status}
-            </Text>
-          </Text>
-          {/* Progress Chart */}
-          <View style={styles.progressContainer}>
-            <Progress.Circle
-              progress={item.progress}
-              size={120}
-              thickness={12}
-              color={
-                item.status === "Completed"
-                  ? colors.success
-                  : item.status === "In Progress"
-                  ? colors.warning
-                  : colors.danger
-              }
-              showsText
-              formatText={() => `${Math.floor(item.progress * 100)}%`}
-              strokeCap="round"
-              textStyle={styles.progressText}
-            />
-          </View>
-
-          {/* Redeem Reward Button for Completed referrals */}
-          {item.status === "Completed" && (
-            <Button style={styles.redeemButton} onPress={handleRedeemReward}>
-              <ButtonText>Redeem Reward</ButtonText>
-            </Button>
-          )}
-        </View>
-      )}
-    />
+    <View style={styles.container}>
+      <VStack alignItems="center" justifyContent="center" m="$4">
+        <MaterialCommunityIcons
+          name="information-outline"
+          size={80}
+          color={colors.primary}
+        />
+        <Text style={styles.messageText}>
+          Once approved, your referrals will appear here.
+        </Text>
+      </VStack>
+    </View>
   );
 };
 
 export default ReferralProgressScreen;
 
 const styles = StyleSheet.create({
-  referralItem: {
-    padding: 20,
-    marginVertical: 10,
-    marginHorizontal: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 3,
-  },
-  personName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#34495E",
-    marginBottom: 5,
-  },
-  propertyName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#2C3E50",
-    marginBottom: 15,
-  },
-  status: {
-    fontSize: 14,
-    color: "#7F8C8D",
-    marginBottom: 10,
-  },
-  progressContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 10,
-  },
-  progressText: {
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  redeemButton: {
-    marginTop: 10,
-    backgroundColor: "#4CAF50",
-    paddingVertical: 10,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  centered: {
+  container: {
     flex: 1,
+    backgroundColor: colors.light,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: colors.light,
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: "600",
+  },
+  messageText: {
+    fontSize: 24,
+    color: colors.primary,
+    textAlign: "center",
+    fontWeight: "700",
   },
 });

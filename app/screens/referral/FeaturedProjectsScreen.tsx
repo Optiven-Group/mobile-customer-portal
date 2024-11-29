@@ -11,7 +11,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { ReferralStackParamList, Project } from "../../navigation/types";
 import api from "../../utils/api";
 import colors from "../../utils/colors";
-import { Feather } from "@expo/vector-icons"; // For the share icon
+import { Feather } from "@expo/vector-icons";
 
 interface FeaturedProjectsScreenProps {
   navigation: NavigationProp<ReferralStackParamList, "FeaturedProjects">;
@@ -61,10 +61,9 @@ const FeaturedProjectsScreen: React.FC<FeaturedProjectsScreenProps> = ({
             )}
             <View style={styles.content}>
               <Text style={styles.projectName}>{item.name}</Text>
-              {/* <Text style={styles.description}>{item.description}</Text> */}
-              <Button variant="link" justifyContent="flex-start">
+              {/* <Button variant="link" justifyContent="flex-start">
                 <ButtonText color={colors.primary}>View Details</ButtonText>
-              </Button>
+              </Button> */}
             </View>
           </TouchableOpacity>
           {/* Share Icon */}
@@ -92,7 +91,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 3,
-    overflow: "hidden", // To ensure the image doesn't go beyond card
+    overflow: "hidden",
   },
   banner: {
     width: "100%",

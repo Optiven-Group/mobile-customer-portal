@@ -15,12 +15,12 @@ import { Text } from "@gluestack-ui/themed";
 import {
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   Switch,
   ActivityIndicator,
   View,
   Linking,
   Alert,
+  ScrollView,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../../utils/colors";
@@ -40,7 +40,7 @@ type SettingOption = {
   id: string;
   title: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
-  type: "toggle" | "call";
+  type: "toggle" | "email";
 };
 
 const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
@@ -98,13 +98,15 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
     await logout();
   };
 
-  const handleCallSupport = async () => {
-    const phoneNumber = "tel:+254790300300";
-    const supported = await Linking.canOpenURL(phoneNumber);
+  const handleEmailSupport = async () => {
+    const email = "info@optiven.co.ke";
+    const subject = "Support Request";
+    const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+    const supported = await Linking.canOpenURL(mailtoUrl);
     if (supported) {
-      Linking.openURL(phoneNumber);
+      Linking.openURL(mailtoUrl);
     } else {
-      Alert.alert("Error", "Unable to place a call.");
+      Alert.alert("Error", "Unable to send email.");
     }
   };
 
@@ -113,8 +115,9 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
       id: "support",
       title: "Support",
       icon: "help-circle",
-      type: "call",
+      type: "email",
     },
+    // Add more settings options here if needed
   ];
 
   return (
@@ -140,7 +143,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
           settingsOptions={settingsOptions}
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
-          handleCallSupport={handleCallSupport}
+          handleEmailSupport={handleEmailSupport}
         />
 
         {/* Logout Button */}
@@ -239,25 +242,24 @@ type SettingsOptionsProps = {
   settingsOptions: SettingOption[];
   isDarkMode: boolean;
   setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
-  handleCallSupport: () => void;
+  handleEmailSupport: () => void;
 };
 
 const SettingsOptions: React.FC<SettingsOptionsProps> = ({
   settingsOptions,
   isDarkMode,
   setIsDarkMode,
-  handleCallSupport,
+  handleEmailSupport,
 }) => (
-  <FlatList
-    data={settingsOptions}
-    keyExtractor={(item) => item.id}
-    renderItem={({ item }) => (
+  <VStack style={styles.settingsList}>
+    {settingsOptions.map((item) => (
       <TouchableOpacity
+        key={item.id}
         onPress={() => {
           if (item.type === "toggle") {
             setIsDarkMode(!isDarkMode);
-          } else if (item.id === "support") {
-            handleCallSupport();
+          } else if (item.type === "email") {
+            handleEmailSupport();
           }
         }}
         style={styles.settingItem}
@@ -283,9 +285,8 @@ const SettingsOptions: React.FC<SettingsOptionsProps> = ({
           )}
         </Box>
       </TouchableOpacity>
-    )}
-    contentContainerStyle={styles.settingsList}
-  />
+    ))}
+  </VStack>
 );
 
 // Reusable LogoutButton Component
@@ -418,6 +419,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
+    marginTop: 20,
   },
   logoutText: {
     marginLeft: 12,
