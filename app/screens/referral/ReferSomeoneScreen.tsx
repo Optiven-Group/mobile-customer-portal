@@ -18,8 +18,14 @@ const ReferSomeoneScreen: React.FC<ReferSomeoneScreenProps> = ({ route }) => {
 
   const handleShare = async () => {
     try {
+      const referralCode = `${user?.customerNumber}-${project.project_id}`;
+      const referralLink = `https://workspace.optiven.co.ke/referral-form?referralCode=${encodeURIComponent(
+        referralCode
+      )}&projectId=${encodeURIComponent(project.project_id)}`;
+
       await Share.share({
-        message: `Join me in the ${project.name} project! Use my referral code ${referralCode} and get 1% off!`,
+        message: `Join me in the ${project.name} project! Use my referral code ${referralCode} and get 1% off! ${referralLink}`,
+        url: referralLink,
       });
     } catch (error) {
       console.error("Error sharing referral code:", error);
