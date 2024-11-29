@@ -78,7 +78,7 @@ const MpesaPaymentScreen: React.FC<MpesaPaymentScreenProps> = ({
         phone_number: phoneNumber,
         installment_schedule_id: payment.is_id.toString(),
         customer_number: customerNumber,
-        
+        plot_number: property.plot_number,
       });
 
       Alert.alert("Payment Initiated", response.data.CustomerMessage);

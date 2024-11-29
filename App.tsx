@@ -77,12 +77,11 @@ const NotificationHandler = () => {
     // Listener for incoming notifications
     if (notificationListener.current === null) {
       notificationListener.current =
+        // In your NotificationHandler component
         Notifications.addNotificationReceivedListener((notification) => {
           console.log("Notification received:", notification);
-
-          // Create a notification object conforming to AppNotification
           const appNotification: AppNotification = {
-            id: Date.now(), // Generate a unique ID
+            id: Date.now(),
             user_id: user.id,
             title: notification.request.content.title || "No Title",
             body: notification.request.content.body || "No Body",
