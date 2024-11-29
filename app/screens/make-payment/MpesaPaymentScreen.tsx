@@ -26,8 +26,10 @@ const MpesaPaymentScreen: React.FC<MpesaPaymentScreenProps> = ({
   const { payment, property } = route.params;
   const { user } = useAuth();
 
-  const [phoneNumber, setPhoneNumber] = useState<string>(user?.phone || "");
-  const [customerNumber] = useState<string>(user?.customer_number || "");
+  const [phoneNumber, setPhoneNumber] = useState<string>(
+    __DEV__ ? "254708374149" : ""
+  );
+  const [customerNumber] = useState<string>(user?.customerNumber || "");
   const [amount, setAmount] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [paymentInitiated, setPaymentInitiated] = useState<boolean>(false);
@@ -36,11 +38,6 @@ const MpesaPaymentScreen: React.FC<MpesaPaymentScreenProps> = ({
   const MinTransactionAmount = 1; // M-PESA minimum per transaction
 
   const handleInitiatePayment = async () => {
-    if (!phoneNumber) {
-      Alert.alert("Error", "Please enter your phone number");
-      return;
-    }
-
     const phoneRegex = /^2547\d{8}$/;
     if (!phoneRegex.test(phoneNumber)) {
       Alert.alert(
@@ -81,6 +78,7 @@ const MpesaPaymentScreen: React.FC<MpesaPaymentScreenProps> = ({
         phone_number: phoneNumber,
         installment_schedule_id: payment.is_id.toString(),
         customer_number: customerNumber,
+        
       });
 
       Alert.alert("Payment Initiated", response.data.CustomerMessage);
