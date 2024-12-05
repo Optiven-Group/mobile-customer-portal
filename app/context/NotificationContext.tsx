@@ -23,14 +23,17 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const { isLoggedIn } = useAuth(); // Get isLoggedIn from AuthContext
+  const { isLoggedIn } = useAuth();
 
   const addNotification = (notification: AppNotification) => {
     setNotifications((prev) => [notification, ...prev]);
   };
 
   useEffect(() => {
-    if (!isLoggedIn) return; // Do not fetch if not logged in
+    if (!isLoggedIn) {
+      setNotifications([]); // Clear notifications when logged out
+      return;
+    }
 
     const fetchNotifications = async () => {
       try {
@@ -41,7 +44,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
       }
     };
     fetchNotifications();
-  }, [isLoggedIn]); // Depend on isLoggedIn
+  }, [isLoggedIn]);
 
   return (
     <NotificationContext.Provider

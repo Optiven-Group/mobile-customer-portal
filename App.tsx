@@ -33,30 +33,28 @@ export default function App() {
   return (
     <AuthProvider>
       <MembershipProvider>
-        <GluestackUIProvider config={config}>
-          <NavigationContainer ref={navigationRef}>
-            <MainNavigator />
-          </NavigationContainer>
-          <AuthConsumer />
-        </GluestackUIProvider>
+        <NotificationProvider>
+          <GluestackUIProvider config={config}>
+            <NavigationContainer ref={navigationRef}>
+              <MainNavigator />
+            </NavigationContainer>
+            <AuthConsumer />
+          </GluestackUIProvider>
+        </NotificationProvider>
       </MembershipProvider>
     </AuthProvider>
   );
 }
 
-// Memoized MainNavigator to prevent unnecessary re-renders
 const MainNavigator = React.memo(() => {
   const { isLoggedIn } = useAuth();
   return isLoggedIn ? <RootNavigator /> : <AuthNavigator />;
 });
 
+// AuthConsumer remains the same
 const AuthConsumer = () => {
   const { isLoggedIn } = useAuth();
-  return isLoggedIn ? (
-    <NotificationProvider>
-      <NotificationHandler />
-    </NotificationProvider>
-  ) : null;
+  return isLoggedIn ? <NotificationHandler /> : null;
 };
 
 const NotificationHandler = () => {
@@ -83,7 +81,6 @@ const NotificationHandler = () => {
     // Listener for incoming notifications
     if (notificationListener.current === null) {
       notificationListener.current =
-        // In your NotificationHandler component
         Notifications.addNotificationReceivedListener((notification) => {
           console.log("Notification received:", notification);
           const appNotification: AppNotification = {
@@ -109,7 +106,7 @@ const NotificationHandler = () => {
         notificationListener.current = null;
       }
     };
-  }, [user]); // Depend only on 'user'
+  }, [user]);
 
   return null;
 };
