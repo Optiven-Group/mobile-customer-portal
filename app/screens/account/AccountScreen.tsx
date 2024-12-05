@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "500",
     color: colors.dark,
   },
   activityIndicator: {
@@ -419,7 +419,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3,
-    marginTop: 20,
   },
   logoutText: {
     marginLeft: 12,

@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { AppNotification } from "../navigation/types";
 import api from "../utils/api";
+import { useAuth } from "./AuthContext"; // Import useAuth
 
 interface NotificationContextType {
   notifications: AppNotification[];
@@ -22,12 +23,15 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const { isLoggedIn } = useAuth(); // Get isLoggedIn from AuthContext
 
   const addNotification = (notification: AppNotification) => {
     setNotifications((prev) => [notification, ...prev]);
   };
 
   useEffect(() => {
+    if (!isLoggedIn) return; // Do not fetch if not logged in
+
     const fetchNotifications = async () => {
       try {
         const response = await api.get("/notifications");
@@ -37,7 +41,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
       }
     };
     fetchNotifications();
-  }, []);
+  }, [isLoggedIn]); // Depend on isLoggedIn
 
   return (
     <NotificationContext.Provider

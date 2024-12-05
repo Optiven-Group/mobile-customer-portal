@@ -156,11 +156,8 @@ const ReceiptItem = ({
 
       const downloadResult = await downloadResumable.downloadAsync();
 
-      console.log("Download result:", downloadResult);
-
       if (downloadResult && downloadResult.status === 200) {
         const localUri = downloadResult.uri;
-        console.log("Finished downloading to ", localUri);
 
         // Open the PDF
         if (localUri && (await FileSystem.getInfoAsync(localUri)).exists) {
@@ -169,7 +166,6 @@ const ReceiptItem = ({
           alert("Could not find the downloaded file.");
         }
       } else {
-        console.log("Download failed. Status:", downloadResult?.status);
         alert("Failed to download receipt. Please try again.");
       }
     } catch (error) {

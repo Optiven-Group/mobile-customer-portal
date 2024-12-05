@@ -1,5 +1,5 @@
 export default {
-  primary: "#66cc8a", // Primary color in emerald theme
+  primary: "#066839", // Primary color in emerald theme
   secondary: "#333c4d", // Secondary color in emerald theme
   black: "#000",
   white: "#fff",

@@ -1,12 +1,16 @@
+// FeaturedProjectsScreen.tsx
+
 import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   ActivityIndicator,
-  FlatList,
+  SectionList,
   TouchableOpacity,
   Image,
+  View,
+  Dimensions,
 } from "react-native";
-import { View, Text, Button, ButtonText } from "@gluestack-ui/themed";
+import { Text } from "@gluestack-ui/themed";
 import { NavigationProp } from "@react-navigation/native";
 import { ReferralStackParamList, Project } from "../../navigation/types";
 import api from "../../utils/api";
@@ -17,29 +21,50 @@ interface FeaturedProjectsScreenProps {
   navigation: NavigationProp<ReferralStackParamList, "FeaturedProjects">;
 }
 
+const { width } = Dimensions.get("window");
+const isTablet = width >= 768;
+
 const FeaturedProjectsScreen: React.FC<FeaturedProjectsScreenProps> = ({
   navigation,
 }) => {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
+  const [otherProjects, setOtherProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchFeaturedProjects = async () => {
+    const fetchProjects = async () => {
       try {
-        const response = await api.get("/featured-projects");
-        setProjects(response.data.projects);
+        const response = await api.get("/visible-projects");
+        setFeaturedProjects(response.data.featured_projects);
+        setOtherProjects(response.data.other_projects);
       } catch (error) {
-        console.error("Failed to fetch featured projects:", error);
+        console.error("Failed to fetch projects:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchFeaturedProjects();
+    fetchProjects();
   }, []);
 
   const handleSelectProject = (project: Project) => {
     navigation.navigate("ReferSomeone", { project });
   };
+
+  const sections = [];
+
+  if (featuredProjects.length > 0) {
+    sections.push({
+      title: "Featured Projects",
+      data: featuredProjects,
+    });
+  }
+
+  if (otherProjects.length > 0) {
+    sections.push({
+      title: "All Projects",
+      data: otherProjects,
+    });
+  }
 
   if (loading) {
     return (
@@ -50,9 +75,14 @@ const FeaturedProjectsScreen: React.FC<FeaturedProjectsScreenProps> = ({
   }
 
   return (
-    <FlatList
-      data={projects}
+    <SectionList
+      sections={sections}
       keyExtractor={(item) => item.project_id.toString()}
+      renderSectionHeader={({ section: { title } }) => (
+        <View style={styles.sectionHeaderContainer}>
+          <Text style={styles.sectionHeader}>{title}</Text>
+        </View>
+      )}
       renderItem={({ item }) => (
         <View style={styles.card}>
           <TouchableOpacity onPress={() => handleSelectProject(item)}>
@@ -61,9 +91,9 @@ const FeaturedProjectsScreen: React.FC<FeaturedProjectsScreenProps> = ({
             )}
             <View style={styles.content}>
               <Text style={styles.projectName}>{item.name}</Text>
-              {/* <Button variant="link" justifyContent="flex-start">
-                <ButtonText color={colors.primary}>View Details</ButtonText>
-              </Button> */}
+              {item.description && (
+                <Text style={styles.description}>{item.description}</Text>
+              )}
             </View>
           </TouchableOpacity>
           {/* Share Icon */}
@@ -71,10 +101,11 @@ const FeaturedProjectsScreen: React.FC<FeaturedProjectsScreenProps> = ({
             style={styles.shareButton}
             onPress={() => handleSelectProject(item)}
           >
-            <Feather name="share" size={24} color={colors.primary} />
+            <Feather name="share-2" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
       )}
+      contentContainerStyle={styles.listContent}
     />
   );
 };
@@ -82,6 +113,19 @@ const FeaturedProjectsScreen: React.FC<FeaturedProjectsScreenProps> = ({
 export default FeaturedProjectsScreen;
 
 const styles = StyleSheet.create({
+  listContent: {
+    paddingBottom: 20,
+  },
+  sectionHeaderContainer: {
+    backgroundColor: colors.light,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  sectionHeader: {
+    fontSize: isTablet ? 24 : 20,
+    fontWeight: "bold",
+    color: colors.dark,
+  },
   card: {
     marginHorizontal: 20,
     marginVertical: 10,
@@ -95,20 +139,19 @@ const styles = StyleSheet.create({
   },
   banner: {
     width: "100%",
-    height: 200,
+    height: isTablet ? 250 : 200,
     resizeMode: "cover",
   },
   content: {
     padding: 15,
   },
   projectName: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: isTablet ? 20 : 18,
     color: colors.dark,
     marginBottom: 5,
   },
   description: {
-    fontSize: 14,
+    fontSize: isTablet ? 16 : 14,
     color: colors.medium,
     marginBottom: 10,
   },
@@ -117,9 +160,12 @@ const styles = StyleSheet.create({
     right: 15,
     top: 15,
     backgroundColor: "#FFF",
-    borderRadius: 20,
-    padding: 5,
+    borderRadius: 30,
+    padding: 8,
     elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
   centered: {
     flex: 1,

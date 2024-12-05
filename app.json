@@ -2,7 +2,7 @@
   "expo": {
     "name": "OptivenCustomerPortal",
     "slug": "expo-app",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,14 +11,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "scheme": "optivencustomerportal",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.optiven.optivencustomerportal",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.2.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +24,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.optiven.optivencustomerportal",
-      "versionCode": 1,
+      "versionCode": 3,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -39,3 +37,4 @@
     }
   }
 }
+

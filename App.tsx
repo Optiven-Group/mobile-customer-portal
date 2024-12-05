@@ -1,7 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { config } from "@gluestack-ui/config";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  createNavigationContainerRef,
+  NavigationContainer,
+} from "@react-navigation/native";
 import RootNavigator from "./app/navigation/RootNavigator";
 import AuthNavigator from "./app/navigation/AuthNavigator";
 import { AuthProvider, useAuth } from "./app/context/AuthContext";
@@ -24,18 +27,18 @@ Notifications.setNotificationHandler({
   }),
 });
 
+export const navigationRef = createNavigationContainerRef();
+
 export default function App() {
   return (
     <AuthProvider>
       <MembershipProvider>
-        <NotificationProvider>
-          <GluestackUIProvider config={config}>
-            <NavigationContainer>
-              <MainNavigator />
-            </NavigationContainer>
-            <AuthConsumer />
-          </GluestackUIProvider>
-        </NotificationProvider>
+        <GluestackUIProvider config={config}>
+          <NavigationContainer ref={navigationRef}>
+            <MainNavigator />
+          </NavigationContainer>
+          <AuthConsumer />
+        </GluestackUIProvider>
       </MembershipProvider>
     </AuthProvider>
   );
@@ -47,10 +50,13 @@ const MainNavigator = React.memo(() => {
   return isLoggedIn ? <RootNavigator /> : <AuthNavigator />;
 });
 
-// Conditional rendering of NotificationHandler based on authentication
 const AuthConsumer = () => {
   const { isLoggedIn } = useAuth();
-  return isLoggedIn ? <NotificationHandler /> : null;
+  return isLoggedIn ? (
+    <NotificationProvider>
+      <NotificationHandler />
+    </NotificationProvider>
+  ) : null;
 };
 
 const NotificationHandler = () => {

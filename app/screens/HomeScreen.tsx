@@ -4,6 +4,7 @@ import {
   Dimensions,
   ScrollView,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
 import Screen from "../app-components/Screen";
@@ -28,29 +29,24 @@ type HomeScreenProps = {
 };
 
 const { width } = Dimensions.get("window");
+const isTablet = width >= 768;
 
-// Utility function to get greeting based on the time of day
 const getGreeting = () => {
   const currentHour = new Date().getHours();
-  if (currentHour < 12) {
-    return "Good morning";
-  } else if (currentHour < 18) {
-    return "Good afternoon";
-  } else {
-    return "Good evening";
-  }
+  if (currentHour < 12) return "Good morning";
+  if (currentHour < 18) return "Good afternoon";
+  return "Good evening";
 };
 
-// Separate Greeting Component for better readability
+const getFirstName = (name: string) => name.split(" ")[0];
+
 const Greeting: React.FC<{ name: string }> = ({ name }) => (
   <Heading
-    my="$4"
+    my={isTablet ? "$6" : "$4"}
     textAlign="center"
-    numberOfLines={2} // Allow up to 2 lines for long names
-    adjustsFontSizeToFit // Adjust font size to fit the container
     style={styles.greetingHeading}
   >
-    {`${getGreeting()}, ${name}`}
+    {`${getGreeting()}, ${getFirstName(name)}`}
   </Heading>
 );
 
@@ -64,12 +60,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [featuredError, setFeaturedError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCampaigns = async () => {
+    const fetchProjects = async () => {
       try {
         const response = await api.get("/featured-projects");
-        setCampaigns(response.data.projects);
+        const projects = response.data.projects;
+        if (projects.length > 0) {
+          setCampaigns(projects); // Set to the full array of projects
+        } else {
+          setCampaigns([]); // Handle case when there are no featured projects
+        }
       } catch (error) {
-        console.error("Failed to fetch campaigns:", error);
+        console.error("Failed to fetch featured projects:", error);
+        setCampaigns([]); // Ensure campaigns is an empty array on error
       }
     };
 
@@ -79,98 +81,89 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         setFeaturedCampaign(response.data.campaign);
         setFeaturedError(null);
       } catch (error: any) {
-        if (error.response && error.response.status === 404) {
+        if (error.response?.status === 404) {
           setFeaturedError("No featured campaigns at the moment.");
         } else {
           setFeaturedError("Failed to fetch featured campaign.");
         }
-        console.error("Failed to fetch featured campaign:", error);
       } finally {
         setLoadingFeatured(false);
       }
     };
 
-    fetchCampaigns();
+    fetchProjects();
     fetchFeaturedCampaign();
   }, []);
+
+  const openURL = (url: string) => {
+    Linking.openURL(url).catch((err) =>
+      console.error("Failed to open URL:", err)
+    );
+  };
 
   return (
     <Screen style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Center>
-          {/* Greeting Section */}
-          <Greeting name={user?.name || "User"} />
+          <Box bgColor={colors.light}>
+            <Greeting name={user?.name || "User"} />
 
-          {/* Quick Actions */}
-          <Box
-            flexDirection="row"
-            flexWrap="wrap" // Allow wrapping for better responsiveness
-            justifyContent="space-around"
-            w="90%"
-            mb="$4"
-          >
-            {[
-              {
-                label: "Payment Schedule",
-                icon: "calendar",
-                route: "Project Selection for Payment",
-              },
-              {
-                label: "View My Receipts",
-                icon: "receipt",
-                route: "Project Selection",
-              },
-              {
-                label: "Payment Progress",
-                icon: "progress-check",
-                route: "Payment Progress",
-              },
-              {
-                label: "View Statements",
-                icon: "history",
-                route: "Project Selection for Statements",
-              },
-            ].map((item) => (
-              <VStack
-                key={item.label}
-                alignItems="center"
-                justifyContent="center"
-                w="20%"
-                mb="$4" // Add margin bottom for better spacing on wrap
-              >
-                <Pressable
-                  onPress={() => navigation.navigate(item.route)}
-                  h="$16"
-                  w="$16"
-                  bg="$green700"
-                  borderRadius="$full"
+            <Box
+              flexDirection="row"
+              flexWrap="wrap"
+              justifyContent="space-between"
+              w="100%"
+              mb="$6"
+              paddingHorizontal="10%"
+              borderRadius={20}
+            >
+              {[
+                {
+                  label: "Payment Schedule",
+                  icon: "calendar",
+                  route: "Project Selection for Payment",
+                },
+                {
+                  label: "View Receipts",
+                  icon: "receipt",
+                  route: "Project Selection",
+                },
+                {
+                  label: "Payment Progress",
+                  icon: "progress-check",
+                  route: "Payment Progress",
+                },
+                {
+                  label: "View Statements",
+                  icon: "history",
+                  route: "Project Selection for Statements",
+                },
+              ].map((item) => (
+                <VStack
+                  key={item.label}
                   alignItems="center"
                   justifyContent="center"
-                  style={styles.quickActionButton}
+                  w="22%"
+                  mb={isTablet ? "$6" : "$4"}
                 >
-                  <MaterialCommunityIcons
-                    name={
-                      item.icon as keyof typeof MaterialCommunityIcons.glyphMap
-                    }
-                    size={24}
-                    color="white"
-                  />
-                </Pressable>
-                <Text
-                  bold
-                  size="xs"
-                  textAlign="center"
-                  lineHeight={14}
-                  mt="$1"
-                  style={styles.quickActionLabel}
-                >
-                  {item.label}
-                </Text>
-              </VStack>
-            ))}
+                  <Pressable
+                    onPress={() => navigation.navigate(item.route)}
+                    style={styles.quickActionButton}
+                  >
+                    <MaterialCommunityIcons
+                      name={
+                        item.icon as keyof typeof MaterialCommunityIcons.glyphMap
+                      }
+                      size={isTablet ? 40 : 30}
+                      color="white"
+                    />
+                  </Pressable>
+                  <Text style={styles.quickActionLabel}>{item.label}</Text>
+                </VStack>
+              ))}
+            </Box>
           </Box>
 
-          {/* Featured Campaign Section */}
           <Heading size="md" my="$4" textAlign="center">
             Featured Campaign
           </Heading>
@@ -178,61 +171,44 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           {loadingFeatured ? (
             <ActivityIndicator size="large" color={colors.primary} />
           ) : featuredError ? (
-            <Text color="red.500" textAlign="center" mb="$4">
-              {featuredError}
-            </Text>
+            <Text style={styles.errorText}>{featuredError}</Text>
           ) : (
             featuredCampaign && (
-              <Box key={featuredCampaign.id} style={styles.campaignCard}>
-                <Image
-                  source={{ uri: featuredCampaign.banner_image_url }}
-                  width={width * 0.9} // Adjust width for better spacing
-                  height={320}
-                  alt={`${featuredCampaign.title} image`}
-                  style={styles.campaignImage}
-                />
-                <Box
-                  position="absolute"
-                  bottom={10}
-                  left={15}
-                  right={15}
-                  bg="rgba(0,0,0,0.6)" // Increased opacity for better readability
-                  p={5}
-                  borderRadius={8}
-                >
-                  <Text color="white" bold size="lg" style={styles.campaignTitle}>
-                    {featuredCampaign.title}
-                  </Text>
-                  <Text color="white" size="sm" style={styles.campaignDescription}>
-                    {featuredCampaign.description}
-                  </Text>
+              <Pressable onPress={() => openURL(featuredCampaign.link)}>
+                <Box style={styles.campaignCard}>
+                  <Image
+                    source={{ uri: featuredCampaign.banner_image_url }}
+                    style={styles.campaignImage}
+                    alt={`${featuredCampaign.title} image`}
+                  />
                 </Box>
-              </Box>
+              </Pressable>
             )
           )}
 
-          {/* Featured Properties Section */}
-          <Heading my="$4" textAlign="left" style={styles.featuredPropertiesHeading}>
+          <Heading size="md" mb="$6" textAlign="center">
             Featured Properties
           </Heading>
 
           {campaigns.length > 0 ? (
             <Carousel
               loop
-              width={width * 0.9} // Adjust width for better spacing
-              height={280}
-              autoPlay={true}
+              width={width * 0.9}
+              height={isTablet ? width * 0.5 : width * 0.6}
+              autoPlay
               data={campaigns}
               scrollAnimationDuration={1000}
               renderItem={({ item }: { item: Project }) => (
-                <Pressable key={item.project_id} style={styles.campaignCard}>
-                  {item.banner && (
-                    <Image
-                      source={{ uri: item.banner }}
-                      style={styles.campaignImage}
-                      alt={`${item.name} image`}
-                    />
-                  )}
+                <Pressable
+                  key={item.project_id}
+                  style={styles.campaignCard}
+                  onPress={() => openURL(item.website_link)}
+                >
+                  <Image
+                    source={{ uri: item.banner }}
+                    style={styles.campaignImage}
+                    alt={`${item.name} image`}
+                  />
                 </Pressable>
               )}
             />
@@ -256,56 +232,53 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     alignItems: "center",
-    paddingVertical: 20,
   },
   greetingHeading: {
-    fontSize: 24, // Increased font size
-    fontWeight: "700", // Bolder text
-    color: colors.textPrimary, // Use a defined text color
-    paddingHorizontal: 10, // Add padding to prevent text from touching edges
+    fontSize: isTablet ? 32 : 24,
+    fontWeight: "500",
   },
   quickActionButton: {
+    height: isTablet ? 80 : 60,
+    width: isTablet ? 80 : 60,
+    borderRadius: 12,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3, // Add shadow for better visual depth
+    shadowRadius: 10,
+    elevation: 5,
   },
   quickActionLabel: {
-    fontSize: 12,
-    color: colors.secondary, // Use a secondary text color
+    marginTop: 8,
+    fontSize: isTablet ? 16 : 12,
+    textAlign: "center",
+    color: colors.secondary,
+    fontWeight: "600",
   },
   campaignCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: "hidden",
+    backgroundColor: colors.white,
     shadowColor: "#000",
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.2,
     shadowRadius: 10,
-    elevation: 3,
+    elevation: 5,
     width: width * 0.9,
-    alignSelf: "center",
     marginBottom: 20,
   },
   campaignImage: {
     width: "100%",
-    height: 240,
+    height: isTablet ? width * 0.5 : width * 0.6,
     resizeMode: "cover",
   },
-  campaignTitle: {
-    fontSize: 20,
-    marginBottom: 5,
-  },
-  campaignDescription: {
-    fontSize: 14,
-  },
-  featuredPropertiesHeading: {
-    alignSelf: "flex-start",
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.primary,
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 16,
   },
   noCampaignsText: {
-    fontSize: 16,
+    fontSize: isTablet ? 16 : 14,
     color: colors.secondary,
     marginTop: 10,
   },

@@ -90,6 +90,7 @@ export interface Project {
   description?: string;
   banner?: string;
   is_featured?: boolean;
+  website_link: string;
 }
 
 // Property Interface
@@ -117,6 +118,7 @@ export interface Campaign {
   banner_image_url: string;
   month: number;
   year: number;
+  link: string;
 }
 
 // Referral Stack Param List

@@ -13,6 +13,7 @@ import { Alert } from "react-native";
 import { LeadFile } from "../navigation/types";
 import axios from "axios";
 import { BASE_URL } from "../config";
+import { logout as logoutUtil } from "../utils/authUtils";
 
 // Define the User interface
 interface User {
@@ -83,19 +84,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem("accessToken");
-    await AsyncStorage.removeItem("refreshToken");
-    await AsyncStorage.removeItem("userData");
+    await logoutUtil();
     setUser(null);
     setAccessToken(null);
     setRefreshToken(null);
     setIsLoggedIn(false);
-
-    try {
-      await api.post("/logout");
-    } catch (error) {
-      console.error("Failed to log out:", error);
-    }
   };
 
   const refreshAccessToken = async () => {
@@ -151,7 +144,6 @@ async function registerForPushNotificationsAsync() {
       return;
     }
     token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log("Expo Push Token:", token);
   } else {
     Alert.alert("Must use physical device for Push Notifications");
   }

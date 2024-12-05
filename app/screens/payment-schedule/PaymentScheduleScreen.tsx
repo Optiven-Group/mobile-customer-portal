@@ -257,9 +257,16 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
         </Button>
       </HStack>
 
-      {nextPayment ? (
+      {!nextPayment ? (
+        <Center my="$2">
+          <Text size="sm" bold>
+            🎉You have completed all your payments! 🎉
+          </Text>
+        </Center>
+      ) : (
         <Center>
           <Card bgColor={colors.white} style={styles.card}>
+            {/* Next Payment Details */}
             <VStack>
               <Text size="sm" bold>
                 {isOverdue ? "Overdue Payment" : "Next Payment Due"}
@@ -294,20 +301,6 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
               </Button>
             )}
           </Card>
-        </Center>
-      ) : (
-        <Center my="$2">
-          <Text size="sm" bold>
-            All payments are up to date.
-          </Text>
-        </Center>
-      )}
-
-      {!nextPayment && (
-        <Center my="$2">
-          <Text size="sm" bold>
-            No upcoming payments. All payments are up to date.
-          </Text>
         </Center>
       )}
 

@@ -4,6 +4,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   RefreshControl,
+  View,
+  Dimensions,
 } from "react-native";
 import { Card, Text, Pressable } from "@gluestack-ui/themed";
 import Screen from "../../app-components/Screen";
@@ -11,11 +13,15 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { OverviewStackParamList, Property } from "../../navigation/types";
 import colors from "../../utils/colors";
 import api from "../../utils/api";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type PropertySelectionScreenProps = NativeStackScreenProps<
   OverviewStackParamList,
   "Property Selection for Payment"
 >;
+
+const { width } = Dimensions.get("window");
+const isTablet = width >= 768;
 
 const PropertySelectionScreen = ({
   navigation,
@@ -66,7 +72,9 @@ const PropertySelectionScreen = ({
   if (loading) {
     return (
       <Screen style={styles.container}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
       </Screen>
     );
   }
@@ -74,12 +82,15 @@ const PropertySelectionScreen = ({
   if (error) {
     return (
       <Screen style={styles.container}>
-        <Text style={{ color: colors.danger, textAlign: "center" }}>
-          {error}
-        </Text>
-        <Pressable onPress={() => fetchProperties()} style={styles.retryButton}>
-          <Text style={{ color: colors.primary }}>Tap to Retry</Text>
-        </Pressable>
+        <View style={styles.loading}>
+          <Text style={styles.errorText}>{error}</Text>
+          <Pressable
+            onPress={() => fetchProperties()}
+            style={styles.retryButton}
+          >
+            <Text style={styles.retryText}>Tap to Retry</Text>
+          </Pressable>
+        </View>
       </Screen>
     );
   }
@@ -92,12 +103,25 @@ const PropertySelectionScreen = ({
         renderItem={({ item }) => (
           <Pressable onPress={() => handlePropertySelect(item)}>
             <Card style={styles.card}>
-              <Text bold size="lg">
-                {item.plot_number}
-              </Text>
+              <View style={styles.cardContent}>
+                <MaterialCommunityIcons
+                  name="home-circle-outline"
+                  size={isTablet ? 36 : 28}
+                  color={colors.primary}
+                  style={styles.cardIcon}
+                />
+                <Text
+                  bold
+                  size={isTablet ? "xl" : "lg"}
+                  style={styles.cardText}
+                >
+                  {item.plot_number}
+                </Text>
+              </View>
             </Card>
           </Pressable>
         )}
+        contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -113,6 +137,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.light,
   },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: colors.danger,
+    textAlign: "center",
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  retryButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+  },
+  retryText: {
+    color: colors.white,
+    fontSize: 16,
+  },
+  listContent: {
+    paddingVertical: 20,
+  },
   card: {
     padding: 20,
     marginVertical: 8,
@@ -121,9 +169,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 12,
     elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
-  retryButton: {
-    marginTop: 20,
-    alignSelf: "center",
+  cardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cardIcon: {
+    marginRight: 16,
+  },
+  cardText: {
+    color: colors.primary,
   },
 });

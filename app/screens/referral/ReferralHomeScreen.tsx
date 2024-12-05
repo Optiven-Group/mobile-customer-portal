@@ -68,7 +68,6 @@ const ReferralHomeScreen: React.FC<ReferralHomeScreenProps> = ({
               width={width * 0.8}
               bgColor={colors.primary}
               size="md"
-              style={styles.button}
             >
               <MaterialCommunityIcons
                 name="account-plus"
@@ -85,7 +84,6 @@ const ReferralHomeScreen: React.FC<ReferralHomeScreenProps> = ({
               width={width * 0.8}
               bgColor={colors.white}
               size="md"
-              style={styles.buttonSecondary}
             >
               <MaterialCommunityIcons
                 name="clipboard-check"
@@ -145,28 +143,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     alignItems: "center",
-  },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-  },
-  buttonSecondary: {
-    flexDirection: "row",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
   },
   buttonIcon: {
     marginRight: 10,
