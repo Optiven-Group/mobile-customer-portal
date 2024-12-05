@@ -16,6 +16,10 @@ import Screen from "../../app-components/Screen";
 import api from "../../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../navigation/types";
+import { Dimensions, Platform } from "react-native";
+
+const { width: screenWidth } = Dimensions.get("window");
+const isTablet = screenWidth >= 768;
 
 type VerifyUserScreenProps = NativeStackScreenProps<
   AuthStackParamList,
@@ -54,7 +58,7 @@ const VerifyUserScreen: React.FC<VerifyUserScreenProps> = ({ navigation }) => {
   return (
     <Screen style={styles.container}>
       <Center>
-        <Box width="$4/5">
+        <Box width={isTablet ? "60%" : "85%"}>
           <Image
             alt="logo"
             style={styles.logo}
@@ -110,9 +114,12 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     justifyContent: "center",
+    paddingHorizontal: isTablet ? 20 : 10,
   },
   logo: {
     alignSelf: "center",
-    width: "100%",
+    width: isTablet ? "80%" : "70%",
+    height: isTablet ? 100 : 80,
+    resizeMode: "contain",
   },
 });

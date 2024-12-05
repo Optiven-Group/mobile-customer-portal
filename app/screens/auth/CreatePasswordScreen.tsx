@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Alert } from "react-native";
+import { StyleSheet, Alert, Dimensions } from "react-native";
 import {
   Box,
   Button,
@@ -17,6 +17,9 @@ import api from "../../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../navigation/types";
 
+const { width: screenWidth } = Dimensions.get("window");
+const isTablet = screenWidth >= 768;
+
 type CreatePasswordScreenProps = NativeStackScreenProps<
   AuthStackParamList,
   "CreatePassword"
@@ -28,7 +31,6 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
 }) => {
   const [newPassword, setNewPassword] = useState<string>("");
 
-  // Extract parameters from route
   const { email, otp, forResetPassword, customerNumber } = route.params;
 
   const handleCreatePassword = async () => {
@@ -39,7 +41,6 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
 
     try {
       if (forResetPassword) {
-        // Password Reset Flow
         await api.post("/reset-password", {
           email,
           otp,
@@ -48,7 +49,6 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
         Alert.alert("Success", "Password has been reset. Please log in.");
         navigation.navigate("Login");
       } else {
-        // Registration Flow
         await api.post("/complete-registration", {
           customer_number: customerNumber,
           email,
@@ -69,7 +69,7 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
   return (
     <Screen style={styles.container}>
       <Center>
-        <Box width="$4/5">
+        <Box width={isTablet ? "60%" : "85%"}>
           <Image
             alt="logo"
             style={styles.logo}
@@ -112,10 +112,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    paddingHorizontal: isTablet ? 20 : 10,
   },
   logo: {
     alignSelf: "center",
-    width: "100%",
+    width: isTablet ? "80%" : "70%",
+    height: isTablet ? 100 : 80,
     resizeMode: "contain",
   },
 });

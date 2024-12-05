@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Alert } from "react-native";
+import { StyleSheet, Alert, Dimensions, Platform } from "react-native";
 import {
   Box,
   Button,
@@ -16,6 +16,9 @@ import Screen from "../../app-components/Screen";
 import api from "../../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../navigation/types";
+
+const { width: screenWidth } = Dimensions.get("window");
+const isTablet = screenWidth >= 768;
 
 type ForgotPasswordScreenProps = NativeStackScreenProps<
   AuthStackParamList,
@@ -56,7 +59,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   return (
     <Screen style={styles.container}>
       <Center>
-        <Box width="$4/5">
+        <Box width={isTablet ? "60%" : "85%"}>
           <Image
             alt="logo"
             style={styles.logo}
@@ -98,9 +101,12 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     justifyContent: "center",
+    paddingHorizontal: isTablet ? 20 : 10,
   },
   logo: {
     alignSelf: "center",
-    width: "100%",
+    width: isTablet ? "80%" : "70%",
+    height: isTablet ? 100 : 80,
+    resizeMode: "contain",
   },
 });

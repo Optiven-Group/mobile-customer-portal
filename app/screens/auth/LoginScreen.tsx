@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, Alert, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Dimensions,
+  Platform,
+} from "react-native";
 import {
   Box,
   Button,
@@ -19,6 +25,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../navigation/types";
 import { useAuth } from "../../context/AuthContext";
 
+const { width: screenWidth } = Dimensions.get("window");
+const isTablet = screenWidth >= 768;
+
 type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, "Login">;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
@@ -36,7 +45,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       }
 
       await login(access_token, refresh_token, userData);
-      // Navigation will happen automatically due to isLoggedIn change
     } catch (error: any) {
       Alert.alert(
         "Error",
@@ -48,7 +56,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   return (
     <Screen style={styles.container}>
       <Center>
-        <Box width="$4/5">
+        <Box
+          style={[
+            styles.boxContainer,
+            { width: isTablet ? "60%" : "85%" },
+          ]}
+        >
           <Image
             alt="logo"
             style={styles.logo}
@@ -112,21 +125,24 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     justifyContent: "center",
+    paddingHorizontal: isTablet ? 20 : 10,
   },
   logo: {
     alignSelf: "center",
-    width: "100%",
+    width: isTablet ? "80%" : "70%",
+    height: isTablet ? 100 : 80,
+    resizeMode: "contain",
   },
-  forgotPasswordBtn: {
-    alignSelf: "flex-start",
+  boxContainer: {
+    alignSelf: "center",
   },
   optionsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 15,
   },
   optionText: {
     color: "#007AFF",
-    fontSize: 16,
+    fontSize: Platform.OS === "ios" ? 16 : 14,
   },
 });
