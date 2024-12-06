@@ -109,7 +109,6 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     }, [])
   );
 
-  // Inside your downloadPDF function for the installment schedule
   const downloadPDF = async () => {
     try {
       const uri = `${api.defaults.baseURL}/properties/${property.lead_file_no}/installment-schedule/pdf`;
@@ -190,10 +189,20 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     return new Intl.NumberFormat().format(number);
   };
 
+  // Define the current date and one month from now
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
 
-  const unpaidPayments = schedules.filter(
+  const oneMonthFromNow = new Date();
+  oneMonthFromNow.setHours(0, 0, 0, 0);
+  oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
+
+  // Filter schedules so that we only show those due within the next month
+  const visibleSchedules = schedules.filter(
+    (schedule) => new Date(schedule.due_date) <= oneMonthFromNow
+  );
+
+  const unpaidPayments = visibleSchedules.filter(
     (schedule) => schedule.paid.toLowerCase() === "no"
   );
 
@@ -202,7 +211,8 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
     nextPayment &&
     new Date(nextPayment.due_date).getTime() < currentDate.getTime();
 
-  const otherPayments = schedules.filter(
+  // Filter out the nextPayment from the rest
+  const otherPayments = visibleSchedules.filter(
     (schedule) => schedule.is_id !== nextPayment?.is_id
   );
 
@@ -260,13 +270,12 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
       {!nextPayment ? (
         <Center my="$2">
           <Text size="sm" bold>
-            🎉You have completed all your payments! 🎉
+            🎉You have completed all your payments within the next month! 🎉
           </Text>
         </Center>
       ) : (
         <Center>
           <Card bgColor={colors.white} style={styles.card}>
-            {/* Next Payment Details */}
             <VStack>
               <Text size="sm" bold>
                 {isOverdue ? "Overdue Payment" : "Next Payment Due"}
@@ -290,6 +299,7 @@ const PaymentScheduleScreen: React.FC<PaymentScheduleScreenProps> = ({
             ) : nextPayment.paid.toLowerCase() === "yes" ? (
               <Text style={{ color: colors.primary, marginTop: 10 }}>Paid</Text>
             ) : (
+              // Only show Pay Now if this payment is within the next month (already guaranteed by filtering)
               <Button
                 size="md"
                 variant="solid"
@@ -403,16 +413,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     justifyContent: "center",
   },
-  statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  retryButton: {
-    marginTop: 20,
-    alignSelf: "center",
-  },
   payNowButton: {
     marginTop: 10,
     backgroundColor: colors.primary,
@@ -420,10 +420,5 @@ const styles = StyleSheet.create({
   payNowButtonText: {
     color: colors.white,
     fontWeight: "bold",
-  },
-  noUpcomingPaymentsText: {
-    textAlign: "center",
-    color: colors.medium,
-    marginVertical: 20,
   },
 });

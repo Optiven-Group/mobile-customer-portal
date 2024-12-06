@@ -52,7 +52,7 @@ const Greeting: React.FC<{ name: string }> = ({ name }) => (
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { user } = useAuth();
-  const [campaigns, setCampaigns] = useState<Project[]>([]);
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
   const [featuredCampaign, setFeaturedCampaign] = useState<Campaign | null>(
     null
   );
@@ -65,13 +65,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         const response = await api.get("/featured-projects");
         const projects = response.data.projects;
         if (projects.length > 0) {
-          setCampaigns(projects); // Set to the full array of projects
+          setFeaturedProjects(projects); // Set to the full array of projects
         } else {
-          setCampaigns([]); // Handle case when there are no featured projects
+          setFeaturedProjects([]); // Handle case when there are no featured projects
         }
       } catch (error) {
         console.error("Failed to fetch featured projects:", error);
-        setCampaigns([]); // Ensure campaigns is an empty array on error
+        setFeaturedProjects([]); // Ensure featured projects is an empty array on error
       }
     };
 
@@ -104,7 +104,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <Screen style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Center>
+        <Center mb="$4">
           <Box bgColor={colors.light}>
             <Greeting name={user?.name || "User"} />
 
@@ -190,13 +190,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             Featured Properties
           </Heading>
 
-          {campaigns.length > 0 ? (
+          {featuredProjects.length > 0 ? (
             <Carousel
               loop
               width={width * 0.9}
               height={isTablet ? width * 0.5 : width * 0.6}
               autoPlay
-              data={campaigns}
+              data={featuredProjects}
               scrollAnimationDuration={1000}
               renderItem={({ item }: { item: Project }) => (
                 <Pressable

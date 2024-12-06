@@ -52,15 +52,21 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
       );
 
       const fetchedTransactions: Transaction[] = response.data.transactions
-        .map((transaction: any) => ({
-          id: transaction.id,
-          date: new Date(transaction.date),
-          type: transaction.type,
-          amount: transaction.amount,
-          time: transaction.time,
-        }))
-        .sort((a: any, b: any) => b.date - a.date)
-        .filter((transaction: any) => transaction.amount > 0);
+        .map((transaction: any) => {
+          const dateValue = new Date(transaction.date);
+          return {
+            id: transaction.id,
+            date: isNaN(dateValue.getTime()) ? null : dateValue,
+            type: transaction.type,
+            amount: transaction.amount,
+            time: transaction.time,
+          };
+        })
+        .sort(
+          (a: Transaction, b: Transaction) =>
+            (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0)
+        )
+        .filter((transaction: Transaction) => transaction.amount > 0);
 
       setTransactions(fetchedTransactions);
       setError("");
@@ -142,19 +148,26 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
   );
 };
 
-const TransactionItem = ({ item }: { item: Transaction }) => (
-  <Pressable style={styles.transactionItem}>
-    <View style={styles.transactionType}>
-      <Text bold>{item.type}</Text>
-      <Text size="sm">{format(item.date, "do MMMM yyyy")}</Text>
-    </View>
-    <View style={styles.transactionAmount}>
-      <Text color={item.amount >= 0 ? "green" : "tomato"}>
-        {formatCurrency(item.amount, "KES", "en-KE")}
-      </Text>
-    </View>
-  </Pressable>
-);
+const TransactionItem = ({ item }: { item: Transaction }) => {
+  let displayDate = "Unknown Date";
+  if (item.date && !isNaN(item.date.getTime())) {
+    displayDate = format(item.date, "do MMMM yyyy");
+  }
+
+  return (
+    <Pressable style={styles.transactionItem}>
+      <View style={styles.transactionType}>
+        <Text bold>{item.type}</Text>
+        <Text size="sm">{displayDate}</Text>
+      </View>
+      <View style={styles.transactionAmount}>
+        <Text color={item.amount >= 0 ? "green" : "tomato"}>
+          {formatCurrency(item.amount, "KES", "en-KE")}
+        </Text>
+      </View>
+    </Pressable>
+  );
+};
 
 export default ViewStatementsScreen;
 
