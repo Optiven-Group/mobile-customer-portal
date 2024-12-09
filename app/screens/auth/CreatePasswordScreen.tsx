@@ -30,6 +30,7 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
   navigation,
 }) => {
   const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
 
   const { email, otp, forResetPassword, customerNumber } = route.params;
 
@@ -39,12 +40,22 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
       return;
     }
 
+    if (!confirmPassword) {
+      Alert.alert("Error", "Please confirm your password.");
+      return;
+    }
+
+    if (newPassword.trim() !== confirmPassword.trim()) {
+      Alert.alert("Error", "Passwords do not match. Please try again.");
+      return;
+    }
+
     try {
       if (forResetPassword) {
         await api.post("/reset-password", {
           email,
           otp,
-          new_password: newPassword,
+          new_password: newPassword.trim(),
         });
         Alert.alert("Success", "Password has been reset. Please log in.");
         navigation.navigate("Login");
@@ -53,7 +64,7 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
           customer_number: customerNumber,
           email,
           otp,
-          new_password: newPassword,
+          new_password: newPassword.trim(),
         });
         Alert.alert("Success", "Registration successful. You can now log in.");
         navigation.navigate("Login");
@@ -88,6 +99,21 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
                 placeholder="Enter new password"
                 value={newPassword}
                 onChangeText={setNewPassword}
+              />
+            </Input>
+          </FormControl>
+          <FormControl isRequired mt="$4">
+            <FormControlLabel mb="$1">
+              <FormControlLabelText size="md">
+                Confirm Password
+              </FormControlLabelText>
+            </FormControlLabel>
+            <Input size="lg">
+              <InputField
+                type="password"
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
               />
             </Input>
           </FormControl>

@@ -36,15 +36,26 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { login } = useAuth();
 
   const handleLogin = async () => {
-    try {
-      const response = await api.post("/login", { email, password });
-      const { access_token, refresh_token, user: userData } = response.data;
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
 
-      if (!access_token || !refresh_token || !userData) {
+    if (!trimmedEmail || !trimmedPassword) {
+      Alert.alert("Error", "Email and password cannot be empty.");
+      return;
+    }
+
+    try {
+      const response = await api.post("/login", {
+        email: trimmedEmail,
+        password: trimmedPassword,
+      });
+      const { access_token, user: userData } = response.data;
+
+      if (!access_token || !userData) {
         throw new Error("Invalid login response");
       }
 
-      await login(access_token, refresh_token, userData);
+      await login(access_token, userData);
     } catch (error: any) {
       Alert.alert(
         "Error",
@@ -56,12 +67,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   return (
     <Screen style={styles.container}>
       <Center>
-        <Box
-          style={[
-            styles.boxContainer,
-            { width: isTablet ? "60%" : "85%" },
-          ]}
-        >
+        <Box style={[styles.boxContainer, { width: isTablet ? "60%" : "85%" }]}>
           <Image
             alt="logo"
             style={styles.logo}

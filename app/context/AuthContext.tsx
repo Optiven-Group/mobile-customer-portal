@@ -11,11 +11,8 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Alert } from "react-native";
 import { LeadFile } from "../navigation/types";
-import axios from "axios";
-import { BASE_URL } from "../config";
 import { logout as logoutUtil } from "../utils/authUtils";
 
-// Define the User interface
 interface User {
   id: number;
   email: string;
@@ -27,9 +24,8 @@ interface User {
 interface AuthContextType {
   isLoggedIn: boolean;
   user: User | null;
-  login: (accessToken: string, refreshToken: string, userData: User) => void;
-  logout: () => void;
-  refreshAccessToken: () => Promise<void>;
+  login: (accessToken: string, userData: User) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,83 +35,49 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       const storedAccessToken = await AsyncStorage.getItem("accessToken");
-      const storedRefreshToken = await AsyncStorage.getItem("refreshToken");
       const userDataString = await AsyncStorage.getItem("userData");
 
-      if (storedAccessToken && storedRefreshToken && userDataString) {
+      if (storedAccessToken && userDataString) {
         const userData: User = JSON.parse(userDataString);
         setUser(userData);
-        setAccessToken(storedAccessToken);
-        setRefreshToken(storedRefreshToken);
         setIsLoggedIn(true);
       } else {
         setUser(null);
-        setAccessToken(null);
-        setRefreshToken(null);
         setIsLoggedIn(false);
       }
     };
     checkAuthStatus();
   }, []);
 
-  const login = async (
-    accessToken: string,
-    refreshToken: string,
-    userData: User
-  ) => {
+  const login = async (accessToken: string, userData: User) => {
     await AsyncStorage.setItem("accessToken", accessToken);
-    await AsyncStorage.setItem("refreshToken", refreshToken);
     await AsyncStorage.setItem("userData", JSON.stringify(userData));
     setUser(userData);
-    setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
     setIsLoggedIn(true);
 
     const pushToken = await registerForPushNotificationsAsync();
     if (pushToken) {
-      await api.post("/save-push-token", { pushToken });
+      await api
+        .post("/save-push-token", { push_token: pushToken })
+        .catch((err) => {
+          console.error("Failed to save push token:", err);
+        });
     }
   };
 
   const logout = async () => {
+    // Just do local cleanup
     await logoutUtil();
     setUser(null);
-    setAccessToken(null);
-    setRefreshToken(null);
     setIsLoggedIn(false);
   };
 
-  const refreshAccessToken = async () => {
-    if (!refreshToken) {
-      logout();
-      return;
-    }
-
-    try {
-      const response = await axios.post(`${BASE_URL}/refresh-token`, {
-        refresh_token: refreshToken,
-      });
-      const { access_token, refresh_token } = response.data;
-      setAccessToken(access_token);
-      setRefreshToken(refresh_token);
-      await AsyncStorage.setItem("accessToken", access_token);
-      await AsyncStorage.setItem("refreshToken", refresh_token);
-    } catch (error) {
-      console.error("Failed to refresh access token:", error);
-      logout();
-    }
-  };
-
   return (
-    <AuthContext.Provider
-      value={{ isLoggedIn, user, login, logout, refreshAccessToken }}
-    >
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

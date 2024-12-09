@@ -23,60 +23,21 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-
-    // If the error is 401 Unauthorized and the request has not been retried yet
+    // If the request is to /logout and returns 401, just ignore and don't logout again
     if (
+      error.config.url.includes("/logout") &&
       error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
+      error.response.status === 401
     ) {
-      // Avoid infinite loop by marking the request as retried
-      originalRequest._retry = true;
-
-      // Check if the request is not to the refresh-token or logout endpoints
-      if (
-        !originalRequest.url.includes("/refresh-token") &&
-        !originalRequest.url.includes("/logout")
-      ) {
-        try {
-          const refreshToken = await AsyncStorage.getItem("refreshToken");
-          if (refreshToken) {
-            // Attempt to refresh the token
-            const response = await axios.post(`${BASE_URL}/refresh-token`, {
-              refresh_token: refreshToken,
-            });
-            const { access_token, refresh_token } = response.data;
-
-            // Update tokens in AsyncStorage
-            await AsyncStorage.setItem("accessToken", access_token);
-            await AsyncStorage.setItem("refreshToken", refresh_token);
-
-            // Update the access token in the Axios instance
-            api.defaults.headers.common[
-              "Authorization"
-            ] = `Bearer ${access_token}`;
-
-            // Retry the original request with the new access token
-            originalRequest.headers["Authorization"] = `Bearer ${access_token}`;
-            return api(originalRequest);
-          } else {
-            // No refresh token available, log out the user
-            await logout();
-            return Promise.reject(error);
-          }
-        } catch (refreshError) {
-          // If refreshing the token fails, log out the user
-          await logout();
-          return Promise.reject(refreshError);
-        }
-      } else {
-        // If the request is to /refresh-token or /logout, do not attempt to refresh token
-        return Promise.reject(error);
-      }
+      // The user might not have a valid token, so let's just ignore and proceed
+      return Promise.reject(error);
     }
 
-    // For other errors, reject the promise
+    // If 401 on other requests, logout once if needed
+    if (error.response && error.response.status === 401) {
+      await logout();
+    }
+
     return Promise.reject(error);
   }
 );

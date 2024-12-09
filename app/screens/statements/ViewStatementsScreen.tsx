@@ -62,6 +62,7 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
             time: transaction.time,
           };
         })
+        // Sort by date descending (latest first)
         .sort(
           (a: Transaction, b: Transaction) =>
             (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0)
@@ -137,7 +138,7 @@ const ViewStatementsScreen: React.FC<ViewStatementsScreenProps> = ({
   return (
     <Screen>
       <FlatList
-        data={transactions.sort((a, b) => b.id.localeCompare(a.id))}
+        data={transactions} // Don't re-sort here
         renderItem={({ item }) => <TransactionItem item={item} />}
         keyExtractor={(item) => item.id}
         refreshControl={

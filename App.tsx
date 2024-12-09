@@ -10,7 +10,7 @@ import AuthNavigator from "./app/navigation/AuthNavigator";
 import { AuthProvider, useAuth } from "./app/context/AuthContext";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import { Alert, Platform } from "react-native";
+import { Platform } from "react-native";
 import {
   NotificationProvider,
   useNotifications,
@@ -51,7 +51,6 @@ const MainNavigator = React.memo(() => {
   return isLoggedIn ? <RootNavigator /> : <AuthNavigator />;
 });
 
-// AuthConsumer remains the same
 const AuthConsumer = () => {
   const { isLoggedIn } = useAuth();
   return isLoggedIn ? <NotificationHandler /> : null;
@@ -75,6 +74,10 @@ const NotificationHandler = () => {
         } catch (error) {
           console.error("Failed to save push token:", error);
         }
+      } else {
+        console.log(
+          "No push token obtained (not a physical device or permissions not granted)."
+        );
       }
     });
 
@@ -97,7 +100,6 @@ const NotificationHandler = () => {
         });
     }
 
-    // Clean up the notification listener when component unmounts
     return () => {
       if (notificationListener.current) {
         Notifications.removeNotificationSubscription(
@@ -115,26 +117,27 @@ async function registerForPushNotificationsAsync() {
   let expoPushToken: string | undefined;
 
   try {
-    if (Constants.isDevice) {
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      console.log("Existing notification permission status:", existingStatus);
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        console.log("Requested notification permission status:", status);
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        Alert.alert("Failed to get push token for notifications!");
-        return;
-      }
-      const tokenData = await Notifications.getExpoPushTokenAsync();
-      expoPushToken = tokenData.data;
-      console.log("Expo Push Token:", expoPushToken);
-    } else {
-      Alert.alert("Must use physical device for Push Notifications");
+    // Check if we are on a physical device
+    if (!Constants.isDevice) {
+      // On emulators or simulators, just skip requesting push tokens.
+      console.log("Not a physical device, skipping push token request.");
+      return undefined;
     }
+
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      console.log("Notification permissions not granted.");
+      return;
+    }
+    const tokenData = await Notifications.getExpoPushTokenAsync();
+    expoPushToken = tokenData.data;
+    console.log("Expo Push Token:", expoPushToken);
 
     if (Platform.OS === "android") {
       await Notifications.setNotificationChannelAsync("default", {
