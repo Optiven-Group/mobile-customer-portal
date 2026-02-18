@@ -1,34 +1,48 @@
-import React, { useState } from "react";
-import { StyleSheet, Alert } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  StyleSheet,
+  Alert,
+  Dimensions,
+  Platform,
+  TouchableOpacity,
+  View,
+  TextInput,
+  Animated,
+  Easing,
+  KeyboardAvoidingView,
+  ScrollView,
+} from "react-native";
 import {
   Box,
-  Button,
-  ButtonText,
   Center,
-  FormControl,
-  FormControlLabel,
-  FormControlLabelText,
-  Input,
-  InputField,
-  Image,
+  Text,
+  VStack,
 } from "@gluestack-ui/themed";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Screen from "../../app-components/Screen";
 import api from "../../utils/api";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../navigation/types";
-import { Dimensions, Platform } from "react-native";
 
-const { width: screenWidth } = Dimensions.get("window");
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 const isTablet = screenWidth >= 768;
 
-type VerifyUserScreenProps = NativeStackScreenProps<
-  AuthStackParamList,
-  "VerifyUser"
->;
+type VerifyUserScreenProps = NativeStackScreenProps<AuthStackParamList, "VerifyUser">;
 
 const VerifyUserScreen: React.FC<VerifyUserScreenProps> = ({ navigation }) => {
   const [customerNumber, setCustomerNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 600, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+  }, []);
 
   const handleVerifyUser = async () => {
     if (!customerNumber || !email) {
@@ -36,74 +50,98 @@ const VerifyUserScreen: React.FC<VerifyUserScreenProps> = ({ navigation }) => {
       return;
     }
 
+    setIsLoading(true);
     try {
-      const response = await api.post("/verify-user", {
-        customer_number: customerNumber,
-        email,
-      });
+      await api.post("/verify-user", { customer_number: customerNumber, email });
       Alert.alert("Success", "OTP sent to your email");
-      navigation.navigate("VerifyOTP", {
-        customerNumber,
-        email,
-        forResetPassword: false,
-      });
+      navigation.navigate("VerifyOTP", { customerNumber, email, forResetPassword: false });
     } catch (error: any) {
-      Alert.alert(
-        "Error",
-        error.response?.data?.error || "Something went wrong"
-      );
+      Alert.alert("Error", error.response?.data?.error || "Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <Screen style={styles.container}>
-      <Center>
-        <Box width={isTablet ? "60%" : "85%"}>
-          <Image
-            alt="logo"
-            style={styles.logo}
-            source={require("../../../assets/logo.png")}
-            mb="$8"
-          />
-          <FormControl isRequired>
-            <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">
-                Customer Number
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Input size="lg">
-              <InputField
-                type="text"
-                placeholder="Enter your customer number"
-                value={customerNumber}
-                onChangeText={setCustomerNumber}
-              />
-            </Input>
-          </FormControl>
-          <FormControl isRequired mt="$4">
-            <FormControlLabel mb="$1">
-              <FormControlLabelText size="md">Email</FormControlLabelText>
-            </FormControlLabel>
-            <Input size="lg">
-              <InputField
-                type="text"
-                placeholder="Enter your email"
-                value={email}
-                onChangeText={setEmail}
-              />
-            </Input>
-          </FormControl>
-          <Button
-            variant="solid"
-            action="positive"
-            mt="$4"
-            size="lg"
-            onPress={handleVerifyUser}
+      <View style={[styles.circle, styles.circle1]} />
+      <View style={[styles.circle, styles.circle2]} />
+
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <Animated.View
+            style={{
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+              width: isTablet ? "60%" : "100%",
+              alignSelf: "center",
+              paddingHorizontal: 24,
+            }}
           >
-            <ButtonText size="md">Submit</ButtonText>
-          </Button>
-        </Box>
-      </Center>
+            <Center mt={screenHeight * 0.1}>
+              <Box style={styles.iconCircle}>
+                <MaterialCommunityIcons name="account-check-outline" size={40} color="#388E3C" />
+              </Box>
+              <Text style={styles.brandTitle}>Activate Account</Text>
+              <Text style={styles.brandSubtitle}>
+                Enter your customer number and email to activate your portal account
+              </Text>
+            </Center>
+
+            <Box style={styles.formCard}>
+              {/* Customer Number */}
+              <Box mb="$4">
+                <Text style={styles.inputLabel}>Customer Number</Text>
+                <View style={styles.modernInput}>
+                  <MaterialCommunityIcons name="card-account-details-outline" size={20} color="#388E3C" />
+                  <TextInput
+                    placeholder="Enter your customer number"
+                    value={customerNumber}
+                    onChangeText={setCustomerNumber}
+                    style={styles.textInput}
+                    placeholderTextColor="#9CA3AF"
+                  />
+                </View>
+              </Box>
+
+              {/* Email */}
+              <Box mb="$5">
+                <Text style={styles.inputLabel}>Email Address</Text>
+                <View style={styles.modernInput}>
+                  <MaterialCommunityIcons name="email-outline" size={20} color="#388E3C" />
+                  <TextInput
+                    placeholder="Enter your email"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    style={styles.textInput}
+                    placeholderTextColor="#9CA3AF"
+                  />
+                </View>
+              </Box>
+
+              {/* Submit Button */}
+              <TouchableOpacity
+                style={[styles.submitButton, isLoading && styles.buttonDisabled]}
+                onPress={handleVerifyUser}
+                disabled={isLoading}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.submitButtonText}>
+                  {isLoading ? "Verifying..." : "Activate Account"}
+                </Text>
+              </TouchableOpacity>
+            </Box>
+
+            <VStack mt="$6" alignItems="center" pb="$8">
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Text style={styles.backLink}>← Back to Login</Text>
+              </TouchableOpacity>
+            </VStack>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Screen>
   );
 };
@@ -112,14 +150,114 @@ export default VerifyUserScreen;
 
 const styles = StyleSheet.create({
   container: {
-    display: "flex",
-    justifyContent: "center",
-    paddingHorizontal: isTablet ? 20 : 10,
+    flex: 1,
+    backgroundColor: "#F5FBF6",
   },
-  logo: {
-    alignSelf: "center",
-    width: isTablet ? "80%" : "70%",
-    height: isTablet ? 100 : 80,
-    resizeMode: "contain",
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 40,
+  },
+  circle: {
+    position: "absolute",
+    borderRadius: 999,
+    opacity: 0.08,
+  },
+  circle1: {
+    width: screenWidth * 1.0,
+    height: screenWidth * 1.0,
+    backgroundColor: "#4CAF50",
+    top: -screenWidth * 0.5,
+    right: -screenWidth * 0.3,
+  },
+  circle2: {
+    width: screenWidth * 0.6,
+    height: screenWidth * 0.6,
+    backgroundColor: "#81C784",
+    bottom: -screenWidth * 0.15,
+    left: -screenWidth * 0.2,
+  },
+  iconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#E8F5E9",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  brandTitle: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#1B5E20",
+    letterSpacing: -0.5,
+  },
+  brandSubtitle: {
+    fontSize: 14,
+    color: "#66BB6A",
+    marginTop: 6,
+    letterSpacing: 0.3,
+    textAlign: "center",
+    paddingHorizontal: 20,
+  },
+  formCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 24,
+    marginTop: 28,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 3,
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#1B5E20",
+    marginBottom: 8,
+    letterSpacing: 0.3,
+  },
+  modernInput: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F0F7F1",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: Platform.OS === "ios" ? 14 : 10,
+    borderWidth: 1.5,
+    borderColor: "#E8F5E9",
+    gap: 10,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 15,
+    color: "#1B5E20",
+    paddingVertical: Platform.OS === "ios" ? 2 : 0,
+  },
+  submitButton: {
+    backgroundColor: "#388E3C",
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#388E3C",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+  submitButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  backLink: {
+    fontSize: 14,
+    color: "#388E3C",
+    fontWeight: "600",
   },
 });

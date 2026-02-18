@@ -33,6 +33,7 @@ import NewsFeedScreen from "../screens/news/NewsFeedScreen";
 import SupportScreen from "../screens/support/SupportScreen";
 import LoyaltyNavigator from "./LoyaltyNavigator";
 import AllPropertiesScreen from "../screens/properties/AllPropertiesScreen";
+import ProjectDetailScreen from "../screens/properties/ProjectDetailScreen";
 
 const Drawer = createDrawerNavigator<DrawerStackParamList>();
 
@@ -327,6 +328,16 @@ const DrawerNavigator = () => {
           title: "All Properties",
           headerShown: true,
           headerTitle: "All Properties",
+        }}
+      />
+      <Drawer.Screen
+        name="ProjectDetail"
+        component={ProjectDetailScreen}
+        options={{
+          title: "Project Details",
+          headerShown: true,
+          headerTitle: "Project Details",
+          drawerItemStyle: { display: "none" },
         }}
       />
     </Drawer.Navigator>

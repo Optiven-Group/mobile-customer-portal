@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -7,6 +7,7 @@ import {
   Linking,
   TouchableOpacity,
   RefreshControl,
+  Animated,
 } from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import Screen from "../app-components/Screen";
@@ -36,12 +37,19 @@ import { getDashboardSummary, getRecentActivity } from "../services/dashboardSer
 
 const { width } = Dimensions.get("window");
 
-type Lang = "en" | "sw";
-
-const GREETINGS: Record<Lang, { morning: string; afternoon: string; evening: string; welcome: string; date_locale: string }> = {
-  en: { morning: "Good Morning", afternoon: "Good Afternoon", evening: "Good Evening", welcome: "Welcome back", date_locale: "en-US" },
-  sw: { morning: "Habari za Asubuhi", afternoon: "Habari za Mchana", evening: "Habari za Jioni", welcome: "Karibu tena", date_locale: "sw-KE" },
-};
+// 10 languages with time-of-day greetings
+const LANGUAGES = [
+  { code: "en", morning: "Good Morning", afternoon: "Good Afternoon", evening: "Good Evening", flag: "🇬🇧" },
+  { code: "sw", morning: "Habari za Asubuhi", afternoon: "Habari za Mchana", evening: "Habari za Jioni", flag: "🇰🇪" },
+  { code: "fr", morning: "Bonjour", afternoon: "Bon après-midi", evening: "Bonsoir", flag: "🇫🇷" },
+  { code: "es", morning: "Buenos Días", afternoon: "Buenas Tardes", evening: "Buenas Noches", flag: "🇪🇸" },
+  { code: "ar", morning: "صباح الخير", afternoon: "مساء الخير", evening: "مساء الخير", flag: "🇸🇦" },
+  { code: "zh", morning: "早上好", afternoon: "下午好", evening: "晚上好", flag: "🇨🇳" },
+  { code: "pt", morning: "Bom Dia", afternoon: "Boa Tarde", evening: "Boa Noite", flag: "🇧🇷" },
+  { code: "de", morning: "Guten Morgen", afternoon: "Guten Tag", evening: "Guten Abend", flag: "🇩🇪" },
+  { code: "ja", morning: "おはようございます", afternoon: "こんにちは", evening: "こんばんは", flag: "🇯🇵" },
+  { code: "hi", morning: "सुप्रभात", afternoon: "नमस्ते", evening: "शुभ संध्या", flag: "🇮🇳" },
+];
 
 const HomeScreen = () => {
   const { user } = useAuth();
@@ -52,20 +60,31 @@ const HomeScreen = () => {
   const [activities, setActivities] = useState<ActivityFeedItem[]>([]);
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
   const [featuredCampaign, setFeaturedCampaign] = useState<Campaign | null>(null);
-  const [lang, setLang] = useState<Lang>("en");
+  const [langIndex, setLangIndex] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  // Auto-cycle languages every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
+        setLangIndex((prev) => (prev + 1) % LANGUAGES.length);
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const getGreeting = useCallback((): string => {
     const hour = new Date().getHours();
-    const g = GREETINGS[lang];
-    if (hour < 12) return g.morning;
-    if (hour < 18) return g.afternoon;
-    return g.evening;
-  }, [lang]);
+    const lang = LANGUAGES[langIndex];
+    if (hour < 12) return lang.morning;
+    if (hour < 18) return lang.afternoon;
+    return lang.evening;
+  }, [langIndex]);
 
   const getDateString = useCallback((): string => {
-    const locale = GREETINGS[lang].date_locale;
-    return new Date().toLocaleDateString(locale, { weekday: "long", month: "long", day: "numeric" });
-  }, [lang]);
+    return new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  }, []);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -162,51 +181,20 @@ const HomeScreen = () => {
       >
         {/* Welcome Section */}
         <Box px="$5" pt="$4" pb="$8" bg={colors.primary}>
-          <HStack justifyContent="space-between" alignItems="flex-start">
-            <VStack flex={1}>
-              <Text color="$white" opacity={0.7} size="xs">
-                {getDateString()}
-              </Text>
-              <Text color="$white" opacity={0.85} size="md" mt="$0.5">
+          <Text color="$white" opacity={0.7} size="xs">
+            {getDateString()}
+          </Text>
+          <Animated.View style={{ opacity: fadeAnim }}>
+            <HStack alignItems="center" space="xs" mt="$0.5">
+              <Text style={{ fontSize: 16 }}>{LANGUAGES[langIndex].flag}</Text>
+              <Text color="$white" opacity={0.85} size="md">
                 {getGreeting()},
               </Text>
-              <Heading size="xl" color="$white" mt="$0.5" style={{ letterSpacing: -0.3 }}>
-                {user?.name?.split(" ")[0] || "User"} 👋
-              </Heading>
-            </VStack>
-            {/* Language Toggle */}
-            <TouchableOpacity
-              onPress={() => setLang(lang === "en" ? "sw" : "en")}
-              style={{
-                flexDirection: "row",
-                backgroundColor: "rgba(255,255,255,0.15)",
-                borderRadius: 20,
-                padding: 3,
-                marginTop: 2,
-              }}
-            >
-              <Box
-                bg={lang === "en" ? "$white" : "transparent"}
-                px="$2.5"
-                py="$1"
-                borderRadius={16}
-              >
-                <Text size="2xs" bold color={lang === "en" ? colors.primary : "$white"}>
-                  EN
-                </Text>
-              </Box>
-              <Box
-                bg={lang === "sw" ? "$white" : "transparent"}
-                px="$2.5"
-                py="$1"
-                borderRadius={16}
-              >
-                <Text size="2xs" bold color={lang === "sw" ? colors.primary : "$white"}>
-                  SW
-                </Text>
-              </Box>
-            </TouchableOpacity>
-          </HStack>
+            </HStack>
+          </Animated.View>
+          <Heading size="xl" color="$white" mt="$0.5" style={{ letterSpacing: -0.3 }}>
+            {user?.name?.split(" ")[0] || "User"} 👋
+          </Heading>
         </Box>
 
         {/* Summary Stats Pills */}

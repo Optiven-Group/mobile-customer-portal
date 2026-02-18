@@ -1,189 +1,234 @@
 import React from "react";
-import { Box, Text, VStack, HStack, Divider } from "@gluestack-ui/themed";
-import { ScrollView, StyleSheet } from "react-native";
-import colors from "../../utils/colors";
+import { StyleSheet, ScrollView, View, TouchableOpacity, Dimensions } from "react-native";
+import { Box, Text, VStack, HStack, Heading } from "@gluestack-ui/themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useMembership } from "../../context/MembershipContext";
+import Screen from "../../app-components/Screen";
+
+const { width } = Dimensions.get("window");
+
+const TIERS = [
+  {
+    name: "Sapphire",
+    color: "#0F52BA",
+    icon: "gem",
+    threshold: "Starting Tier",
+    discount: "Welcome benefits",
+    description: "Welcome aboard! You're on your way to unlocking amazing benefits.",
+    benefits: ["Access to property listings", "Customer support", "News & updates"],
+  },
+  {
+    name: "Bronze",
+    color: "#CD7F32",
+    icon: "trophy",
+    threshold: "KES 1M+",
+    discount: "3% discount",
+    description: "Great start! Keep investing for more rewards.",
+    benefits: ["3% discount on purchases", "Basic referral rewards", "Payment flexibility"],
+  },
+  {
+    name: "Silver",
+    color: "#A0A0A0",
+    icon: "medal",
+    threshold: "KES 5M+",
+    discount: "5% discount",
+    description: "You're climbing the ladder! Silver suits you well.",
+    benefits: ["5% discount on purchases", "Priority site visits", "Exclusive previews", "Dedicated support"],
+  },
+  {
+    name: "Gold",
+    color: "#FFD700",
+    icon: "star-circle",
+    threshold: "KES 10M+",
+    discount: "7% discount",
+    description: "Shining bright! Enjoy premium benefits.",
+    benefits: ["7% discount on purchases", "VIP events access", "Free valuations", "Priority processing", "Early project access"],
+  },
+  {
+    name: "Platinum",
+    color: "#8B8B8B",
+    icon: "diamond-stone",
+    threshold: "KES 20M+",
+    discount: "10% discount",
+    description: "You're a property mogul! Enjoy the finest perks.",
+    benefits: ["10% discount on purchases", "Personal account manager", "Complimentary title processing", "Platinum events", "Investment advisory", "First-class transport"],
+  },
+];
 
 const LoyaltyInfoScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
+  const { membershipTier } = useMembership();
+
   return (
-    <ScrollView style={styles.container}>
-      <Box px={20} py={20}>
-        <Text style={styles.header}>Unlock Exclusive Benefits!</Text>
-        <Text style={styles.subHeader}>
-          Discover the perks of climbing up our loyalty tiers. The more you
-          invest, the more you gain!
-        </Text>
-        <Divider
-          style={{ marginTop: 20, backgroundColor: colors.light, height: 1 }}
-        />
-        <VStack space="xs" mt={20}>
-          {/* Platinum Tier */}
-          <Box style={styles.tierContainer}>
-            <HStack alignItems="center">
-              <Box
-                style={[styles.iconContainer, { backgroundColor: "#E5E4E2" }]}
-              >
-                <MaterialCommunityIcons
-                  name="crown"
-                  size={24}
-                  color={colors.white}
-                />
-              </Box>
-              <Text style={[styles.tierTitle, { color: "#E5E4E2" }]}>
-                Platinum Tier
-              </Text>
-            </HStack>
-            <Text style={styles.tierDescription}>
-              🎉 You're a property mogul! With over 20 million spent, enjoy an{" "}
-              <Text bold>exclusive 10% discount</Text> on your next purchase.
-              Time to add another gem to your collection!
-            </Text>
-          </Box>
-          <Divider style={styles.divider} />
+    <Screen style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerIcon}>
+            <MaterialCommunityIcons name="shield-star" size={32} color="#388E3C" />
+          </View>
+          <Heading size="xl" color="#1B5E20" textAlign="center" mt="$3">
+            Loyalty Program
+          </Heading>
+          <Text size="sm" color="#66BB6A" textAlign="center" mt="$1">
+            Invest more, unlock exclusive rewards
+          </Text>
 
-          {/* Gold Tier */}
-          <Box style={styles.tierContainer}>
-            <HStack alignItems="center">
-              <Box
-                style={[styles.iconContainer, { backgroundColor: "#FFD700" }]}
-              >
-                <MaterialCommunityIcons
-                  name="star"
-                  size={24}
-                  color={colors.white}
-                />
-              </Box>
-              <Text style={[styles.tierTitle, { color: "#FFD700" }]}>
-                Gold Tier
-              </Text>
-            </HStack>
-            <Text style={styles.tierDescription}>
-              ✨ Shining bright! With over 10 million spent, enjoy a{" "}
-              <Text bold>7% discount</Text> on your next purchase. Keep up the
-              sparkle!
-            </Text>
-          </Box>
-          <Divider style={styles.divider} />
+          <TouchableOpacity
+            style={styles.viewTierBtn}
+            onPress={() => navigation.getParent()?.navigate("LoyaltyNav")}
+            activeOpacity={0.85}
+          >
+            <MaterialCommunityIcons name="chart-bar" size={16} color="#FFF" />
+            <Text size="xs" bold color="$white" ml="$1.5">View Full Dashboard</Text>
+          </TouchableOpacity>
+        </View>
 
-          {/* Silver Tier */}
-          <Box style={styles.tierContainer}>
-            <HStack alignItems="center">
-              <Box
-                style={[styles.iconContainer, { backgroundColor: "#C0C0C0" }]}
-              >
-                <MaterialCommunityIcons
-                  name="medal"
-                  size={24}
-                  color={colors.white}
-                />
-              </Box>
-              <Text style={[styles.tierTitle, { color: "#C0C0C0" }]}>
-                Silver Tier
-              </Text>
-            </HStack>
-            <Text style={styles.tierDescription}>
-              🥈 You're climbing the ladder! With over 5 million spent, enjoy a{" "}
-              <Text bold>5% discount</Text> on your next purchase. Silver suits
-              you!
-            </Text>
-          </Box>
-          <Divider style={styles.divider} />
+        {/* Current Tier Highlight */}
+        <View style={styles.currentTierCard}>
+          <Text size="2xs" color="#9CA3AF" mb="$1">Your Current Tier</Text>
+          <HStack alignItems="center" space="sm">
+            <View style={[styles.currentTierIcon, { backgroundColor: (TIERS.find(t => t.name === membershipTier)?.color || "#0F52BA") + "20" }]}>
+              <MaterialCommunityIcons
+                name={(TIERS.find(t => t.name === membershipTier)?.icon || "gem") as any}
+                size={22}
+                color={TIERS.find(t => t.name === membershipTier)?.color || "#0F52BA"}
+              />
+            </View>
+            <Heading size="lg" color="#1F2937">{membershipTier}</Heading>
+          </HStack>
+        </View>
 
-          {/* Bronze Tier */}
-          <Box style={styles.tierContainer}>
-            <HStack alignItems="center">
-              <Box
-                style={[styles.iconContainer, { backgroundColor: "#CD7F32" }]}
-              >
-                <MaterialCommunityIcons
-                  name="trophy"
-                  size={24}
-                  color={colors.white}
-                />
-              </Box>
-              <Text style={[styles.tierTitle, { color: "#CD7F32" }]}>
-                Bronze Tier
-              </Text>
-            </HStack>
-            <Text style={styles.tierDescription}>
-              🏅 Great start! With over 1 million spent, enjoy a{" "}
-              <Text bold>3% discount</Text> on your next purchase. Keep going
-              for more rewards!
-            </Text>
-          </Box>
-          <Divider style={styles.divider} />
+        {/* Tier Cards */}
+        {TIERS.map((tier, index) => {
+          const isCurrent = tier.name === membershipTier;
 
-          {/* Sapphire Tier */}
-          <Box style={styles.tierContainer}>
-            <HStack alignItems="center">
-              <Box
-                style={[styles.iconContainer, { backgroundColor: "#0F52BA" }]}
-              >
-                <MaterialCommunityIcons
-                  name="circle"
-                  size={24}
-                  color={colors.white}
-                />
-              </Box>
-              <Text style={[styles.tierTitle, { color: "#0F52BA" }]}>
-                Sapphire Tier
-              </Text>
-            </HStack>
-            <Text style={styles.tierDescription}>
-              💎 Welcome aboard! As a Sapphire member, you're on your way to
-              unlocking amazing benefits. Let's embark on this exciting journey
-              together!
-            </Text>
-          </Box>
-        </VStack>
-      </Box>
-    </ScrollView>
+          return (
+            <View key={tier.name} style={[styles.tierCard, isCurrent && { borderColor: tier.color, borderWidth: 2 }]}>
+              {/* Tier header */}
+              <HStack alignItems="center" space="md" mb="$3">
+                <View style={[styles.tierIcon, { backgroundColor: tier.color + "15" }]}>
+                  <MaterialCommunityIcons name={tier.icon as any} size={26} color={tier.color} />
+                </View>
+                <VStack flex={1}>
+                  <HStack alignItems="center" space="sm">
+                    <Heading size="md" color={tier.color}>{tier.name}</Heading>
+                    {isCurrent && (
+                      <View style={[styles.currentBadge, { backgroundColor: tier.color }]}>
+                        <Text size="2xs" bold color="#FFF">Current</Text>
+                      </View>
+                    )}
+                  </HStack>
+                  <Text size="xs" color="#6B7280">{tier.threshold}</Text>
+                </VStack>
+                <View style={[styles.discountPill, { backgroundColor: tier.color + "15" }]}>
+                  <Text size="2xs" bold color={tier.color}>{tier.discount}</Text>
+                </View>
+              </HStack>
+
+              {/* Description */}
+              <Text size="xs" color="#6B7280" mb="$3" lineHeight={18}>{tier.description}</Text>
+
+              {/* Benefits */}
+              <VStack space="xs">
+                {tier.benefits.map((benefit, i) => (
+                  <HStack key={i} alignItems="center" space="sm">
+                    <MaterialCommunityIcons name="check-circle" size={14} color={tier.color} />
+                    <Text size="xs" color="#374151">{benefit}</Text>
+                  </HStack>
+                ))}
+              </VStack>
+            </View>
+          );
+        })}
+      </ScrollView>
+    </Screen>
   );
 };
 
 export default LoyaltyInfoScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.white,
-  },
+  container: { flex: 1, backgroundColor: "#F5FBF6" },
   header: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: colors.dark,
-    textAlign: "center",
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 28,
+    paddingHorizontal: 24,
+    alignItems: "center",
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 2,
   },
-  subHeader: {
-    fontSize: 16,
-    color: colors.medium,
-    textAlign: "center",
-    marginTop: 8,
+  headerIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#E8F5E9",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  tierContainer: {
-    paddingVertical: 16,
+  viewTierBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#388E3C",
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginTop: 18,
   },
-  iconContainer: {
-    height: 40,
+  currentTierCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  currentTierIcon: {
     width: 40,
+    height: 40,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
   },
-  tierTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
+  tierCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 20,
+    marginHorizontal: 16,
+    marginTop: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#F0F0F0",
   },
-  tierDescription: {
-    marginTop: 8,
-    fontSize: 16,
-    color: colors.medium,
-    lineHeight: 22,
+  tierIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  divider: {
-    marginVertical: 8,
-    backgroundColor: colors.light,
-    height: 1,
+  currentBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  discountPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
   },
 });

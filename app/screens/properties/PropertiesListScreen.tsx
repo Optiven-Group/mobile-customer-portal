@@ -1,37 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
+import { StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, View, TextInput, Dimensions, RefreshControl } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Screen from "../../app-components/Screen";
 import colors from "../../utils/colors";
-import { Box, VStack, HStack, Text, Heading, Card, Image, Input, InputField, InputSlot, InputIcon } from "@gluestack-ui/themed";
-import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
-import { Property, Project } from "../../navigation/types";
+import { Box, VStack, HStack, Text, Heading, Image } from "@gluestack-ui/themed";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import api from "../../utils/api";
 
-// Mock data for properties if API fails or for demo
+const { width } = Dimensions.get("window");
+
 const MOCK_PROPERTIES = [
-  {
-    id: 1,
-    name: "Plot 45",
-    project: "Amani Ridge",
-    location: "Kiambu",
-    size: "50x100",
-    status: "Fully Paid",
-    image: "https://www.optiven.co.ke/wp-content/uploads/2023/10/amani-ridge.jpg",
-    price: 3500000,
-    balance: 0,
-  },
-  {
-    id: 2,
-    name: "Plot 12",
-    project: "Love Gardens",
-    location: "Kajiado",
-    size: "50x100",
-    status: "Installment",
-    image: "https://www.optiven.co.ke/wp-content/uploads/2023/10/love-gardens.jpg",
-    price: 1500000,
-    balance: 450000,
-  },
+  { id: 1, name: "Plot 45", project: "Amani Ridge", location: "Kiambu", size: "50x100", status: "Fully Paid", image: "", price: 3500000, balance: 0 },
+  { id: 2, name: "Plot 12", project: "Love Gardens", location: "Kajiado", size: "50x100", status: "Installment", image: "", price: 1500000, balance: 450000 },
 ];
 
 const PropertiesListScreen = () => {
@@ -39,34 +19,31 @@ const PropertiesListScreen = () => {
   const [properties, setProperties] = useState<any[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchProperties = async () => {
     try {
-      // Simulate API call
-      // const response = await api.get("/my-properties");
-      // setProperties(response.data.properties);
       setTimeout(() => {
-          setProperties(MOCK_PROPERTIES);
-          setFilteredProperties(MOCK_PROPERTIES);
-          setLoading(false);
-      }, 1000);
+        setProperties(MOCK_PROPERTIES);
+        setFilteredProperties(MOCK_PROPERTIES);
+        setLoading(false);
+        setRefreshing(false);
+      }, 800);
     } catch (error) {
-      console.error("Failed to fetch properties", error);
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  useEffect(() => {
-    fetchProperties();
-  }, []);
+  useEffect(() => { fetchProperties(); }, []);
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
     if (text) {
-      const filtered = properties.filter((prop) => 
-        prop.project.toLowerCase().includes(text.toLowerCase()) || 
-        prop.name.toLowerCase().includes(text.toLowerCase())
+      const filtered = properties.filter((p) =>
+        p.project.toLowerCase().includes(text.toLowerCase()) ||
+        p.name.toLowerCase().includes(text.toLowerCase())
       );
       setFilteredProperties(filtered);
     } else {
@@ -74,60 +51,128 @@ const PropertiesListScreen = () => {
     }
   };
 
-  const renderItem = ({ item }: { item: any }) => (
-    <TouchableOpacity onPress={() => navigation.navigate("PropertyDetail", { property: item })}>
-      <Card p="$0" mb="$4" borderRadius="$lg" overflow="hidden" variant="elevated">
-        <Image
-          source={{ uri: item.image }}
-          alt={item.project}
-          w="$full"
-          h={150}
-          resizeMode="cover"
-        />
-        <Box p="$3">
-          <HStack justifyContent="space-between" alignItems="center" mb="$1">
-            <Heading size="sm">{item.project}</Heading>
-            <Box bg={item.status === 'Fully Paid' ? "$success100" : "$warning100"} px="$2" py="$1" borderRadius="$sm">
-                <Text size="xs" color={item.status === 'Fully Paid' ? "$success700" : "$warning700"} bold>{item.status}</Text>
-            </Box>
+  const getStatusConfig = (status: string) => {
+    if (status === "Fully Paid") return { bg: "#E8F5E9", color: "#2E7D32", icon: "check-circle" };
+    return { bg: "#FFF3E0", color: "#E65100", icon: "clock-outline" };
+  };
+
+  const getProgress = (item: any) => {
+    if (item.price === 0) return 100;
+    return Math.round(((item.price - item.balance) / item.price) * 100);
+  };
+
+  const renderItem = ({ item }: { item: any }) => {
+    const statusConfig = getStatusConfig(item.status);
+    const progress = getProgress(item);
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => navigation.navigate("PropertyDetail", { property: item })}
+        style={styles.card}
+      >
+        {/* Color bar top */}
+        <View style={[styles.cardAccent, { backgroundColor: statusConfig.color }]} />
+
+        <View style={styles.cardContent}>
+          <HStack justifyContent="space-between" alignItems="flex-start">
+            <VStack flex={1}>
+              <Heading size="sm" color="#1F2937">{item.project}</Heading>
+              <Text size="xs" color="#6B7280" mt="$0.5">{item.name} • {item.location}</Text>
+            </VStack>
+            <View style={[styles.statusChip, { backgroundColor: statusConfig.bg }]}>
+              <MaterialCommunityIcons name={statusConfig.icon as any} size={12} color={statusConfig.color} />
+              <Text size="2xs" bold color={statusConfig.color} ml="$1">{item.status}</Text>
+            </View>
           </HStack>
-          <Text size="sm" color="$coolGray600" mb="$2">{item.name} • {item.location}</Text>
-          <HStack alignItems="center" space="xs">
-             <MaterialCommunityIcons name="ruler-square" size={16} color={colors.coolGray} />
-             <Text size="xs" color="$coolGray500">{item.size}</Text>
+
+          {/* Progress bar */}
+          <View style={styles.progressSection}>
+            <HStack justifyContent="space-between" mb="$1">
+              <Text size="2xs" color="#9CA3AF">Payment progress</Text>
+              <Text size="2xs" bold color="#388E3C">{progress}%</Text>
+            </HStack>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progress}%`, backgroundColor: statusConfig.color }]} />
+            </View>
+          </View>
+
+          {/* Financial details */}
+          <HStack mt="$3" justifyContent="space-between">
+            <VStack>
+              <Text size="2xs" color="#9CA3AF">Total Price</Text>
+              <Text size="xs" bold color="#1F2937">KES {item.price.toLocaleString()}</Text>
+            </VStack>
+            <VStack alignItems="flex-end">
+              <Text size="2xs" color="#9CA3AF">Balance</Text>
+              <Text size="xs" bold color={item.balance > 0 ? "#E65100" : "#2E7D32"}>
+                KES {item.balance.toLocaleString()}
+              </Text>
+            </VStack>
+            <VStack alignItems="flex-end">
+              <Text size="2xs" color="#9CA3AF">Size</Text>
+              <Text size="xs" bold color="#1F2937">{item.size}</Text>
+            </VStack>
           </HStack>
-        </Box>
-      </Card>
-    </TouchableOpacity>
-  );
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   if (loading) {
-     return (
-        <Screen style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </Screen>
-      );
+    return (
+      <Screen style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </Screen>
+    );
   }
 
   return (
     <Screen style={styles.container}>
-      <VStack space="md" p="$4">
-        <Input variant="outline" size="md" isDisabled={false} isInvalid={false} isReadOnly={false}>
-          <InputSlot pl="$3">
-            <InputIcon as={Feather} name="search" color="$coolGray400"/>
-          </InputSlot>
-          <InputField placeholder="Search properties..." value={searchQuery} onChangeText={handleSearch} />
-        </Input>
+      {/* Search */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBar}>
+          <MaterialCommunityIcons name="magnify" size={20} color="#9CA3AF" />
+          <TextInput
+            placeholder="Search my properties..."
+            value={searchQuery}
+            onChangeText={handleSearch}
+            style={styles.searchInput}
+            placeholderTextColor="#9CA3AF"
+          />
+        </View>
+      </View>
 
-        <FlatList
-          data={filteredProperties}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          ListEmptyComponent={<Text textAlign="center" mt="$10" color="$coolGray500">No properties found.</Text>}
-          showsVerticalScrollIndicator={false}
-        />
-      </VStack>
+      {/* Stats summary */}
+      <HStack px="$4" mb="$2" space="sm">
+        <View style={styles.statChip}>
+          <Text size="2xs" bold color="#388E3C">{properties.length}</Text>
+          <Text size="2xs" color="#6B7280"> Properties</Text>
+        </View>
+        <View style={styles.statChip}>
+          <Text size="2xs" bold color="#2E7D32">{properties.filter(p => p.status === "Fully Paid").length}</Text>
+          <Text size="2xs" color="#6B7280"> Paid</Text>
+        </View>
+        <View style={styles.statChip}>
+          <Text size="2xs" bold color="#E65100">{properties.filter(p => p.status !== "Fully Paid").length}</Text>
+          <Text size="2xs" color="#6B7280"> Active</Text>
+        </View>
+      </HStack>
+
+      <FlatList
+        data={filteredProperties}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 30 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchProperties(); }} colors={[colors.primary]} />}
+        ListEmptyComponent={
+          <Box py="$10" alignItems="center">
+            <MaterialCommunityIcons name="home-off-outline" size={48} color="#D1D5DB" />
+            <Text mt="$2" color="#9CA3AF">No properties found.</Text>
+          </Box>
+        }
+        showsVerticalScrollIndicator={false}
+      />
     </Screen>
   );
 };
@@ -135,13 +180,56 @@ const PropertiesListScreen = () => {
 export default PropertiesListScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F7FA",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
+  container: { flex: 1, backgroundColor: "#F5FBF6" },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  searchContainer: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8 },
+  searchBar: {
+    flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1.5,
+    borderColor: "#E8F5E9",
+    gap: 8,
   },
+  searchInput: { flex: 1, fontSize: 14, color: "#1F2937" },
+  statChip: {
+    flexDirection: "row",
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E8F5E9",
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    marginBottom: 14,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  cardAccent: { height: 4, width: "100%" },
+  cardContent: { padding: 16 },
+  statusChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  progressSection: { marginTop: 14 },
+  progressTrack: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#F0F0F0",
+    overflow: "hidden",
+  },
+  progressFill: { height: "100%", borderRadius: 3 },
 });

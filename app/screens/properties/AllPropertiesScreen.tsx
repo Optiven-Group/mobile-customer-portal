@@ -4,9 +4,11 @@ import {
   ActivityIndicator,
   FlatList,
   TouchableOpacity,
-  Image,
   View,
   Dimensions,
+  Animated,
+  TextInput,
+  RefreshControl,
 } from "react-native";
 import Screen from "../../app-components/Screen";
 import colors from "../../utils/colors";
@@ -17,9 +19,9 @@ import {
   HStack,
   Text,
   Heading,
-  Card,
 } from "@gluestack-ui/themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
@@ -31,7 +33,6 @@ interface Project {
   location?: string;
 }
 
-// Mock data fallback
 const MOCK_PROJECTS: Project[] = [
   { project_id: 1, name: "Amani Ridge — The Place of Peace", description: "Prime plots in Kiambu County, 40 minutes from Nairobi CBD. Available in 1/8 and 1/4 acre sizes.", banner: "", location: "Kiambu, Kenya" },
   { project_id: 2, name: "Love Gardens — Machakos", description: "Plots in Machakos with beautiful views of the surrounding hills. Great for residential and investment.", banner: "", location: "Machakos, Kenya" },
@@ -41,28 +42,38 @@ const MOCK_PROJECTS: Project[] = [
   { project_id: 6, name: "Wema Gardens — Nanyuki", description: "Cool-climate plots with stunning views of Mount Kenya. Perfect for holiday homes.", banner: "", location: "Nanyuki, Laikipia" },
 ];
 
+const PROJECT_COLORS = ["#388E3C", "#1B5E20", "#2E7D32", "#4CAF50", "#0D47A1", "#5A0000"];
+
 const AllPropertiesScreen = () => {
+  const navigation = useNavigation<any>();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await api.get("/visible-projects");
-        const all = [
-          ...(response.data.featured_projects || []),
-          ...(response.data.other_projects || []),
-        ];
-        setProjects(all.length > 0 ? all : MOCK_PROJECTS);
-      } catch (error) {
-        console.log("Using mock projects");
-        setProjects(MOCK_PROJECTS);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
-  }, []);
+  const fetchProjects = async () => {
+    try {
+      const response = await api.get("/visible-projects");
+      const all = [
+        ...(response.data.featured_projects || []),
+        ...(response.data.other_projects || []),
+      ];
+      setProjects(all.length > 0 ? all : MOCK_PROJECTS);
+    } catch (error) {
+      setProjects(MOCK_PROJECTS);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => { fetchProjects(); }, []);
+
+  const onRefresh = () => { setRefreshing(true); fetchProjects(); };
+
+  const filtered = search
+    ? projects.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.location?.toLowerCase().includes(search.toLowerCase()))
+    : projects;
 
   if (loading) {
     return (
@@ -72,47 +83,92 @@ const AllPropertiesScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: Project }) => (
-    <Card variant="elevated" mb="$3" p="$0" borderRadius={14} overflow="hidden">
-      {/* Banner or placeholder */}
-      {item.banner ? (
-        <Image source={{ uri: item.banner }} style={styles.banner} />
-      ) : (
-        <Box bg={colors.primary + "12"} h={120} alignItems="center" justifyContent="center">
-          <MaterialCommunityIcons name="home-city" size={40} color={colors.primary} />
-        </Box>
-      )}
-      <VStack p="$4">
-        <Heading size="sm">{item.name}</Heading>
-        {item.location && (
-          <HStack alignItems="center" space="xs" mt="$1">
-            <MaterialCommunityIcons name="map-marker" size={14} color={colors.coolGray} />
-            <Text size="xs" color="$coolGray500">{item.location}</Text>
+  const renderItem = ({ item, index }: { item: Project; index: number }) => {
+    const accentColor = PROJECT_COLORS[index % PROJECT_COLORS.length];
+    return (
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => navigation.navigate("ProjectDetail", { project: item })}
+        style={styles.card}
+      >
+        {/* Color accent header */}
+        {item.banner ? (
+          <View style={[styles.bannerPlaceholder, { backgroundColor: accentColor + "10" }]}>
+            <MaterialCommunityIcons name="image" size={40} color={accentColor} />
+          </View>
+        ) : (
+          <View style={[styles.bannerPlaceholder, { backgroundColor: accentColor + "10" }]}>
+            <View style={[styles.iconBubble, { backgroundColor: accentColor + "20" }]}>
+              <MaterialCommunityIcons name="home-city" size={32} color={accentColor} />
+            </View>
+          </View>
+        )}
+
+        <View style={styles.cardBody}>
+          <Heading size="sm" color="#1F2937" numberOfLines={1}>{item.name}</Heading>
+          {item.location && (
+            <HStack alignItems="center" space="xs" mt="$1">
+              <MaterialCommunityIcons name="map-marker-outline" size={14} color="#66BB6A" />
+              <Text size="xs" color="#6B7280">{item.location}</Text>
+            </HStack>
+          )}
+          {item.description && (
+            <Text size="xs" color="#9CA3AF" mt="$1.5" numberOfLines={2} lineHeight={18}>
+              {item.description}
+            </Text>
+          )}
+
+          <HStack mt="$3" alignItems="center" justifyContent="space-between">
+            <HStack space="xs" alignItems="center">
+              <View style={[styles.statusDot, { backgroundColor: "#4CAF50" }]} />
+              <Text size="2xs" color="#4CAF50" bold>Available</Text>
+            </HStack>
+            <HStack alignItems="center" space="xs">
+              <Text size="xs" color="#388E3C" bold>View Details</Text>
+              <MaterialCommunityIcons name="arrow-right" size={14} color="#388E3C" />
+            </HStack>
           </HStack>
-        )}
-        {item.description && (
-          <Text size="xs" color="$coolGray600" mt="$1" numberOfLines={2}>{item.description}</Text>
-        )}
-      </VStack>
-    </Card>
-  );
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <Screen style={styles.container}>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBar}>
+          <MaterialCommunityIcons name="magnify" size={20} color="#9CA3AF" />
+          <TextInput
+            placeholder="Search properties..."
+            value={search}
+            onChangeText={setSearch}
+            style={styles.searchInput}
+            placeholderTextColor="#9CA3AF"
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch("")}>
+              <MaterialCommunityIcons name="close-circle" size={18} color="#D1D5DB" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
       <FlatList
-        data={projects}
+        data={filtered}
         keyExtractor={(item) => item.project_id.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 16, paddingBottom: 30 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />}
         ListHeaderComponent={
-          <Box mb="$2">
-            <Text size="sm" color="$coolGray500">{projects.length} properties available</Text>
-          </Box>
+          <HStack justifyContent="space-between" alignItems="center" mb="$3">
+            <Text size="sm" color="#6B7280">{filtered.length} properties available</Text>
+          </HStack>
         }
         ListEmptyComponent={
           <Box py="$10" alignItems="center">
-            <MaterialCommunityIcons name="home-search" size={48} color={colors.coolGray} />
-            <Text mt="$2" color="$coolGray500">No properties found.</Text>
+            <MaterialCommunityIcons name="home-search" size={48} color="#D1D5DB" />
+            <Text mt="$2" color="#9CA3AF">No properties found.</Text>
           </Box>
         }
       />
@@ -123,7 +179,44 @@ const AllPropertiesScreen = () => {
 export default AllPropertiesScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F7FA" },
+  container: { flex: 1, backgroundColor: "#F5FBF6" },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  banner: { width: "100%", height: 140, resizeMode: "cover" },
+  searchContainer: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1.5,
+    borderColor: "#E8F5E9",
+    gap: 8,
+  },
+  searchInput: { flex: 1, fontSize: 14, color: "#1F2937" },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    marginBottom: 14,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  bannerPlaceholder: {
+    height: 100,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconBubble: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardBody: { padding: 16 },
+  statusDot: { width: 6, height: 6, borderRadius: 3 },
 });

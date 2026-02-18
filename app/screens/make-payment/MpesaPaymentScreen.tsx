@@ -35,7 +35,7 @@ const MpesaPaymentScreen: React.FC<MpesaPaymentScreenProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [paymentInitiated, setPaymentInitiated] = useState<boolean>(false);
 
-  const MaxTransactionAmount = 150000; // M-PESA maximum per transaction
+  const MaxTransactionAmount = 500000; // M-PESA maximum per transaction
   const MinTransactionAmount = 1; // M-PESA minimum per transaction
 
   const handleInitiatePayment = async () => {

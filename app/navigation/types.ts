@@ -73,6 +73,7 @@ export type DrawerStackParamList = {
   "Refer & Earn": undefined;
   LoyaltyNav: undefined;
   AllProperties: undefined;
+  ProjectDetail: { project: any };
 };
 
 // Overview Stack Param List

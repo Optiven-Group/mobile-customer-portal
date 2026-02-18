@@ -149,7 +149,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
         {/* ═══ Quick Actions 2×2 Grid ═══ */}
         <View style={styles.quickGrid}>
           <HStack space="sm">
-            <QuickAction icon="help-circle" label="Help" bg="#388E3C" onPress={() => Linking.openURL("mailto:info@optiven.co.ke?subject=Support")} />
+            <QuickAction icon="help-circle" label="Help" bg="#388E3C" onPress={() => navigation.getParent()?.navigate("Support")} />
             <QuickAction icon="wallet" label="Wallet" bg="#2E7D32" onPress={() => navigation.getParent()?.navigate("Wallet")} />
           </HStack>
           <HStack space="sm" mt="$2">
@@ -244,7 +244,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
             icon="help-circle-outline"
             label="Support"
             subtitle="Get help, FAQs"
-            onPress={() => Linking.openURL("mailto:info@optiven.co.ke?subject=Support")}
+            onPress={() => navigation.getParent()?.navigate("Support")}
           />
           <MenuRow
             icon="information-outline"
