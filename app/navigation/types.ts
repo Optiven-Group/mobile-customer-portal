@@ -1,10 +1,15 @@
 // Auth Stack Param List
 export type AuthStackParamList = {
+  Splash: undefined;
+  Onboarding: undefined;
   Login: undefined;
   VerifyUser: undefined;
   VerifyOTP: {
     customerNumber?: string;
     email: string;
+    phone?: string;
+    name?: string;
+    userId?: number;
     forResetPassword: boolean;
   };
   CreatePassword: {
@@ -14,6 +19,8 @@ export type AuthStackParamList = {
     forResetPassword: boolean;
   };
   ForgotPassword: undefined;
+  KYCVerification: undefined;
+  Register: undefined;
 };
 
 // Account Stack Param List
@@ -27,6 +34,7 @@ export type AccountStackParamList = {
     email: string;
     phone: string;
   };
+  ChangePassword: undefined;
 };
 
 // InstallmentSchedule Interface
@@ -50,6 +58,21 @@ export type RootStackParamList = {
   Support: undefined;
   Refer: undefined;
   Notifications: undefined;
+};
+
+// Drawer Stack Param List
+export type DrawerStackParamList = {
+  MainTabs: undefined;
+  PropertyNav: undefined;
+  Wallet: undefined;
+  Payments: undefined;
+  NewsFeed: undefined;
+  Profile: undefined;
+  Settings: undefined;
+  Support: undefined;
+  "Refer & Earn": undefined;
+  LoyaltyNav: undefined;
+  AllProperties: undefined;
 };
 
 // Overview Stack Param List
@@ -124,10 +147,36 @@ export interface Campaign {
 // Referral Stack Param List
 export type ReferralStackParamList = {
   ReferralHome: undefined;
+  ReferralDashboard: undefined;
   HowItWorks: undefined;
   ReferSomeone: { project: Project };
   FeaturedProjects: undefined;
   ReferralProgress: undefined;
+  ReferralDetail: { referral: any };
+  Commission: undefined;
+  PayoutHistory: undefined;
+};
+
+// Loyalty Stack Param List
+export type LoyaltyStackParamList = {
+  LoyaltyDashboard: undefined;
+  TierSystem: undefined;
+  PointsHistory: undefined;
+  RewardsCatalog: undefined;
+  RewardDetail: { reward: any };
+  Leaderboard: undefined;
+  Badges: undefined;
+};
+
+// Property Stack Param List
+export type PropertyStackParamList = {
+  PropertiesList: undefined;
+  PropertyDetail: {
+    property: any;
+  };
+  PropertyDocuments: {
+    property: any;
+  };
 };
 
 // Notification Interface (Custom)
@@ -143,4 +192,33 @@ export interface AppNotification {
 export interface LeadFile {
   leadFileNo: string;
   customerNo: string;
+}
+
+// Dashboard Summary Interface
+export interface DashboardSummary {
+  totalProperties: number;
+  paymentsDue: number;
+  walletBalance: number;
+  nextPaymentDate?: string;
+}
+
+// Activity Feed Item Interface
+export interface ActivityFeedItem {
+  id: number;
+  type: "payment" | "property" | "support" | "system";
+  title: string;
+  description: string;
+  date: string;
+  read: boolean;
+}
+
+// Transaction Interface
+export interface Transaction {
+  id: string;
+  type: "credit" | "debit";
+  description: string;
+  amount: number;
+  date: string;
+  status: "completed" | "pending" | "failed";
+  reference?: string;
 }

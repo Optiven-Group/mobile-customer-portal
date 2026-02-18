@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import AppNavigator from "./AppNavigator";
+import DrawerNavigator from "./DrawerNavigator";
 import SettingsScreen from "../screens/settings/SettingsScreen";
 import SupportScreen from "../screens/support/SupportScreen";
 import { RootStackParamList } from "./types";
@@ -12,10 +12,10 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const RootNavigator = () => {
   return (
     <Stack.Navigator>
-      {/* Hide the header for the AppNavigator */}
+      {/* Hide the header for the DrawerNavigator which contains AppNavigator */}
       <Stack.Screen
         name="Main"
-        component={AppNavigator}
+        component={DrawerNavigator}
         options={{ headerShown: false }}
       />
       <Stack.Screen

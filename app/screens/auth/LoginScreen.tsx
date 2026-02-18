@@ -33,7 +33,7 @@ type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, "Login">;
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth();
 
   const handleLogin = async () => {
     const trimmedEmail = email.trim();
@@ -115,8 +115,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             >
               <Text style={styles.optionText}>Forgot Password?</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+              <Text style={styles.optionText}>Sign Up</Text>
+            </TouchableOpacity>
+          </Box>
+          <Box mt="$4" alignItems="center">
             <TouchableOpacity onPress={() => navigation.navigate("VerifyUser")}>
-              <Text style={styles.optionText}>Register</Text>
+              <Text style={styles.activateText}>
+                Already a customer? Activate Account
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={loginAsGuest} style={{ marginTop: 15 }}>
+              <Text style={[styles.activateText, { color: "#666" }]}>
+                Skip & Continue as Guest
+              </Text>
             </TouchableOpacity>
           </Box>
         </Box>
@@ -150,5 +162,10 @@ const styles = StyleSheet.create({
   optionText: {
     color: "#007AFF",
     fontSize: Platform.OS === "ios" ? 16 : 14,
+  },
+  activateText: {
+    color: "#007AFF",
+    fontSize: Platform.OS === "ios" ? 16 : 14,
+    marginTop: 10,
   },
 });

@@ -30,7 +30,7 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
   navigation,
 }) => {
   const [otp, setOtp] = useState<string>("");
-  const { customerNumber, email, forResetPassword } = route.params;
+  const { customerNumber, email, phone, name, userId, forResetPassword } = route.params;
 
   const handleVerifyOTP = async () => {
     try {
@@ -46,11 +46,14 @@ const VerifyOTPScreen: React.FC<VerifyOTPScreenProps> = ({
           forResetPassword: true,
         });
       } else {
-        await api.post("/verify-otp", {
-          customer_number: customerNumber,
-          email,
-          otp,
-        });
+        // Handle Registration OTP or Existing Customer OTP
+        const payload: any = { email, otp };
+        if (customerNumber) payload.customer_number = customerNumber;
+        if (userId) payload.user_id = userId;
+        // if (phone) payload.phone = phone; // Add if API supports it
+
+        await api.post("/verify-otp", payload);
+        
         Alert.alert("Success", "OTP verified");
         navigation.navigate("CreatePassword", {
           customerNumber,

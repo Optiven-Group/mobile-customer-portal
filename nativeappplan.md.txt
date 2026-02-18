@@ -1,0 +1,1498 @@
+# Mobile App Development Plan
+## Real Estate Customer Platform - React Native
+
+**Platform:** React Native (iOS & Android)  
+**Backend:** API-first (Swagger documented)
+
+---
+
+## 📋 EXECUTIVE SUMMARY
+
+This plan covers all mobile app frontend development needed before API integration, including:
+- UI/UX design and component library
+- Authentication flows
+- All customer-facing features
+- State management setup
+- Mock data integration
+- Testing infrastructure
+
+**Total Estimated Timeline:** 10-12 weeks
+
+---
+
+## 🎯 PHASE 1: FOUNDATION & INFRASTRUCTURE
+**Duration:** 2 weeks
+
+### Week 1: Project Setup & Architecture
+
+#### Mobile App Setup
+- [ ] Initialize React Native project (latest stable version)
+- [ ] Setup folder structure (features-based architecture)
+- [ ] Configure navigation (React Navigation v6)
+- [ ] Setup state management (Redux Toolkit + RTK Query / Zustand)
+- [ ] Configure environment variables (.env setup)
+- [ ] Setup API service layer (Axios/Fetch with interceptors)
+- [ ] Configure build tools (iOS & Android)
+- [ ] Setup TypeScript configuration
+- [ ] Install and configure essential packages:
+  - React Navigation (Stack, Tab, Drawer)
+  - React Native Paper / Native Base (UI library)
+  - React Hook Form + Yup (forms & validation)
+  - React Native Vector Icons
+  - AsyncStorage / MMKV (local storage)
+  - React Native Permissions
+  - React Native Image Picker
+  - React Native Share
+  - React Native QR Code Generator/Scanner
+
+### Week 2: Design System & Component Library
+
+#### Shared Components
+- [ ] Define color palette and theme
+- [ ] Typography system
+- [ ] Spacing and grid system
+- [ ] Button variants (primary, secondary, outline, text)
+- [ ] Input fields (text, number, email, phone, password)
+- [ ] Dropdown/Select components
+- [ ] Checkbox and Radio buttons
+- [ ] Date/Time pickers
+- [ ] File upload components
+- [ ] Modal/Dialog components
+- [ ] Alert/Toast notifications
+- [ ] Loading states (spinners, skeletons)
+- [ ] Empty states
+- [ ] Error states
+- [ ] Card components
+- [ ] Badge/Chip components
+- [ ] Avatar components
+- [ ] Tab components
+- [ ] Accordion components
+
+#### Mobile-Specific Components
+- [ ] Bottom sheet
+- [ ] Pull-to-refresh
+- [ ] Swipeable list items
+- [ ] Bottom navigation bar
+- [ ] Header with back button
+- [ ] Search bar
+- [ ] Filter panel
+- [ ] QR code scanner component
+- [ ] Camera component
+- [ ] Share sheet integration
+
+**Deliverables:**
+- Working development environment
+- Component library
+- Design system documentation
+- Mock API service layer ready for integration
+
+---
+
+## 🎯 PHASE 2: AUTHENTICATION & ONBOARDING
+**Duration:** 2 weeks
+
+### Week 3: Authentication Flows
+
+#### 1. **Splash Screen**
+   - [ ] App logo and branding
+   - [ ] Loading animation
+   - [ ] Version check logic
+
+#### 2. **Onboarding/Tutorial Screens** (optional)
+   - [ ] Feature highlights (3-4 slides)
+   - [ ] Skip button
+   - [ ] Get Started button
+
+#### 3. **Login Screen**
+   - [ ] Phone number / Email input
+   - [ ] Password input with show/hide toggle
+   - [ ] Remember me checkbox
+   - [ ] Login button
+   - [ ] Forgot password link
+   - [ ] Sign up link
+   - [ ] Social login buttons (optional)
+
+#### 4. **Registration Screen**
+   - [ ] Full name input
+   - [ ] Phone number input
+   - [ ] Email input
+   - [ ] Password input (with strength indicator)
+   - [ ] Confirm password input
+   - [ ] Terms & Conditions checkbox
+   - [ ] Sign up button
+   - [ ] Already have account link
+
+#### 5. **Phone/Email Verification Screen**
+   - [ ] OTP input (6-digit code)
+   - [ ] Resend code button (with countdown)
+   - [ ] Verify button
+   - [ ] Change phone/email link
+
+#### 6. **Forgot Password Flow**
+   - [ ] Enter phone/email screen
+   - [ ] OTP verification screen
+   - [ ] New password screen
+   - [ ] Password reset confirmation
+
+#### 7. **KYC Verification Screen**
+   - [ ] Document type selection
+   - [ ] Document number input
+   - [ ] Document upload (front/back)
+   - [ ] Selfie capture
+   - [ ] Submit button
+   - [ ] Verification pending state
+   - [ ] Verification approved/rejected state
+
+### Week 4: Profile & Settings
+
+#### 1. **Profile Screen**
+   - [ ] Profile picture upload
+   - [ ] Personal information display/edit
+   - [ ] Contact information
+   - [ ] KYC status badge
+   - [ ] Edit profile button
+   - [ ] Logout button
+
+#### 2. **Edit Profile Screen**
+   - [ ] All editable fields
+   - [ ] Save button
+   - [ ] Cancel button
+   - [ ] Form validation
+
+#### 3. **Settings Screen**
+   - [ ] Notification preferences
+   - [ ] Language selection
+   - [ ] Theme (light/dark mode)
+   - [ ] Security settings
+   - [ ] About app
+   - [ ] Terms & Conditions
+   - [ ] Privacy Policy
+   - [ ] App version
+
+#### 4. **Change Password Screen**
+   - [ ] Current password
+   - [ ] New password
+   - [ ] Confirm password
+   - [ ] Submit button
+
+#### 5. **Security Settings**
+   - [ ] Enable biometric login
+   - [ ] Enable PIN code
+   - [ ] Two-factor authentication
+   - [ ] Active sessions management
+
+**Deliverables:**
+- Complete authentication flows
+- Profile management functionality
+- Mock authentication service with local storage
+- Form validation implemented
+- Navigation guards/protected routes
+
+---
+
+## 🎯 PHASE 3: CUSTOMER PORTAL
+**Duration:** 3 weeks
+
+### Week 5: Dashboard & Property Management
+
+#### 1. **Dashboard/Home Screen**
+   - [ ] Welcome message with user name
+   - [ ] Summary cards (total properties, payments due, wallet balance)
+   - [ ] Quick actions (pay installment, refer friend, view properties)
+   - [ ] Recent activity feed
+   - [ ] Announcements banner
+   - [ ] Navigation to all major sections
+   - [ ] Notification bell icon
+
+#### 2. **Property Management Screens**
+   
+   **Properties List Screen**
+   - [ ] List of all owned properties (cards/list view)
+   - [ ] Property thumbnail image
+   - [ ] Property name and location
+   - [ ] Project name
+   - [ ] Ownership status badge
+   - [ ] Purchase date
+   - [ ] Search and filter functionality
+   - [ ] Sort options
+
+   **Property Detail Screen**
+   - [ ] Property images (gallery/carousel)
+   - [ ] Property information (size, location, price)
+   - [ ] Project details
+   - [ ] Ownership records
+   - [ ] Payment status
+   - [ ] Document section
+   - [ ] Map view (property location)
+   - [ ] Share property button
+   - [ ] Download documents button
+
+   **Property Documents Screen**
+   - [ ] List of all documents
+   - [ ] Document type badges
+   - [ ] Upload date
+   - [ ] Download button
+   - [ ] Preview button
+   - [ ] Upload new document option
+
+### Week 6: Financial Management
+
+#### 1. **Wallet Screen**
+   - [ ] Wallet balance (prominently displayed)
+   - [ ] Add money button
+   - [ ] Withdraw money button
+   - [ ] Transaction history tabs (All, Credits, Debits)
+   - [ ] Transaction list items with details
+   - [ ] Filter by date range
+   - [ ] Search transactions
+   - [ ] Export statement button
+
+   **Wallet Transaction Detail**
+   - [ ] Transaction type and description
+   - [ ] Amount and date
+   - [ ] Transaction ID
+   - [ ] Status badge
+   - [ ] Receipt/proof (if available)
+
+   **Withdrawal Request Screen**
+   - [ ] Available balance display
+   - [ ] Withdrawal amount input
+   - [ ] Payment method selection (M-Pesa, Bank)
+   - [ ] M-Pesa number / Bank details input
+   - [ ] Submit request button
+   - [ ] Minimum threshold warning
+   - [ ] Pending requests list
+
+#### 2. **Payments & Installments Screens**
+   
+   **Payments Overview**
+   - [ ] Total paid amount
+   - [ ] Outstanding balance
+   - [ ] Next payment due
+   - [ ] Payment schedule/timeline
+   - [ ] Payment history list
+   - [ ] Make payment button
+
+   **Payment Detail Screen**
+   - [ ] Receipt information
+   - [ ] Payment amount and date
+   - [ ] Payment method
+   - [ ] Property associated
+   - [ ] Transaction reference
+   - [ ] Download receipt button
+   - [ ] Share receipt button
+
+   **Make Payment Screen**
+   - [ ] Property selection
+   - [ ] Amount input (or predefined installment)
+   - [ ] Payment method selection
+   - [ ] Payment confirmation dialog
+   - [ ] Success/failure feedback
+
+   **Payment History Screen**
+   - [ ] List of all payments
+   - [ ] Filter by property
+   - [ ] Filter by date range
+   - [ ] Download statement
+   - [ ] Search functionality
+
+#### 3. **Financial Statements**
+   - [ ] Statement of account
+   - [ ] Date range selector
+   - [ ] Statement preview
+   - [ ] Download as PDF
+   - [ ] Email statement option
+
+### Week 7: Engagement & Support
+
+#### 1. **News Feed Screen**
+   - [ ] List of announcements and updates
+   - [ ] Featured news at top
+   - [ ] News card with image, title, excerpt
+   - [ ] Category badges
+   - [ ] Publication date
+   - [ ] Like/bookmark functionality
+   - [ ] Share functionality
+   - [ ] Pull to refresh
+
+   **News Detail Screen**
+   - [ ] Full article with images
+   - [ ] Publication date and author
+   - [ ] Related articles
+   - [ ] Share button
+   - [ ] Bookmark button
+
+#### 2. **Promotions & Offers Screen**
+   - [ ] Active promotions list
+   - [ ] Promotion card with image
+   - [ ] Discount badge
+   - [ ] Validity period
+   - [ ] Terms & Conditions link
+   - [ ] Claim/Apply button
+
+   **Promotion Detail Screen**
+   - [ ] Full promotion details
+   - [ ] How to redeem
+   - [ ] Terms & Conditions
+   - [ ] Apply button
+
+#### 3. **Notifications Screen**
+   - [ ] All notifications list
+   - [ ] Tabs (All, Unread, Referrals, Payments, Rewards)
+   - [ ] Notification icons by type
+   - [ ] Mark as read functionality
+   - [ ] Mark all as read button
+   - [ ] Delete notification option
+   - [ ] Notification detail/action on tap
+
+#### 4. **Support & Help Screens**
+   
+   **Help Center Screen**
+   - [ ] FAQ sections (accordion)
+   - [ ] Search functionality
+   - [ ] Category navigation
+   - [ ] Contact support button
+
+   **Support Tickets Screen**
+   - [ ] Create new ticket button
+   - [ ] Active tickets list
+   - [ ] Closed tickets list
+   - [ ] Ticket status badges
+   - [ ] Last update timestamp
+
+   **Create Ticket Screen**
+   - [ ] Subject input
+   - [ ] Category selection
+   - [ ] Description textarea
+   - [ ] Attachment upload
+   - [ ] Priority selection
+   - [ ] Submit button
+
+   **Ticket Detail Screen**
+   - [ ] Ticket information
+   - [ ] Status and priority badges
+   - [ ] Conversation thread
+   - [ ] Reply input
+   - [ ] Attachment upload
+   - [ ] Close ticket button
+
+**Deliverables:**
+- Complete customer portal screens
+- Navigation and screen transitions
+- Mock data for all features
+- Forms with validation
+- Local state management
+- Pull-to-refresh and pagination
+
+---
+
+## 🎯 PHASE 4: REFERRAL PROGRAM
+**Duration:** 2 weeks
+
+### Week 8: Referral Creation & Sharing
+
+#### 1. **Referral Dashboard Screen**
+   - [ ] Hero section with referral stats
+     - Total referrals count
+     - Successful referrals
+     - Pending referrals
+     - Conversion rate
+   - [ ] Commission summary cards
+     - Total earned
+     - Pending commission
+     - Paid commission
+   - [ ] Refer now button (prominent CTA)
+   - [ ] Referral history preview
+   - [ ] Quick share buttons
+   - [ ] How it works section
+
+#### 2. **Refer a Friend Screen**
+   - [ ] Referral methods tabs:
+     - [ ] Share Link tab
+     - [ ] Share Code tab
+     - [ ] QR Code tab
+     - [ ] Manual Entry tab
+   
+   **Share Link Tab**
+   - [ ] Generated unique referral link
+   - [ ] Copy link button
+   - [ ] Share via WhatsApp button
+   - [ ] Share via SMS button
+   - [ ] Share via Email button
+   - [ ] Generic share button (system share sheet)
+
+   **Share Code Tab**
+   - [ ] Unique referral code display
+   - [ ] Copy code button
+   - [ ] Share code via social media
+
+   **QR Code Tab**
+   - [ ] Generated QR code
+   - [ ] Download QR code button
+   - [ ] Share QR code button
+
+   **Manual Entry Tab**
+   - [ ] Referee name input
+   - [ ] Referee phone number input
+   - [ ] Referee email input (optional)
+   - [ ] Notes textarea
+   - [ ] Submit referral button
+
+#### 3. **Referral Tracking Screen**
+   - [ ] Status filter tabs (All, Pending, Qualified, Converted, Rejected)
+   - [ ] Referral cards list showing:
+     - Referee name (or masked if privacy)
+     - Referral date
+     - Current status badge
+     - Potential commission
+     - Progress indicator
+   - [ ] Search referrals
+   - [ ] Sort options (date, status, commission)
+
+#### 4. **Referral Detail Screen**
+   - [ ] Referee information (name, phone - masked)
+   - [ ] Referral timeline/progress tracker:
+     - Submitted
+     - Contacted
+     - Site visit scheduled
+     - Negotiation
+     - Sale closed
+     - Commission approved
+     - Paid
+   - [ ] Current status with description
+   - [ ] Commission details
+   - [ ] Referral date
+   - [ ] Expected payout date (if applicable)
+   - [ ] Contact support button
+   - [ ] Status update notifications toggle
+
+### Week 9: Commission & Payouts
+
+#### 1. **Commission Breakdown Screen**
+   - [ ] Visual representation (charts)
+   - [ ] Commission by status (earned, pending, paid)
+   - [ ] Commission by project
+   - [ ] Commission by month/quarter
+   - [ ] Filter by date range
+   - [ ] Export report button
+
+#### 2. **Payout History Screen**
+   - [ ] List of all payouts
+   - [ ] Payout card showing:
+     - Amount
+     - Date
+     - Payment method
+     - Transaction reference
+     - Status badge
+   - [ ] Filter by date range
+   - [ ] Search functionality
+   - [ ] Download receipt option
+
+#### 3. **Payout Detail Screen**
+   - [ ] Payout amount
+   - [ ] Payout date and time
+   - [ ] Payment method (M-Pesa, Bank, Wallet)
+   - [ ] Transaction reference
+   - [ ] Status badge
+   - [ ] Breakdown of commission sources
+   - [ ] Tax information (if applicable)
+   - [ ] Download receipt button
+   - [ ] Share receipt button
+
+#### 4. **How Referral Works Screen**
+   - [ ] Step-by-step guide
+   - [ ] Commission structure explanation
+   - [ ] Terms & Conditions
+   - [ ] FAQs section
+   - [ ] Support contact
+
+#### 5. **Referral Campaign Screen** (if promotional)
+   - [ ] Active campaigns list
+   - [ ] Campaign details (increased commission rates)
+   - [ ] Validity period
+   - [ ] Eligible projects
+   - [ ] Campaign terms
+
+**Deliverables:**
+- Complete referral system screens
+- Sharing functionality (mocked)
+- QR code generation
+- Referral tracking with status updates
+- Commission calculation display
+- Local storage for mock referrals
+
+---
+
+## 🎯 PHASE 5: LOYALTY PROGRAM
+**Duration:** 2 weeks
+
+### Week 10: Points & Tiers
+
+#### 1. **Loyalty Dashboard Screen**
+   - [ ] Current tier badge (Bronze, Silver, Gold, Platinum)
+   - [ ] Points balance (large, prominent)
+   - [ ] Points to next tier progress bar
+   - [ ] Tier benefits preview
+   - [ ] Recent points activity
+   - [ ] Quick actions:
+     - Redeem points
+     - View rewards catalog
+     - View history
+   - [ ] How to earn more points section
+
+#### 2. **Tier System Screen**
+   - [ ] Current tier card (highlighted)
+   - [ ] All tier cards:
+     - Tier name and icon
+     - Points required
+     - Benefits list
+     - Unlock status
+   - [ ] Tier benefits comparison
+   - [ ] Upgrade tips
+
+#### 3. **Tier Benefits Detail Screen**
+   - [ ] Tier icon and name
+   - [ ] All benefits list with icons
+   - [ ] Exclusive perks
+   - [ ] How to maintain tier
+   - [ ] Tier downgrade rules
+
+#### 4. **Points History Screen**
+   - [ ] Filter tabs (All, Earned, Redeemed, Expired)
+   - [ ] Transaction list:
+     - Points amount (+ or -)
+     - Transaction description
+     - Date
+     - Source (purchase, referral, campaign)
+     - Points balance after transaction
+   - [ ] Search functionality
+   - [ ] Filter by date range
+   - [ ] Export statement
+
+#### 5. **Earn Points Screen**
+   - [ ] Ways to earn points:
+     - Purchase properties
+     - Refer friends
+     - Complete profile
+     - Engage with content
+     - Participate in campaigns
+   - [ ] Points value for each activity
+   - [ ] Track progress for activities
+   - [ ] Call-to-action buttons
+
+### Week 11: Rewards & Gamification
+
+#### 1. **Rewards Catalog Screen**
+   - [ ] Category tabs (All, Cashback, Discounts, Gifts, Services)
+   - [ ] Reward cards grid/list:
+     - Reward image
+     - Reward name
+     - Points required
+     - Availability badge
+     - Tier requirement (if any)
+   - [ ] Search rewards
+   - [ ] Filter by points range
+   - [ ] Sort options (points, popularity, newest)
+   - [ ] My tier eligible toggle
+
+#### 2. **Reward Detail Screen**
+   - [ ] Reward image gallery
+   - [ ] Reward name and description
+   - [ ] Points required (prominent)
+   - [ ] Tier requirement badge
+   - [ ] Availability status
+   - [ ] Terms & Conditions
+   - [ ] Redeem button
+   - [ ] Add to wishlist button
+   - [ ] Similar rewards section
+
+#### 3. **Redeem Reward Screen**
+   - [ ] Reward confirmation details
+   - [ ] Points to be deducted
+   - [ ] Current points balance
+   - [ ] Balance after redemption
+   - [ ] Delivery/fulfillment method (if applicable)
+   - [ ] Additional information form (if needed)
+   - [ ] Confirm redemption button
+   - [ ] Cancel button
+
+#### 4. **My Rewards Screen**
+   - [ ] Tabs (Active, Redeemed, Expired)
+   - [ ] Reward cards:
+     - Reward image
+     - Reward name
+     - Redemption date
+     - Status badge
+     - Expiry date (if applicable)
+     - View details button
+   - [ ] Search and filter
+
+#### 5. **Reward Redemption Detail**
+   - [ ] Reward information
+   - [ ] Redemption date
+   - [ ] Points used
+   - [ ] Status badge
+   - [ ] Redemption code/QR (if applicable)
+   - [ ] Fulfillment details
+   - [ ] Expiry date
+   - [ ] Download/share redemption proof
+
+#### 6. **Gamification Screens**
+   
+   **Leaderboard Screen**
+   - [ ] Current month leaderboard
+   - [ ] User's rank (highlighted)
+   - [ ] Top 10/20 users list:
+     - Rank
+     - User name (or anonymous)
+     - Points/referrals
+     - Badge/icon
+   - [ ] My rank card (fixed at top/bottom)
+   - [ ] Filter by time period (week, month, all-time)
+   - [ ] Category tabs (Top Referrers, Top Earners, Most Engaged)
+
+   **Badges & Achievements Screen**
+   - [ ] Grid of all badges:
+     - Badge icon
+     - Badge name
+     - Description
+     - Unlocked/locked state
+     - Unlock date (if earned)
+   - [ ] Progress for locked badges
+   - [ ] Category filters
+   - [ ] Share achievements button
+
+   **Challenges Screen**
+   - [ ] Active challenges list
+   - [ ] Challenge cards:
+     - Challenge name and icon
+     - Description
+     - Progress bar
+     - Reward (points/badge)
+     - Time remaining
+     - Participate/Continue button
+   - [ ] Completed challenges
+   - [ ] Upcoming challenges
+
+#### 7. **Loyalty Settings**
+   - [ ] Notification preferences for:
+     - Points earned
+     - Rewards available
+     - Tier upgrades
+     - Challenges
+   - [ ] Privacy settings (leaderboard visibility)
+
+**Deliverables:**
+- Complete loyalty program screens
+- Points tracking system
+- Tier progression logic
+- Rewards catalog
+- Gamification features
+- Mock data for points, rewards, badges
+
+---
+
+## 🎯 PHASE 6: TESTING, OPTIMIZATION & DOCUMENTATION
+**Duration:** 2 weeks
+
+### Week 12: Testing & Quality Assurance
+
+#### Mobile App Testing
+- [ ] Unit tests for utility functions
+- [ ] Component tests (Jest + React Native Testing Library)
+- [ ] Navigation flow tests
+- [ ] Form validation tests
+- [ ] Mock API integration tests
+- [ ] E2E tests (Detox) for critical flows:
+  - Login flow
+  - Referral creation
+  - Payment flow
+  - Reward redemption
+- [ ] Performance testing
+- [ ] Memory leak detection
+- [ ] iOS testing on simulators/devices
+- [ ] Android testing on emulators/devices
+- [ ] Different screen sizes testing
+- [ ] Offline functionality testing
+- [ ] Push notification testing (mock)
+
+#### Cross-Cutting Concerns
+- [ ] Security testing (XSS, CSRF prevention)
+- [ ] Input validation testing
+- [ ] Error handling testing
+- [ ] Loading states testing
+- [ ] Empty states testing
+- [ ] Edge cases testing
+
+### Week 13: Optimization, Documentation & Handoff
+
+#### Performance Optimization
+- [ ] Code splitting (if applicable)
+- [ ] Image optimization
+- [ ] Lazy loading implementation
+- [ ] Bundle size optimization
+- [ ] Memory optimization
+- [ ] Animation performance
+- [ ] FlatList optimization
+- [ ] Redux/state optimization
+
+#### Documentation
+
+**Technical Documentation**
+- [ ] Project setup guide
+- [ ] Architecture documentation
+- [ ] Folder structure explanation
+- [ ] Component library documentation
+- [ ] State management documentation
+- [ ] Routing documentation
+- [ ] Form validation patterns
+- [ ] API service layer documentation
+- [ ] Environment variables guide
+- [ ] Build and deployment guide
+
+**Developer Guides**
+- [ ] Coding standards
+- [ ] Git workflow
+- [ ] Component creation guide
+- [ ] Adding new features guide
+- [ ] Testing guide
+- [ ] Debugging guide
+- [ ] Common issues and solutions
+
+**API Integration Guide**
+- [ ] API service structure
+- [ ] Authentication flow with API
+- [ ] Error handling patterns
+- [ ] Request/response transformations
+- [ ] API endpoint mapping document
+- [ ] Mock data to API migration checklist
+
+**User Guides** (Optional)
+- [ ] Mobile app user guide
+- [ ] Feature walkthroughs
+
+#### Handoff Preparation
+- [ ] Code cleanup
+- [ ] Remove unused dependencies
+- [ ] Remove console logs and debug code
+- [ ] Ensure all environment variables are documented
+- [ ] Final testing on both platforms
+- [ ] Create demo video/walkthrough
+- [ ] Prepare API integration checklist
+- [ ] Create bug tracking template
+- [ ] Setup CI/CD pipeline (GitHub Actions, etc.)
+
+**Deliverables:**
+- Fully tested application
+- Performance-optimized code
+- Comprehensive documentation
+- API integration guide
+- Deployment-ready application
+- Handoff materials
+
+---
+
+## 📊 TIMELINE SUMMARY
+
+| Phase | Duration | Weeks | Focus |
+|-------|----------|-------|-------|
+| Phase 1: Foundation & Infrastructure | 2 weeks | 1-2 | Setup, Components |
+| Phase 2: Authentication & Onboarding | 2 weeks | 3-4 | Auth, Profile |
+| Phase 3: Customer Portal | 3 weeks | 5-7 | Properties, Wallet, Support |
+| Phase 4: Referral Program | 2 weeks | 8-9 | Referrals, Commissions |
+| Phase 5: Loyalty Program | 2 weeks | 10-11 | Points, Rewards, Gamification |
+| Phase 6: Testing & Documentation | 2 weeks | 12-13 | QA, Optimization |
+| **TOTAL** | **~13 weeks** | **~3 months** | Complete Mobile App |
+
+---
+
+## 🛠️ TECHNOLOGY STACK & DEPENDENCIES
+
+### Core Dependencies
+```json
+{
+  "react": "^18.2.0",
+  "react-native": "^0.73.0",
+  "typescript": "^5.0.0"
+}
+```
+
+### Navigation
+```json
+{
+  "@react-navigation/native": "^6.1.0",
+  "@react-navigation/stack": "^6.3.0",
+  "@react-navigation/bottom-tabs": "^6.5.0",
+  "@react-navigation/drawer": "^6.6.0",
+  "react-native-screens": "^3.29.0",
+  "react-native-safe-area-context": "^4.8.0",
+  "react-native-gesture-handler": "^2.14.0"
+}
+```
+
+### State Management
+**Option 1: Redux Toolkit**
+```json
+{
+  "@reduxjs/toolkit": "^2.0.0",
+  "react-redux": "^9.0.0",
+  "redux-persist": "^6.0.0"
+}
+```
+
+**Option 2: Zustand**
+```json
+{
+  "zustand": "^4.4.0"
+}
+```
+
+### UI Components
+```json
+{
+  "react-native-paper": "^5.11.0",
+  "react-native-vector-icons": "^10.0.0",
+  "react-native-elements": "^3.4.0"
+}
+```
+
+### Forms & Validation
+```json
+{
+  "react-hook-form": "^7.49.0",
+  "yup": "^1.3.0",
+  "@hookform/resolvers": "^3.3.0"
+}
+```
+
+### API & Data
+```json
+{
+  "axios": "^1.6.0",
+  "@tanstack/react-query": "^5.0.0"
+}
+```
+
+### Storage
+```json
+{
+  "@react-native-async-storage/async-storage": "^1.21.0",
+  "react-native-mmkv": "^2.11.0"
+}
+```
+
+### Media & File Handling
+```json
+{
+  "react-native-image-picker": "^7.1.0",
+  "react-native-document-picker": "^9.1.0",
+  "react-native-fs": "^2.20.0",
+  "react-native-share": "^10.0.0"
+}
+```
+
+### QR Code & Camera
+```json
+{
+  "react-native-qrcode-svg": "^6.2.0",
+  "react-native-vision-camera": "^3.6.0",
+  "react-native-permissions": "^4.0.0"
+}
+```
+
+### UI Utilities
+```json
+{
+  "react-native-toast-message": "^2.2.0",
+  "react-native-modal": "^13.0.0",
+  "react-native-bottom-sheet": "^4.5.0",
+  "react-native-swipe-list-view": "^3.2.0"
+}
+```
+
+### Date & Time
+```json
+{
+  "date-fns": "^3.0.0",
+  "react-native-date-picker": "^4.3.0"
+}
+```
+
+### Charts & Visualization
+```json
+{
+  "react-native-chart-kit": "^6.12.0",
+  "react-native-svg": "^14.1.0"
+}
+```
+
+### Maps (if needed)
+```json
+{
+  "react-native-maps": "^1.10.0"
+}
+```
+
+### Push Notifications
+```json
+{
+  "@react-native-firebase/messaging": "^19.0.0",
+  "@notifee/react-native": "^7.8.0"
+}
+```
+
+### Development Dependencies
+```json
+{
+  "@testing-library/react-native": "^12.4.0",
+  "@testing-library/jest-native": "^5.4.0",
+  "jest": "^29.7.0",
+  "detox": "^20.13.0",
+  "@babel/core": "^7.23.0",
+  "@babel/preset-env": "^7.23.0",
+  "@babel/runtime": "^7.23.0",
+  "babel-jest": "^29.7.0",
+  "eslint": "^8.55.0",
+  "prettier": "^3.1.0",
+  "typescript": "^5.3.0"
+}
+```
+
+---
+
+## 📂 RECOMMENDED FOLDER STRUCTURE
+
+```
+src/
+├── api/
+│   ├── client.ts                 # Axios/fetch configuration
+│   ├── endpoints.ts              # API endpoint constants
+│   ├── interceptors.ts           # Request/response interceptors
+│   └── services/                 # Service layer
+│       ├── auth.service.ts
+│       ├── customer.service.ts
+│       ├── property.service.ts
+│       ├── wallet.service.ts
+│       ├── payment.service.ts
+│       ├── referral.service.ts
+│       ├── loyalty.service.ts
+│       └── support.service.ts
+├── assets/
+│   ├── images/
+│   │   ├── logo.png
+│   │   ├── splash.png
+│   │   └── ...
+│   ├── icons/
+│   └── fonts/
+├── components/
+│   ├── common/                   # Shared components
+│   │   ├── Button/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Button.styles.ts
+│   │   │   └── index.ts
+│   │   ├── Input/
+│   │   ├── Card/
+│   │   ├── Badge/
+│   │   ├── Avatar/
+│   │   ├── Modal/
+│   │   ├── BottomSheet/
+│   │   ├── Toast/
+│   │   ├── Loader/
+│   │   ├── EmptyState/
+│   │   ├── ErrorState/
+│   │   └── ...
+│   └── features/                 # Feature-specific components
+│       ├── auth/
+│       │   ├── OTPInput/
+│       │   └── SocialLoginButtons/
+│       ├── property/
+│       │   ├── PropertyCard/
+│       │   └── PropertyGallery/
+│       ├── wallet/
+│       │   ├── TransactionItem/
+│       │   └── WalletCard/
+│       ├── referral/
+│       │   ├── ReferralCard/
+│       │   ├── QRCodeDisplay/
+│       │   └── ReferralTimeline/
+│       ├── loyalty/
+│       │   ├── TierBadge/
+│       │   ├── RewardCard/
+│       │   └── PointsDisplay/
+│       └── ...
+├── constants/
+│   ├── colors.ts
+│   ├── fonts.ts
+│   ├── sizes.ts
+│   ├── images.ts
+│   └── config.ts
+├── hooks/                        # Custom hooks
+│   ├── useAuth.ts
+│   ├── useProfile.ts
+│   ├── useWallet.ts
+│   ├── useReferral.ts
+│   ├── useLoyalty.ts
+│   ├── useTheme.ts
+│   └── ...
+├── navigation/
+│   ├── AppNavigator.tsx          # Main navigator
+│   ├── AuthNavigator.tsx         # Auth stack
+│   ├── MainNavigator.tsx         # Main tab navigator
+│   ├── ReferralNavigator.tsx     # Referral stack
+│   ├── LoyaltyNavigator.tsx      # Loyalty stack
+│   ├── linking.ts                # Deep linking config
+│   └── types.ts                  # Navigation types
+├── screens/
+│   ├── auth/
+│   │   ├── SplashScreen.tsx
+│   │   ├── OnboardingScreen.tsx
+│   │   ├── LoginScreen.tsx
+│   │   ├── RegisterScreen.tsx
+│   │   ├── OTPVerificationScreen.tsx
+│   │   ├── ForgotPasswordScreen.tsx
+│   │   ├── ResetPasswordScreen.tsx
+│   │   └── KYCVerificationScreen.tsx
+│   ├── home/
+│   │   └── DashboardScreen.tsx
+│   ├── profile/
+│   │   ├── ProfileScreen.tsx
+│   │   ├── EditProfileScreen.tsx
+│   │   ├── SettingsScreen.tsx
+│   │   ├── ChangePasswordScreen.tsx
+│   │   └── SecuritySettingsScreen.tsx
+│   ├── properties/
+│   │   ├── PropertiesListScreen.tsx
+│   │   ├── PropertyDetailScreen.tsx
+│   │   └── PropertyDocumentsScreen.tsx
+│   ├── wallet/
+│   │   ├── WalletScreen.tsx
+│   │   ├── TransactionDetailScreen.tsx
+│   │   └── WithdrawalRequestScreen.tsx
+│   ├── payments/
+│   │   ├── PaymentsOverviewScreen.tsx
+│   │   ├── PaymentDetailScreen.tsx
+│   │   ├── MakePaymentScreen.tsx
+│   │   └── PaymentHistoryScreen.tsx
+│   ├── referral/
+│   │   ├── ReferralDashboardScreen.tsx
+│   │   ├── ReferAFriendScreen.tsx
+│   │   ├── ReferralTrackingScreen.tsx
+│   │   ├── ReferralDetailScreen.tsx
+│   │   ├── CommissionBreakdownScreen.tsx
+│   │   ├── PayoutHistoryScreen.tsx
+│   │   └── HowItWorksScreen.tsx
+│   ├── loyalty/
+│   │   ├── LoyaltyDashboardScreen.tsx
+│   │   ├── TierSystemScreen.tsx
+│   │   ├── PointsHistoryScreen.tsx
+│   │   ├── RewardsCatalogScreen.tsx
+│   │   ├── RewardDetailScreen.tsx
+│   │   ├── RedeemRewardScreen.tsx
+│   │   ├── MyRewardsScreen.tsx
+│   │   ├── LeaderboardScreen.tsx
+│   │   ├── BadgesScreen.tsx
+│   │   └── ChallengesScreen.tsx
+│   ├── engagement/
+│   │   ├── NewsFeedScreen.tsx
+│   │   ├── NewsDetailScreen.tsx
+│   │   ├── PromotionsScreen.tsx
+│   │   └── PromotionDetailScreen.tsx
+│   ├── notifications/
+│   │   └── NotificationsScreen.tsx
+│   └── support/
+│       ├── HelpCenterScreen.tsx
+│       ├── SupportTicketsScreen.tsx
+│       ├── CreateTicketScreen.tsx
+│       └── TicketDetailScreen.tsx
+├── store/                        # Redux/Zustand store
+│   ├── slices/
+│   │   ├── authSlice.ts
+│   │   ├── profileSlice.ts
+│   │   ├── propertySlice.ts
+│   │   ├── walletSlice.ts
+│   │   ├── referralSlice.ts
+│   │   ├── loyaltySlice.ts
+│   │   └── uiSlice.ts
+│   ├── store.ts
+│   └── persistConfig.ts
+├── types/
+│   ├── models.ts                 # Data models/interfaces
+│   ├── navigation.ts
+│   ├── api.ts
+│   └── index.ts
+├── utils/
+│   ├── validation.ts             # Validation schemas
+│   ├── formatting.ts             # Date, currency, etc.
+│   ├── storage.ts                # Async storage helpers
+│   ├── permissions.ts            # Permission helpers
+│   ├── helpers.ts
+│   └── constants.ts
+├── theme/
+│   ├── colors.ts
+│   ├── typography.ts
+│   ├── spacing.ts
+│   ├── shadows.ts
+│   └── index.ts
+├── mock/                         # Mock data (remove after API integration)
+│   ├── auth.mock.ts
+│   ├── customers.mock.ts
+│   ├── properties.mock.ts
+│   ├── referrals.mock.ts
+│   └── loyalty.mock.ts
+└── App.tsx
+```
+
+---
+
+## 🎨 DESIGN & UI/UX CONSIDERATIONS
+
+### Mobile Design Principles
+
+#### 1. **Touch-Friendly Interface**
+- Minimum button size: 44x44 points (iOS) / 48x48 dp (Android)
+- Adequate spacing between interactive elements (8-16px minimum)
+- Thumb-zone optimization (important actions in easy-to-reach areas)
+
+#### 2. **Progressive Disclosure**
+- Show essential information first
+- Use expandable sections for details
+- Multi-step forms for complex processes
+- Avoid information overload
+
+#### 3. **Visual Hierarchy**
+- Clear primary actions (bold, prominent CTAs)
+- Consistent typography scale (H1, H2, Body, Caption)
+- Strategic use of color and contrast
+- F-pattern or Z-pattern layout
+
+#### 4. **Performance & Responsiveness**
+- Optimistic UI updates
+- Skeleton screens for loading states
+- Smooth animations (60fps)
+- Fast navigation transitions
+
+#### 5. **Feedback & Confirmation**
+- Loading indicators for async operations
+- Success/error toast messages
+- Confirmation dialogs for destructive actions
+- Haptic feedback for important interactions
+
+#### 6. **Accessibility**
+- Support for screen readers (VoiceOver, TalkBack)
+- Sufficient color contrast (WCAG AA minimum)
+- Scalable font sizes
+- Alternative text for images
+- Keyboard navigation support
+
+#### 7. **Offline Support**
+- Cache critical data locally
+- Graceful degradation when offline
+- Queue actions for when online
+- Clear offline indicators
+
+---
+
+## ✅ API INTEGRATION READINESS CHECKLIST
+
+Before API integration, ensure you have:
+
+### Configuration
+- [ ] API service layer with interceptors
+- [ ] Request/response type definitions (TypeScript interfaces)
+- [ ] Error handling middleware
+- [ ] Authentication token management (storage, refresh)
+- [ ] Refresh token logic
+- [ ] Network error handling
+- [ ] Loading state management
+- [ ] Environment-based API URL configuration
+
+### Data Management
+- [ ] Mock data removal checklist
+- [ ] API endpoint mapping document
+- [ ] Request/response transformation functions
+- [ ] Data validation schemas
+- [ ] Cache strategy defined
+
+### Authentication
+- [ ] Login API integration
+- [ ] Registration API integration
+- [ ] OTP verification API integration
+- [ ] Token refresh mechanism
+- [ ] Logout API integration
+- [ ] Session management
+
+### Testing
+- [ ] API mocking setup for tests
+- [ ] Integration test templates
+- [ ] Error scenario testing
+
+### Documentation
+- [ ] Swagger documentation review completed
+- [ ] API endpoint inventory
+- [ ] Authentication flow documented
+- [ ] File upload strategy defined
+- [ ] Pagination strategy defined
+- [ ] Real-time updates strategy (if applicable)
+- [ ] Offline support strategy
+- [ ] Error code to user message mapping
+- [ ] API rate limiting handling
+- [ ] API versioning strategy
+
+---
+
+## 📱 PLATFORM-SPECIFIC CONSIDERATIONS
+
+### iOS
+- [ ] Info.plist permissions (Camera, Photo Library, Location)
+- [ ] App icons (all required sizes)
+- [ ] Launch screens
+- [ ] Push notification entitlements
+- [ ] Code signing setup
+- [ ] TestFlight setup for beta testing
+
+### Android
+- [ ] AndroidManifest.xml permissions
+- [ ] App icons (all densities)
+- [ ] Splash screen
+- [ ] Push notification setup
+- [ ] Release key generation
+- [ ] ProGuard/R8 configuration
+- [ ] Google Play Console setup for beta testing
+
+---
+
+## 🚀 DEPLOYMENT PREPARATION
+
+### Pre-Deployment Checklist
+- [ ] Remove all console.log statements
+- [ ] Remove all TODO comments
+- [ ] Update app version and build number
+- [ ] Test on physical devices (iOS and Android)
+- [ ] Test on different screen sizes
+- [ ] Test on different OS versions
+- [ ] Performance profiling
+- [ ] Memory leak detection
+- [ ] Battery usage optimization
+
+### App Store Assets
+- [ ] App name
+- [ ] App description (short and long)
+- [ ] App icon (1024x1024)
+- [ ] Screenshots (all required sizes)
+- [ ] App preview video (optional)
+- [ ] Privacy policy URL
+- [ ] Terms & Conditions URL
+- [ ] Support URL
+- [ ] App keywords (iOS)
+- [ ] App category
+
+### Beta Testing
+- [ ] TestFlight setup (iOS)
+- [ ] Firebase App Distribution / Google Play Internal Testing (Android)
+- [ ] Beta testers invited
+- [ ] Feedback collection mechanism
+- [ ] Bug tracking system
+
+---
+
+## 📝 MOCK DATA STRUCTURE EXAMPLES
+
+### Customer Mock Data
+```typescript
+interface Customer {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  profilePicture?: string;
+  kycStatus: 'pending' | 'verified' | 'rejected';
+  accountStatus: 'active' | 'suspended';
+  registrationDate: string;
+  lastLogin: string;
+}
+```
+
+### Property Mock Data
+```typescript
+interface Property {
+  id: string;
+  name: string;
+  location: string;
+  projectName: string;
+  size: string;
+  purchasePrice: number;
+  purchaseDate: string;
+  ownershipStatus: 'full' | 'partial' | 'pending';
+  images: string[];
+  documents: Document[];
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
+}
+```
+
+### Wallet Mock Data
+```typescript
+interface WalletTransaction {
+  id: string;
+  type: 'credit' | 'debit';
+  amount: number;
+  description: string;
+  date: string;
+  status: 'completed' | 'pending' | 'failed';
+  transactionId: string;
+  source: 'commission' | 'reward' | 'payment' | 'withdrawal';
+  balanceAfter: number;
+}
+
+interface Wallet {
+  balance: number;
+  pendingBalance: number;
+  transactions: WalletTransaction[];
+}
+```
+
+### Referral Mock Data
+```typescript
+interface Referral {
+  id: string;
+  referrerId: string;
+  referrerName: string;
+  refereeName: string;
+  refereePhone: string;
+  refereeEmail?: string;
+  referralDate: string;
+  status: 'submitted' | 'contacted' | 'site_visit' | 'negotiation' | 'closed' | 'rejected';
+  commissionAmount: number;
+  commissionStatus: 'pending' | 'approved' | 'paid';
+  projectName: string;
+  notes?: string;
+  statusHistory: StatusUpdate[];
+}
+
+interface StatusUpdate {
+  status: string;
+  date: string;
+  notes?: string;
+}
+```
+
+### Loyalty Mock Data
+```typescript
+interface LoyaltyProfile {
+  currentTier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  pointsBalance: number;
+  pointsToNextTier: number;
+  totalPointsEarned: number;
+  totalPointsRedeemed: number;
+}
+
+interface PointsTransaction {
+  id: string;
+  type: 'earned' | 'redeemed' | 'expired';
+  points: number;
+  description: string;
+  date: string;
+  source: 'purchase' | 'referral' | 'engagement' | 'campaign';
+  balanceAfter: number;
+}
+
+interface Reward {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  pointsRequired: number;
+  tierRequired?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  category: 'cashback' | 'discount' | 'gift' | 'service';
+  availability: 'available' | 'out_of_stock';
+  termsAndConditions: string;
+}
+
+interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  unlockedDate?: string;
+  progress?: number;
+}
+```
+
+---
+
+## 🎯 SUCCESS CRITERIA
+
+### Definition of Done (DoD)
+A feature is considered complete when:
+1. All screens/components are implemented
+2. Forms have complete validation
+3. Error handling is implemented
+4. Loading states are implemented
+5. Empty states are implemented
+6. Mock data is in place
+7. Navigation flows work correctly
+8. Component tests are written (if applicable)
+9. Code is reviewed and merged
+10. Documentation is updated
+
+### Quality Standards
+- **Code Quality**: ESLint/Prettier configured and passing
+- **Type Safety**: No TypeScript errors
+- **Performance**: No janky animations, smooth scrolling (60fps)
+- **Accessibility**: Meets basic accessibility standards
+- **Consistency**: Follows design system and coding standards
+- **Maintainability**: Well-structured, readable code with comments
+
+---
+
+## 🔄 DEVELOPMENT WORKFLOW
+
+### Git Workflow
+1. **Feature Branches**: `feature/auth-login`, `feature/referral-dashboard`
+2. **Commit Convention**: Conventional Commits (feat, fix, docs, style, refactor, test)
+3. **Code Review**: All PRs require at least one approval
+4. **Testing**: All tests must pass before merge
+5. **Main Branch**: Always deployable
+
+### Daily Workflow
+1. Pull latest changes
+2. Create feature branch
+3. Develop and test locally
+4. Run linter and tests
+5. Commit with descriptive message
+6. Push and create PR
+7. Address review comments
+8. Merge after approval
+
+---
+
+## 📞 SUPPORT & MAINTENANCE PLAN
+
+### Post-Development
+- Bug fixing and hot fixes
+- Feature enhancements
+- UI/UX improvements based on user feedback
+- Performance optimization
+- Security updates
+- Dependency updates
+- OS version compatibility
+- New device support
+
+---
+
+## END OF MOBILE APP PLAN
+
+This comprehensive plan ensures the mobile app is fully developed and ready for API integration. The phased approach allows for structured development, regular testing, and quality assurance throughout the process.
+
+**Next Steps:**
+1. Review and approve this plan
+2. Setup development environment
+3. Begin Phase 1: Foundation & Infrastructure
+4. Schedule regular progress reviews (weekly standups)
+5. Plan API integration kickoff after Phase 6 completion
+
+**Questions or modifications needed? Adjust timelines, priorities, or scope based on your team's capacity and business priorities.**

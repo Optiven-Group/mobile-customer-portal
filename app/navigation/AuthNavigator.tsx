@@ -5,6 +5,10 @@ import VerifyOTPScreen from "../screens/auth/VerifyOTPScreen";
 import CreatePasswordScreen from "../screens/auth/CreatePasswordScreen";
 import LoginScreen from "../screens/auth/LoginScreen";
 import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
+import SplashScreen from "../screens/auth/SplashScreen";
+import OnboardingScreen from "../screens/auth/OnboardingScreen";
+import KYCVerificationScreen from "../screens/auth/KYCVerificationScreen";
+import RegisterScreen from "../screens/auth/RegisterScreen";
 import { AuthStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
@@ -12,12 +16,22 @@ const Stack = createNativeStackNavigator<AuthStackParamList>();
 const AuthNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Login"
+      initialRouteName="Splash"
       screenOptions={{
         headerShadowVisible: false,
         headerTitleAlign: "center",
       }}
     >
+      <Stack.Screen
+        name="Splash"
+        component={SplashScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="Login"
         component={LoginScreen}
@@ -42,6 +56,16 @@ const AuthNavigator = () => {
         name="ForgotPassword"
         component={ForgotPasswordScreen}
         options={{ title: "Forgot Password", headerShown: false }}
+      />
+      <Stack.Screen
+        name="KYCVerification"
+        component={KYCVerificationScreen}
+        options={{ title: "KYC Verification", headerShown: false }}
+      />
+      <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+        options={{ title: "Register", headerShown: false }}
       />
     </Stack.Navigator>
   );

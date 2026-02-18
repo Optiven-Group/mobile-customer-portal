@@ -4,7 +4,8 @@ import DealsScreen from "../screens/account/DealsScreen";
 import { AccountStackParamList } from "./types";
 import LoyaltyInfoScreen from "../screens/account/LoyaltyInfoScreen";
 import PersonalDetailsScreen from "../screens/PersonalDetailsScreen";
-import EditDetailsScreen from "../screens/EditDetailsScreen";
+import EditDetailsScreen from "../screens/account/EditDetailsScreen";
+import ChangePasswordScreen from "../screens/account/ChangePasswordScreen";
 
 const Stack = createNativeStackNavigator<AccountStackParamList>();
 
@@ -19,7 +20,7 @@ const AccountNavigator = () => {
       <Stack.Screen
         name="Account"
         component={AccountScreen}
-        options={{ title: "My Account" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Deals"
@@ -40,6 +41,11 @@ const AccountNavigator = () => {
         name="EditDetails"
         component={EditDetailsScreen}
         options={{ title: "Edit Details" }}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{ title: "Change Password" }}
       />
     </Stack.Navigator>
   );

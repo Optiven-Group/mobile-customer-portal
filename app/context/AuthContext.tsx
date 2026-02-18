@@ -28,6 +28,7 @@ interface AuthContextType {
   user: User | null;
   login: (accessToken: string, userData: User) => Promise<void>;
   logout: () => Promise<void>;
+  loginAsGuest: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,10 +43,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     const checkAuthStatus = async () => {
       const storedAccessToken = await AsyncStorage.getItem("accessToken");
       const userDataString = await AsyncStorage.getItem("userData");
+      const isGuest = await AsyncStorage.getItem("isGuest");
 
       if (storedAccessToken && userDataString) {
         const userData: User = JSON.parse(userDataString);
         setUser(userData);
+        setIsLoggedIn(true);
+      } else if (isGuest === "true") {
+        setUser(null);
         setIsLoggedIn(true);
       } else {
         setUser(null);
@@ -56,6 +61,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   const login = async (accessToken: string, userData: User) => {
+    await AsyncStorage.removeItem("isGuest");
     await AsyncStorage.setItem("accessToken", accessToken);
     await AsyncStorage.setItem("userData", JSON.stringify(userData));
     setUser(userData);
@@ -74,12 +80,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const logout = async () => {
     // Just do local cleanup
     await logoutUtil();
+    await AsyncStorage.removeItem("isGuest");
     setUser(null);
     setIsLoggedIn(false);
   };
 
+  const loginAsGuest = async () => {
+    await AsyncStorage.setItem("isGuest", "true");
+    setUser(null);
+    setIsLoggedIn(true);
+  };
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, loginAsGuest }}>
       {children}
     </AuthContext.Provider>
   );

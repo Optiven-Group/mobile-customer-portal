@@ -11,7 +11,7 @@ interface ScreenProps {
 const Screen: React.FC<ScreenProps> = ({ children, style }) => {
   return (
     <SafeAreaView style={[styles.screen, style]}>
-      <Box>{children}</Box>
+      <Box flex={1}>{children}</Box>
     </SafeAreaView>
   );
 };

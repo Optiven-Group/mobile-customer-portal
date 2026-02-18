@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+// Re-saving to force bundler update
 import { config } from "@gluestack-ui/config";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import {
@@ -109,9 +110,7 @@ const NotificationHandler = () => {
 
     return () => {
       if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(
-          notificationListener.current
-        );
+        notificationListener.current.remove();
         notificationListener.current = null;
       }
     };
