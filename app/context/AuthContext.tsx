@@ -13,6 +13,8 @@ import { Alert } from "react-native";
 import { LeadFile } from "../navigation/types";
 import { logout as logoutUtil } from "../utils/authUtils";
 
+const isExpoGo = Constants.appOwnership === "expo";
+
 interface User {
   id: number;
   email: string;
@@ -92,6 +94,10 @@ export const useAuth = (): AuthContextType => {
 };
 
 async function registerForPushNotificationsAsync() {
+  if (isExpoGo) {
+    console.log("Push notifications not supported in Expo Go");
+    return undefined;
+  }
   let token;
   if (Constants.isDevice) {
     const { status: existingStatus } =

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "OptivenCustomerPortal",
+    "name": "OIS",
     "slug": "expo-app",
     "version": "1.4.0",
     "orientation": "portrait",
@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "scheme": "optivencustomerportal",
     "ios": {
       "supportsTablet": true,
@@ -34,7 +36,9 @@
       "eas": {
         "projectId": "5aae01d1-4f72-4b8f-b77a-81e94487d171"
       }
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
-

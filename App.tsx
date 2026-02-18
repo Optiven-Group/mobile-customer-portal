@@ -11,6 +11,9 @@ import { AuthProvider, useAuth } from "./app/context/AuthContext";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
+const isExpoGo = Constants.appOwnership === "expo";
 import {
   NotificationProvider,
   useNotifications,
@@ -19,13 +22,15 @@ import { MembershipProvider } from "./app/context/MembershipContext";
 import api from "./app/utils/api";
 import { AppNotification } from "./app/navigation/types";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+if (!isExpoGo) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+}
 
 export const navigationRef = createNavigationContainerRef();
 
@@ -34,12 +39,14 @@ export default function App() {
     <AuthProvider>
       <MembershipProvider>
         <NotificationProvider>
-          <GluestackUIProvider config={config}>
-            <NavigationContainer ref={navigationRef}>
-              <MainNavigator />
-            </NavigationContainer>
-            <AuthConsumer />
-          </GluestackUIProvider>
+          <SafeAreaProvider>
+            <GluestackUIProvider config={config}>
+              <NavigationContainer ref={navigationRef}>
+                <MainNavigator />
+              </NavigationContainer>
+              <AuthConsumer />
+            </GluestackUIProvider>
+          </SafeAreaProvider>
         </NotificationProvider>
       </MembershipProvider>
     </AuthProvider>
@@ -63,7 +70,7 @@ const NotificationHandler = () => {
 
   useEffect(() => {
     // Only proceed if user is logged in
-    if (!user) return;
+    if (!user || isExpoGo) return;
 
     // Register for push notifications
     registerForPushNotificationsAsync().then(async (expoPushToken) => {
@@ -114,6 +121,11 @@ const NotificationHandler = () => {
 };
 
 async function registerForPushNotificationsAsync() {
+  if (isExpoGo) {
+    console.log("Push notifications not supported in Expo Go");
+    return undefined;
+  }
+
   let expoPushToken: string | undefined;
 
   try {

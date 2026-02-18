@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
-import { StyleSheet, SafeAreaView, ViewStyle } from "react-native";
+import { StyleSheet, ViewStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Box } from "@gluestack-ui/themed";
 
 interface ScreenProps {

@@ -1,0 +1,30 @@
+﻿Running 17 checks on your project...
+15/17 checks passed. 2 checks failed. Possible issues detected:
+Use the --verbose flag to see more details about passed checks.
+
+Γ£û Validate packages against React Native Directory package metadata
+The following issues were found when validating your dependencies against React Native Directory:
+  Unmaintained: @react-native-community/progress-bar-android
+  No metadata available: @react-native-firebase/dynamic-links
+Advice:
+Use libraries that are actively maintained and support the New Architecture. Find alternative libraries with https://reactnative.directory.
+Add packages to expo.doctor.reactNativeDirectoryCheck.exclude in package.json to selectively skip validations, if the warning is not relevant.
+Update React Native Directory to include metadata for unknown packages. Alternatively, set expo.doctor.reactNativeDirectoryCheck.listUnknownPackages in package.json to false to skip warnings about packages with no metadata, if the warning is not relevant.
+
+Γ£û Check that packages match versions required by installed Expo SDK
+
+Γ¥ù Major version mismatches
+package       expected  found    
+@types/react  ~19.1.10  18.3.12  
+
+ΓÜá∩╕Å Minor version mismatches
+package       expected  found    
+typescript    ~5.9.2    5.3.3    
+
+
+
+2 packages out of date.
+Advice:
+Use 'npx expo install --check' to review and upgrade your dependencies.
+To ignore specific packages, add them to "expo.install.exclude" in package.json. Learn more: https://expo.fyi/dependency-validation
+
