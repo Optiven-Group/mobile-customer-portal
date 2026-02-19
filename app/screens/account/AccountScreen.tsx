@@ -61,7 +61,7 @@ const AccountScreen: React.FC<AccountScreenProps> = ({ navigation }) => {
     Gold: { color: "#FFD700", icon: "star-circle", gradient: ["#B8860B", "#FFD700"] },
     Silver: { color: "#C0C0C0", icon: "medal", gradient: ["#808080", "#C0C0C0"] },
     Bronze: { color: "#CD7F32", icon: "shield-star", gradient: ["#8B4513", "#CD7F32"] },
-    Sapphire: { color: "#0F52BA", icon: "gem", gradient: ["#0A3480", "#0F52BA"] },
+    Sapphire: { color: "#0F52BA", icon: "diamond-outline", gradient: ["#0A3480", "#0F52BA"] },
   };
 
   useEffect(() => {

@@ -12,7 +12,7 @@ const TIERS = [
   {
     name: "Sapphire",
     color: "#0F52BA",
-    icon: "gem",
+    icon: "diamond-outline",
     threshold: "Starting Tier",
     discount: "Welcome benefits",
     description: "Welcome aboard! You're on your way to unlocking amazing benefits.",
@@ -91,7 +91,7 @@ const LoyaltyInfoScreen: React.FC = () => {
           <HStack alignItems="center" space="sm">
             <View style={[styles.currentTierIcon, { backgroundColor: (TIERS.find(t => t.name === membershipTier)?.color || "#0F52BA") + "20" }]}>
               <MaterialCommunityIcons
-                name={(TIERS.find(t => t.name === membershipTier)?.icon || "gem") as any}
+                name={(TIERS.find(t => t.name === membershipTier)?.icon || "diamond-outline") as any}
                 size={22}
                 color={TIERS.find(t => t.name === membershipTier)?.color || "#0F52BA"}
               />
