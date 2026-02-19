@@ -22,9 +22,9 @@ const PersonalDetailsScreen: React.FC<PersonalDetailsScreenProps> = ({ navigatio
   const { user } = useAuth();
 
   const details = {
-    name: user?.name || "FRED MAKOKHA",
-    email: user?.email || "wachiye25@gmail.com",
-    phone: "254794711006",
+    name: user?.name || "James Kabui",
+    email: user?.email || "programmer@optiven.co.ke",
+    phone: "254748199582",
     customerNumber: user?.customerNumber || "OPT-2024-0001",
     joined: "Oct 2023",
   };
