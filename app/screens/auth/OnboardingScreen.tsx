@@ -1,142 +1,61 @@
-import React, { useState, useRef } from "react";
-import {
-  StyleSheet,
-  FlatList,
-  Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  View,
-  TouchableOpacity,
-} from "react-native";
-import {
-  Box,
-  Center,
-  Image,
-  Text,
-  VStack,
-  HStack,
-} from "@gluestack-ui/themed";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Screen from "../../app-components/Screen";
+import React from "react";
+import { StyleSheet, Dimensions, View, TouchableOpacity, ImageBackground, Image } from "react-native";
+import { Box, Text, VStack, HStack } from "@gluestack-ui/themed";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../navigation/types";
-
-const { width, height } = Dimensions.get("window");
+import { LinearGradient } from "expo-linear-gradient";
+import Screen from "../../app-components/Screen";
 
 type OnboardingScreenProps = NativeStackScreenProps<AuthStackParamList, "Onboarding">;
 
-const slides = [
-  {
-    id: "1",
-    title: "Welcome to Optiven",
-    description: "Experience the joy of home ownership with our visible transformation.",
-    icon: "home-city" as const,
-    color: "#388E3C",
-  },
-  {
-    id: "2",
-    title: "Manage Your Properties",
-    description: "Track your payments, view statements, and manage your property portfolio with ease.",
-    icon: "chart-line" as const,
-    color: "#1B5E20",
-  },
-  {
-    id: "3",
-    title: "Seamless Communication",
-    description: "Get real-time updates and meaningful engagement with us.",
-    icon: "message-text-outline" as const,
-    color: "#4CAF50",
-  },
-];
+const { width } = Dimensions.get("window");
 
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
-
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const slideSize = event.nativeEvent.layoutMeasurement.width;
-    const index = event.nativeEvent.contentOffset.x / slideSize;
-    setCurrentIndex(Math.round(index));
-  };
-
-  const handleNext = () => {
-    if (currentIndex < slides.length - 1) {
-      flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
-    } else {
-      navigation.replace("Login");
-    }
-  };
-
-  const handleSkip = () => {
-    navigation.replace("Login");
-  };
-
-  const renderItem = ({ item }: { item: typeof slides[0] }) => (
-    <Box width={width} alignItems="center" px="$8" justifyContent="center" style={{ paddingTop: height * 0.12 }}>
-      {/* Icon Circle */}
-      <Box style={[styles.iconCircle, { backgroundColor: item.color + "15" }]}>
-        <MaterialCommunityIcons name={item.icon} size={60} color={item.color} />
-      </Box>
-
-      {/* Logo */}
-      <Image
-        alt="Optiven"
-        source={require("../../../assets/logo.png")}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-
-      <VStack space="md" mt="$8" alignItems="center">
-        <Text style={styles.slideTitle}>{item.title}</Text>
-        <Text style={styles.slideDescription}>{item.description}</Text>
-      </VStack>
-    </Box>
-  );
-
   return (
     <Screen style={styles.container}>
-      <View style={[styles.circle, styles.circle1]} />
-      <View style={[styles.circle, styles.circle2]} />
+      {/* Main Image Overlay Screen */}
+      <Box flex={1} bg="#1A1B22">
+        <ImageBackground
+          source={{ uri: "https://www.optiven.co.ke/wp-content/uploads/2026/02/ocean-view-ridge-gate.jpeg" }}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        >
+          {/* Top Logo */}
+          <Box position="absolute" top={40} alignSelf="center" zIndex={10}>
+             <Image 
+               source={require("../../../assets/logo.png")} 
+               style={{ width: 140, height: 45, tintColor: "#FFFFFF" }}
+               resizeMode="contain"
+               alt="Optiven Logo"
+             />
+          </Box>
 
-      <FlatList
-        ref={flatListRef}
-        data={slides}
-        renderItem={renderItem}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
-        keyExtractor={(item) => item.id}
-      />
-
-      <Box position="absolute" bottom="$10" width="100%" px="$8">
-        {/* Dots */}
-        <HStack justifyContent="center" space="xs" mb="$8">
-          {slides.map((_, index) => (
-            <Box
-              key={index}
-              width={index === currentIndex ? 28 : 8}
-              height={8}
-              borderRadius="$full"
-              bg={index === currentIndex ? "#388E3C" : "#C8E6C9"}
-            />
-          ))}
-        </HStack>
-
-        {/* Buttons */}
-        <VStack space="md">
-          <TouchableOpacity style={styles.nextButton} onPress={handleNext} activeOpacity={0.85}>
-            <Text style={styles.nextButtonText}>
-              {currentIndex === slides.length - 1 ? "Get Started" : "Next"}
-            </Text>
-          </TouchableOpacity>
-
-          {currentIndex < slides.length - 1 && (
-            <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-              <Text style={styles.skipButtonText}>Skip</Text>
-            </TouchableOpacity>
-          )}
-        </VStack>
+          {/* Strong Gradient Overlay for crisp Text Readability */}
+          <LinearGradient
+            colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.75)", "#052e16"]}
+            style={styles.gradient}
+          />
+          
+          {/* Bottom Content Area */}
+          <Box position="absolute" bottom={0} left={0} right={0} px="$6" pb="$12">
+            <VStack space="xl">
+              <VStack space="sm">
+                <Text color="#FFFFFF" style={styles.welcomeText}>Welcome!</Text>
+                <Text color="#E5E7EB" style={styles.descriptionText}>
+                  Experience the joy of home ownership, easily accessible with a few simple taps.
+                </Text>
+              </VStack>
+              
+              <TouchableOpacity
+                style={styles.startButton}
+                activeOpacity={0.85}
+                onPress={() => navigation.replace("Login")}
+              >
+                <Text style={styles.startButtonText}>Let's Start!</Text>
+              </TouchableOpacity>
+            </VStack>
+          </Box>
+        </ImageBackground>
       </Box>
     </Screen>
   );
@@ -147,77 +66,40 @@ export default OnboardingScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5FBF6",
+    backgroundColor: "#111111", // Dark background for the whole screen
   },
-  circle: {
-    position: "absolute",
-    borderRadius: 999,
-    opacity: 0.06,
+  backgroundImage: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
   },
-  circle1: {
-    width: width * 1.0,
-    height: width * 1.0,
-    backgroundColor: "#4CAF50",
-    top: -width * 0.5,
-    right: -width * 0.3,
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
+    top: "10%", // Allow gradient to gradually take over more of the screen to smoothly anchor text
   },
-  circle2: {
-    width: width * 0.6,
-    height: width * 0.6,
-    backgroundColor: "#81C784",
-    bottom: -width * 0.15,
-    left: -width * 0.2,
+  welcomeText: {
+    fontSize: 42,
+    fontWeight: "bold",
+    letterSpacing: -1,
   },
-  iconCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 24,
-  },
-  logo: {
-    width: 80,
-    height: 80,
-  },
-  slideTitle: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#1B5E20",
-    textAlign: "center",
-    letterSpacing: -0.5,
-  },
-  slideDescription: {
-    fontSize: 15,
-    color: "#66BB6A",
-    textAlign: "center",
-    lineHeight: 22,
-    paddingHorizontal: 16,
-  },
-  nextButton: {
-    backgroundColor: "#388E3C",
-    borderRadius: 14,
-    paddingVertical: 16,
-    alignItems: "center",
-    shadowColor: "#388E3C",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  nextButtonText: {
-    color: "#FFFFFF",
+  descriptionText: {
     fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 0.5,
+    lineHeight: 24,
+    marginBottom: 24,
+    opacity: 0.9,
+    paddingRight: 30, // Keep text from hitting the very edge like the design
   },
-  skipButton: {
-    paddingVertical: 12,
+  startButton: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 30,
+    paddingVertical: 18,
+    paddingHorizontal: 32,
     alignItems: "center",
+    alignSelf: "flex-start",
   },
-  skipButtonText: {
-    color: "#9CA3AF",
-    fontSize: 14,
-    fontWeight: "600",
+  startButtonText: {
+    color: "#111111",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
