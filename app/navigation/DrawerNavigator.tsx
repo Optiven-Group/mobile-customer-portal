@@ -32,6 +32,7 @@ import PaymentsOverviewScreen from "../screens/wallet/PaymentsOverviewScreen";
 import NewsFeedScreen from "../screens/news/NewsFeedScreen";
 import SupportScreen from "../screens/support/SupportScreen";
 import LoyaltyNavigator from "./LoyaltyNavigator";
+import NotificationsScreen from "../screens/NotificationsScreen";
 import AllPropertiesScreen from "../screens/properties/AllPropertiesScreen";
 import ProjectDetailScreen from "../screens/properties/ProjectDetailScreen";
 
@@ -96,7 +97,7 @@ const CustomDrawerContent = (props: any) => {
     );
   };
 
-  const TAB_NAMES = ["Overview", "Refer & Earn", "Notifications", "Profile"];
+  const TAB_NAMES = ["Overview", "My Properties", "Refer & Earn", "Profile"];
 
   const navigateToTab = (tabName: string) => {
     const tabIndex = TAB_NAMES.indexOf(tabName);
@@ -231,18 +232,12 @@ const CustomDrawerContent = (props: any) => {
           >
             <VStack flex={1}>
               <Text bold size="md" color="$white">
-                Become an Affiliate
+                Join Refer and Earn Program
               </Text>
               <Text size="xs" color="$white" opacity={0.85}>
                 Earn money referring Optiven properties
               </Text>
             </VStack>
-            <TouchableOpacity
-              onPress={() => setShowAffiliate(false)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <MaterialCommunityIcons name="close" size={18} color="rgba(255,255,255,0.7)" />
-            </TouchableOpacity>
           </TouchableOpacity>
           {/* Optiven accent bar */}
           <View style={styles.affiliateAccent} />
@@ -257,14 +252,22 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
-      screenOptions={{
+      screenOptions={({ navigation }) => ({
         headerShown: false,
         drawerActiveTintColor: colors.primary,
         drawerInactiveTintColor: colors.dark,
         drawerStyle: {
           width: "78%",
         },
-      }}
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Notifications")}
+            style={{ marginRight: 15 }}
+          >
+            <MaterialCommunityIcons name="bell-outline" size={24} color="#1F2937" />
+          </TouchableOpacity>
+        ),
+      })}
     >
       <Drawer.Screen
         name="MainTabs"
@@ -276,8 +279,7 @@ const DrawerNavigator = () => {
         component={PropertyNavigator}
         options={{
           title: "My Properties",
-          headerShown: true,
-          headerTitle: "My Properties",
+          headerShown: false,
         }}
       />
       <Drawer.Screen
@@ -337,6 +339,16 @@ const DrawerNavigator = () => {
           title: "Project Details",
           headerShown: true,
           headerTitle: "Project Details",
+          drawerItemStyle: { display: "none" },
+        }}
+      />
+      <Drawer.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{
+          title: "Notifications",
+          headerShown: true,
+          headerTitle: "Notifications",
           drawerItemStyle: { display: "none" },
         }}
       />

@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, View, Platform } from "react-native";
 import OverviewNavigator from "./OverviewNavigator";
 import AccountNavigator from "./AccountNavigator";
-import NotificationsScreen from "../screens/NotificationsScreen";
+import PropertyNavigator from "./PropertyNavigator";
 import ReferralNavigator from "./ReferralNavigator";
 import colors from "../utils/colors";
 
@@ -80,13 +80,13 @@ const AppNavigator = () => {
         }}
       />
 
-      {/* Notifications Tab */}
+      {/* My Properties Tab */}
       <Tab.Screen
-        name="Notifications"
-        component={NotificationsScreen}
+        name="My Properties"
+        component={PropertyNavigator}
         options={{
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="bell" color={color} size={22} />
+            <MaterialCommunityIcons name="home-city" color={color} size={22} />
           ),
         }}
       />

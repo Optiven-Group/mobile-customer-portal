@@ -1,5 +1,8 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { TouchableOpacity } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import colors from "../utils/colors";
 import { PropertyStackParamList } from "./types";
 import PropertiesListScreen from "../screens/properties/PropertiesListScreen";
 import PropertyDetailScreen from "../screens/properties/PropertyDetailScreen";
@@ -10,15 +13,32 @@ const Stack = createNativeStackNavigator<PropertyStackParamList>();
 const PropertyNavigator = () => {
   return (
     <Stack.Navigator
-      screenOptions={{
+      screenOptions={({ navigation }) => ({
         headerShadowVisible: false,
         headerTitleAlign: "center",
-      }}
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => (navigation as any).navigate("Notifications")}
+            style={{ marginRight: 15 }}
+          >
+            <MaterialCommunityIcons name="bell-outline" size={24} color={colors.primary} />
+          </TouchableOpacity>
+        ),
+      })}
     >
       <Stack.Screen
         name="PropertiesList"
         component={PropertiesListScreen}
-        options={{ title: "My Properties" }}
+        options={({ navigation }) => ({ 
+          title: "My Properties",
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => (navigation as any).openDrawer()}
+            >
+              <MaterialCommunityIcons name="menu" size={28} color={colors.primary} />
+            </TouchableOpacity>
+          ),
+        })}
       />
       <Stack.Screen
         name="PropertyDetail"

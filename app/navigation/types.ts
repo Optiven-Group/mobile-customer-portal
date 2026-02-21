@@ -74,6 +74,7 @@ export type DrawerStackParamList = {
   LoyaltyNav: undefined;
   AllProperties: undefined;
   ProjectDetail: { project: any };
+  Notifications: undefined;
 };
 
 // Overview Stack Param List

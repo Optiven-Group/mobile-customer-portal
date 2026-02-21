@@ -93,7 +93,7 @@ const HomeScreen = () => {
           onPress={() => (navigation as any).openDrawer()}
           style={{ marginLeft: 10 }}
         >
-          <MaterialCommunityIcons name="menu" size={28} color="black" />
+          <MaterialCommunityIcons name="menu" size={28} color={colors.primary} />
         </TouchableOpacity>
       ),
     });
@@ -139,12 +139,15 @@ const HomeScreen = () => {
     fetchData();
   };
 
-  const ActionButton = ({ title, icon, color, onPress }: any) => (
+  const ActionButton = ({ title, icon, color, onPress, isNew = false }: any) => (
     <TouchableOpacity onPress={onPress} style={styles.actionBtn}>
-      <Box bg={color + "18"} p="$3" borderRadius={14} mb="$1">
-        <MaterialCommunityIcons name={icon} size={22} color={color} />
+      <Box bg="#2C2D35" p="$3" borderRadius={14} mb="$1" position="relative">
+        <MaterialCommunityIcons name={icon} size={24} color={color} />
+        {isNew && (
+          <Box position="absolute" top={-4} right={-4} bg={colors.danger} w={10} h={10} borderRadius={5} />
+        )}
       </Box>
-      <Text size="2xs" textAlign="center" bold color="$coolGray700">{title}</Text>
+      <Text size="2xs" textAlign="center" bold color="#E5E7EB">{title}</Text>
     </TouchableOpacity>
   );
 
@@ -180,100 +183,164 @@ const HomeScreen = () => {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Welcome Section */}
-        <Box px="$5" pt="$4" pb="$8" bg={colors.primary}>
-          <Text color="$white" opacity={0.7} size="xs">
+        <Box px="$5" pt="$6" pb="$6" bg={colors.primary}>
+          <Text color="#E5E7EB" size="xs">
             {getDateString()}
           </Text>
-          <Animated.View style={{ opacity: fadeAnim }}>
-            <HStack alignItems="center" space="xs" mt="$0.5">
-              <Text style={{ fontSize: 16 }}>{LANGUAGES[langIndex].flag}</Text>
-              <Text color="$white" opacity={0.85} size="md">
-                {getGreeting()},
-              </Text>
+          <HStack alignItems="center" justifyContent="space-between" mt="$1">
+            <Animated.View style={{ opacity: fadeAnim }}>
+              <HStack alignItems="center" space="xs">
+                <Text style={{ fontSize: 16 }}>{LANGUAGES[langIndex].flag}</Text>
+                <Text color="#E5E7EB" size="md">
+                  {getGreeting()},
+                </Text>
+              </HStack>
+            </Animated.View>
+            <HStack space="md">
+              
+              <TouchableOpacity onPress={() => (navigation as any).navigate("Profile")}>
+                <Box bg="#2C2D35" p="$2" borderRadius="$full">
+                  <MaterialCommunityIcons name="account-outline" size={20} color="#4CAF50" />
+                </Box>
+              </TouchableOpacity>
             </HStack>
-          </Animated.View>
-          <Heading size="xl" color="$white" mt="$0.5" style={{ letterSpacing: -0.3 }}>
+          </HStack>
+          <Heading size="xl" color="#FFFFFF" mt="$1" style={{ letterSpacing: -0.3 }}>
             {user?.name?.split(" ")[0] || "User"} 👋
           </Heading>
         </Box>
 
-        {/* Summary Stats Pills */}
-        <Box px="$4" mt={-24}>
-          <Card variant="elevated" p="$0" borderRadius={16} overflow="hidden">
-            <HStack>
-              {/* Properties Pill */}
-              <TouchableOpacity style={[styles.statPill, { backgroundColor: colors.secondary }]} onPress={() => (navigation as any).navigate("PropertyNav")}>
-                <MaterialCommunityIcons name="home-city" size={20} color="white" />
-                <Text bold color="$white" size="lg" mt="$0.5">{summary?.totalProperties || 0}</Text>
-                <Text color="$white" size="2xs" opacity={0.85}>Properties</Text>
-              </TouchableOpacity>
+        {/* Summary Stats Cards - Swipeable */}
+        <Box mt="$4">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
+            {/* Properties Card */}
+            <TouchableOpacity style={[styles.darkCard, { width: width * 0.42, marginRight: 16 }]} onPress={() => (navigation as any).navigate("PropertyNav")}>
+              <Text color="#4CAF50" size="xs" bold mb="$1">My Properties</Text>
+              <HStack alignItems="baseline" space="xs" mb="$3">
+                <Text color="#FFFFFF" size="2xl" bold>{summary?.totalProperties || 0}</Text>
+                <MaterialCommunityIcons name="home-city-outline" size={16} color="#9CA3AF" />
+              </HStack>
+              <Box borderWidth={1} borderColor="#374151" borderRadius={8} py="$1.5" px="$3" alignItems="center">
+                <Text color="#4CAF50" size="xs">View All</Text>
+              </Box>
+            </TouchableOpacity>
 
-              {/* Pending Pill */}
-              <TouchableOpacity style={[styles.statPill, { backgroundColor: colors.danger }]} onPress={() => (navigation as any).navigate("Payments")}>
-                <MaterialCommunityIcons name="clock-alert-outline" size={20} color="white" />
-                <Text bold color="$white" size="lg" mt="$0.5">{summary?.paymentsDue || 0}</Text>
-                <Text color="$white" size="2xs" opacity={0.85}>Pending</Text>
-              </TouchableOpacity>
+            {/* Wallet Balance Card */}
+            <TouchableOpacity style={[styles.darkCard, { width: width * 0.42, borderLeftWidth: 2, borderLeftColor: "#3B82F6", marginRight: 16 }]} onPress={() => (navigation as any).navigate("Wallet")}>
+              <HStack justifyContent="space-between" alignItems="center" mb="$1">
+                <Text color="#4CAF50" size="xs" bold>Wallet</Text>
+                {summary?.paymentsDue ? <MaterialCommunityIcons name="alert-circle" size={14} color="#F59E0B" /> : null}
+              </HStack>
+              <Text color="#FFFFFF" size="xl" bold mb="$3" numberOfLines={1}>
+                KES {((summary?.walletBalance || 0) / 1000).toFixed(0)}K
+              </Text>
+              <Box borderWidth={1} borderColor="#374151" borderRadius={8} py="$1.5" px="$3" alignItems="center">
+                <Text color="#4CAF50" size="xs">Top Up</Text>
+              </Box>
+            </TouchableOpacity>
 
-              {/* Wallet Balance Pill */}
-              <TouchableOpacity style={[styles.statPill, { backgroundColor: "#fff" }]} onPress={() => (navigation as any).navigate("Wallet")}>
-                <MaterialCommunityIcons name="wallet-outline" size={20} color={colors.primary} />
-                <Text bold color={colors.primary} size="sm" mt="$0.5" numberOfLines={1}>
-                  KES {((summary?.walletBalance || 0) / 1000).toFixed(0)}K
-                </Text>
-                <Text color={colors.secondary} size="2xs" bold>Top Up +</Text>
-              </TouchableOpacity>
-            </HStack>
-          </Card>
+            {/* Placeholder Card (Optional 3rd swipeable item) */}
+            <TouchableOpacity style={[styles.darkCard, { width: width * 0.42, borderLeftWidth: 2, borderLeftColor: "#F59E0B" }]} onPress={() => (navigation as any).navigate("MainTabs", {screen: "Refer & Earn"})}>
+              <Text color="#4CAF50" size="xs" bold mb="$1">Referrals</Text>
+              <HStack alignItems="baseline" space="xs" mb="$3">
+                <Text color="#FFFFFF" size="2xl" bold>0</Text>
+                <MaterialCommunityIcons name="account-group" size={16} color="#9CA3AF" />
+              </HStack>
+              <Box borderWidth={1} borderColor="#374151" borderRadius={8} py="$1.5" px="$3" alignItems="center">
+                <Text color="#4CAF50" size="xs">Earn More</Text>
+              </Box>
+            </TouchableOpacity>
+          </ScrollView>
         </Box>
 
         {/* Quick Actions */}
-        <Box px="$4" mt="$6">
-          <Heading size="xs" mb="$3" color={colors.secondary} textTransform="uppercase" letterSpacing="$lg">
+        <Box px="$4" mt="$6" bg="#08632eff" pt="$5" pb="$4" borderRadius={24} mx="$4">
+          <Heading size="sm" mb="$4" color="#FFFFFF" px="$2">
             Quick Actions
           </Heading>
-          <HStack justifyContent="space-between">
-            <ActionButton 
-              title="Pay Now" 
-              icon="credit-card-outline" 
-              color={colors.primary} 
-              onPress={() => navigation.navigate("Payment Schedule" as never)} 
-            />
-            <ActionButton 
-              title="Statements" 
-              icon="file-document-outline" 
-              color={colors.secondary} 
-              onPress={() => (navigation as any).navigate("View Statements" as never)} 
-            />
+          <HStack justifyContent="space-between" px="$2">
             <ActionButton 
               title="Properties" 
-              icon="home-search-outline" 
-              color={colors.primary} 
+              icon="home-city-outline" 
+              color="#4CAF50" 
               onPress={() => (navigation as any).navigate("PropertyNav")} 
+            />
+            <ActionButton 
+              title="Pay" 
+              icon="credit-card-outline" 
+              color="#F87171" 
+              onPress={() => navigation.navigate("Payment Schedule" as never)} 
             />
             <ActionButton 
               title="Refer" 
               icon="account-group-outline" 
-              color={colors.secondary} 
+              color="#4CAF50" 
+              isNew
               onPress={() => (navigation as any).navigate("MainTabs", {screen: "Refer & Earn"})} 
+            />
+            <ActionButton 
+              title="Loyalty" 
+              icon="shield-star-outline" 
+              color="#60A5FA" 
+              onPress={() => (navigation as any).navigate("LoyaltyNav")} 
             />
           </HStack>
         </Box>
 
+        {/* News and Updates Horizontal Scroll */}
+        <Box px="$0" mt="$6">
+          <HStack px="$4" justifyContent="space-between" alignItems="center" mb="$3">
+            <Heading size="xs" color={colors.secondary} textTransform="uppercase" letterSpacing="$lg">
+              News & Updates
+            </Heading>
+            <TouchableOpacity onPress={() => (navigation as any).navigate("NewsFeed")}>
+              <Text color={colors.primary} size="xs" bold>View All</Text>
+            </TouchableOpacity>
+          </HStack>
+          
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
+            {[
+              { id: 1, title: "Optiven Awards Top Performers", img: "https://optiven.co.ke/wp-content/uploads/2024/02/IMG-20240214-WA0004.jpg" },
+              { id: 2, title: "New Project Launch in Naivasha", img: "https://www.optiven.co.ke/wp-content/uploads/2023/11/Joy-Lovers-Club-Konza.jpg" },
+              { id: 3, title: "Investment Tips for 2024", img: "https://www.optiven.co.ke/wp-content/uploads/2023/01/Love-Gardens-Kajiado.jpg" }
+            ].map((news, index) => (
+              <Pressable key={news.id} onPress={() => (navigation as any).navigate("NewsFeed")} style={{ width: width * 0.7, marginRight: index === 2 ? 0 : 16 }}>
+                <Card p="$0" overflow="hidden" borderRadius={14}>
+                  <Box position="relative">
+                    <Image 
+                      source={{ uri: news.img }} 
+                      alt={news.title}
+                      w="$full"
+                      h={140}
+                      resizeMode="cover"
+                    />
+                    <Box position="absolute" top={0} bottom={0} left={0} right={0} bg="rgba(0,0,0,0.5)" p="$4" justifyContent="flex-end">
+                      <Text color="$white" size="md" bold numberOfLines={2}>{news.title}</Text>
+                      <Box bg={colors.primary} alignSelf="flex-start" py="$1" px="$3" borderRadius={6} mt="$2">
+                        <Text color="$white" size="xs" bold>Learn More</Text>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Card>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </Box>
+
         {/* Recent Activity Feed */}
-        <Box px="$4" mt="$5">
+        <Box px="$4" mt="$6">
           <HStack justifyContent="space-between" alignItems="center" mb="$3">
             <Heading size="xs" color={colors.secondary} textTransform="uppercase" letterSpacing="$lg">
               Recent Activity
             </Heading>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => (navigation as any).navigate("Notifications")}>
               <Text color={colors.primary} size="xs" bold>View All</Text>
             </TouchableOpacity>
           </HStack>
           <Card variant="elevated" p="$0" borderRadius={14} overflow="hidden">
             <Box bg="$white" px="$4">
               {activities.length > 0 ? (
-                activities.map((item) => (
+                activities.slice(0, 5).map((item) => (
                   <React.Fragment key={item.id}>
                     <ActivityItem item={item} />
                   </React.Fragment>
@@ -336,6 +403,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 14,
     paddingHorizontal: 4,
+  },
+  darkCard: {
+    backgroundColor: "#2C2D35",
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 4,
   },
   actionBtn: {
     width: (width - 48) / 4,

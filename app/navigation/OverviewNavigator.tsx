@@ -1,5 +1,8 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { TouchableOpacity } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import colors from "../utils/colors";
 import { OverviewStackParamList } from "./types";
 import HomeScreen from "../screens/HomeScreen";
 import PaymentScheduleScreen from "../screens/payment-schedule/PaymentScheduleScreen";
@@ -18,10 +21,18 @@ const OverviewNavigator: React.FC = () => {
   return (
     <Stack.Navigator
       initialRouteName="Home"
-      screenOptions={{
+      screenOptions={({ navigation }) => ({
         headerShadowVisible: false,
         headerTitleAlign: "center",
-      }}
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => (navigation as any).navigate("Notifications")}
+            style={{ marginRight: 15 }}
+          >
+            <MaterialCommunityIcons name="bell-outline" size={24} color={colors.primary} />
+          </TouchableOpacity>
+        ),
+      })}
     >
       {/* Home Screen */}
       <Stack.Screen
