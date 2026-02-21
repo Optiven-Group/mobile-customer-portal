@@ -300,11 +300,13 @@ const HomeScreen = () => {
           
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
             {[
-              { id: 1, title: "Optiven Awards Top Performers", img: "https://optiven.co.ke/wp-content/uploads/2024/02/IMG-20240214-WA0004.jpg" },
-              { id: 2, title: "New Project Launch in Naivasha", img: "https://www.optiven.co.ke/wp-content/uploads/2023/11/Joy-Lovers-Club-Konza.jpg" },
-              { id: 3, title: "Investment Tips for 2024", img: "https://www.optiven.co.ke/wp-content/uploads/2023/01/Love-Gardens-Kajiado.jpg" }
+              { id: 1, title: "Optiven Awards Top Performers Prizes", img: "https://www.optiven.co.ke/wp-content/uploads/2026/02/prizes-177x142.jpeg" },
+              { id: 2, title: "Ocean View Ridge Gate Completed", img: "https://www.optiven.co.ke/wp-content/uploads/2026/02/ocean-view-ridge-gate.jpeg" },
+              { id: 3, title: "Title Deed Status Updates", img: "https://www.optiven.co.ke/wp-content/uploads/2026/02/Title-Deed-Status-Optiven-177x142.jpeg" },
+              { id: 4, title: "Optiven Valentines Special", img: "https://www.optiven.co.ke/wp-content/uploads/2026/02/optiven-valentines-177x142.jpeg" },
+              { id: 5, title: "Peace Gardens Konza Launch", img: "https://www.optiven.co.ke/wp-content/uploads/2026/02/peace-gardens-konza-177x142.jpeg" }
             ].map((news, index) => (
-              <Pressable key={news.id} onPress={() => (navigation as any).navigate("NewsFeed")} style={{ width: width * 0.7, marginRight: index === 2 ? 0 : 16 }}>
+              <Pressable key={news.id} onPress={() => (navigation as any).navigate("NewsFeed")} style={{ width: width * 0.7, marginRight: index === 4 ? 0 : 16 }}>
                 <Card p="$0" overflow="hidden" borderRadius={14}>
                   <Box position="relative">
                     <Image 

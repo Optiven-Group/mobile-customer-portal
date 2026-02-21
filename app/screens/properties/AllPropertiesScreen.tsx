@@ -34,12 +34,12 @@ interface Project {
 }
 
 const MOCK_PROJECTS: Project[] = [
-  { project_id: 1, name: "Amani Ridge — The Place of Peace", description: "Prime plots in Kiambu County, 40 minutes from Nairobi CBD. Available in 1/8 and 1/4 acre sizes.", banner: "https://optiven.co.ke/wp-content/uploads/2023/06/Amani-Ridge.jpg", location: "Kiambu, Kenya" },
-  { project_id: 2, name: "Love Gardens — Machakos", description: "Plots in Machakos with beautiful views of the surrounding hills. Great for residential and investment.", banner: "https://www.optiven.co.ke/wp-content/uploads/2023/01/Love-Gardens-Kajiado.jpg", location: "Machakos, Kenya" },
-  { project_id: 3, name: "Success Gardens — Gatanga", description: "Affordable plots in Gatanga, Murang'a County. Ideal for farming and rural homes.", banner: "https://optiven.co.ke/wp-content/uploads/2022/10/Success-Gardens-Gatanga-Road-Phase-2.webp", location: "Gatanga, Murang'a" },
-  { project_id: 4, name: "Joy Lovers — Konza", description: "Strategic plots near the Konza Technopolis. A great investment opportunity.", banner: "https://www.optiven.co.ke/wp-content/uploads/2023/11/Joy-Lovers-Club-Konza.jpg", location: "Konza, Machakos" },
-  { project_id: 5, name: "Victory Gardens — Kitengela", description: "Fast-developing area with excellent infrastructure and proximity to Nairobi.", banner: "https://www.optiven.co.ke/wp-content/uploads/2020/01/Phase-4-1.jpg", location: "Kitengela, Kajiado" },
-  { project_id: 6, name: "Wema Gardens — Nanyuki", description: "Cool-climate plots with stunning views of Mount Kenya. Perfect for holiday homes.", banner: "https://www.optiven.co.ke/wp-content/uploads/2022/11/Wema-Gardens.webp", location: "Nanyuki, Laikipia" },
+  { project_id: 1, name: "Amani Ridge — The Place of Peace", description: "Prime plots in Kiambu County, 40 minutes from Nairobi CBD. Available in 1/8 and 1/4 acre sizes.", banner: "https://www.optiven.co.ke/wp-content/uploads/2025/08/Celebration-Gardens-2.jpeg", location: "Kiambu, Kenya" },
+  { project_id: 2, name: "Love Gardens — Machakos", description: "Plots in Machakos with beautiful views of the surrounding hills. Great for residential and investment.", banner: "https://www.optiven.co.ke/wp-content/uploads/2024/09/Vipingo-Prime.jpeg", location: "Machakos, Kenya" },
+  { project_id: 3, name: "Success Gardens — Gatanga", description: "Affordable plots in Gatanga, Murang'a County. Ideal for farming and rural homes.", banner: "https://www.optiven.co.ke/wp-content/uploads/2026/01/Ushindi-Gardens-Nakuru.jpeg", location: "Gatanga, Murang'a" },
+  { project_id: 4, name: "Joy Lovers — Konza", description: "Strategic plots near the Konza Technopolis. A great investment opportunity.", banner: "https://www.optiven.co.ke/wp-content/uploads/2025/11/Thika-Heights-Thika.jpeg", location: "Konza, Machakos" },
+  { project_id: 5, name: "Victory Gardens — Kitengela", description: "Fast-developing area with excellent infrastructure and proximity to Nairobi.", banner: "https://www.optiven.co.ke/wp-content/uploads/2025/11/Success-Gardens-Ph3.jpeg", location: "Kitengela, Kajiado" },
+  { project_id: 6, name: "Wema Gardens — Nanyuki", description: "Cool-climate plots with stunning views of Mount Kenya. Perfect for holiday homes.", banner: "https://www.optiven.co.ke/wp-content/uploads/2025/11/Malindi-Phase-8.jpeg", location: "Nanyuki, Laikipia" },
 ];
 
 const PROJECT_COLORS = ["#388E3C", "#1B5E20", "#2E7D32", "#4CAF50", "#0D47A1", "#5A0000"];
